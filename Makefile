@@ -1,5 +1,5 @@
-FILES = ${shell ls *.tex}
-DIAGRAMS = ${shell ls *.dia}
+FILES = ${shell ls *.tex 2> /dev/null}
+DIAGRAMS = ${shell ls *.dia 2> /dev/null}
 TEMPLATE = default
 OUTPUT = ${TEMPLATE}.pdf
 LATEX = pdflatex
@@ -22,7 +22,7 @@ images:		.make.images
 	dia -t ${IMAGE_TYPE} ${DIAGRAMS}
 	touch .make.images
 
-${OUTPUT}: $(FILES) images
+${OUTPUT}: $(FILES) .make.images
 	$(LATEX) latex/${TEMPLATE}
 	$(LATEX) latex/${TEMPLATE}
     ifneq  (${TEMPLATE}.pdf, ${OUTPUT})
