@@ -19,7 +19,9 @@ view:		${OUTPUT}
 
 images:		.make.images
 .make.images:	${DIAGRAMS}
-	dia -t ${IMAGE_TYPE} ${DIAGRAMS}
+    ifneq  (${DIAGRAMS}, "")
+		dia -t ${IMAGE_TYPE} ${DIAGRAMS}
+    endif
 	touch .make.images
 
 ${OUTPUT}: $(FILES) .make.images
