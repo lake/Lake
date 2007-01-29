@@ -19,7 +19,7 @@ view:		${OUTPUT}
 
 images:		.make.images
 .make.images:	${DIAGRAMS}
-    ifneq  (${DIAGRAMS}, "")
+    ifneq  (${DIAGRAMS},)
 		dia -t ${IMAGE_TYPE} ${DIAGRAMS}
     endif
 	touch .make.images
@@ -36,5 +36,3 @@ clean:
 
 spellcheck:
 	for f in `ls *.tex`; do aspell -t -c $$f; done
-
-
