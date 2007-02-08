@@ -1,5 +1,5 @@
 FILES = ${shell ls *.tex 2> /dev/null}
-DIAGRAMS = ${shell ls *.dia 2> /dev/null}
+DIAGRAMS = ${shell ls diagrams/*.dia 2> /dev/null}
 TEMPLATE = default
 OUTPUT = ${TEMPLATE}.pdf
 LATEX = pdflatex
@@ -32,7 +32,7 @@ ${OUTPUT}: $(FILES) .make.images
     endif
 
 clean:
-	rm -f *.bak *.aux *.out *.log *.toc *.pdf *.ps *.png .make.*
+	rm -f *.bak *.aux *.out *.log *.toc *.pdf *.ps *.png .make.* diagrams/*.png
 
-spellcheck:
-	for f in `ls *.tex`; do aspell -t -c $$f; done
+todo:
+	grep "TODO"  -R *.tex
