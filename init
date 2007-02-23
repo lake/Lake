@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+`cp latex/Makefile.template Makefile`
+`ln -s latex/Makefile Makefile.global`
+`ln -s latex/gitignore .gitignore`

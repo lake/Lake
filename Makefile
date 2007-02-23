@@ -1,19 +1,14 @@
 FILES = ${shell ls *.tex 2> /dev/null}
 DIAGRAMS = ${shell ls diagrams/*.dia 2> /dev/null}
-TEMPLATE = default
-OUTPUT = ${TEMPLATE}.pdf
+PAPER_DEFAULT = paper
+PAPER = ${PAPER_DEFAULT}
 LATEX = pdflatex
 VIEWER = kpdf
 IMAGE_TYPE = png
 
-LATEX_DIR=latex
 
 
-include local-options
-
-
-
-default:	${OUTPUT}
+default:	.make.paper
 view:		${OUTPUT}
 	$(VIEWER) $(OUTPUT)
 
@@ -24,12 +19,10 @@ images:		.make.images
     endif
 	touch .make.images
 
-${OUTPUT}: $(FILES) .make.images
-	$(LATEX) latex/${TEMPLATE}
-	$(LATEX) latex/${TEMPLATE}
-    ifneq  (${TEMPLATE}.pdf, ${OUTPUT})
-		mv ${TEMPLATE}.pdf ${OUTPUT}
-    endif
+.make.paper: $(FILES) .make.images
+	$(LATEX) ${PAPER}
+	$(LATEX) ${PAPER}
+	touch .make.paper
 
 clean:
 	rm -f *.bak *.aux *.out *.log *.toc *.pdf *.ps *.png .make.* diagrams/*.png
