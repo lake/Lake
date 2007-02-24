@@ -1,13 +1,3 @@
-FILES = ${shell ls *.tex 2> /dev/null}
-DIAGRAMS = ${shell ls diagrams/*.dia 2> /dev/null}
-PAPER_DEFAULT = paper
-PAPER = ${PAPER_DEFAULT}
-LATEX = pdflatex
-VIEWER = kpdf
-IMAGE_TYPE = png
-
-
-
 default:	.make.paper
 view:		${OUTPUT}
 	$(VIEWER) $(OUTPUT)
