@@ -1,0 +1,12 @@
+%really these should be configurable on a per document basis, perhaps via 
+%globals or should this be a template?  Anyway, the idea is to make it easy
+% to shift back and forth between Figure and Fig. as required by the
+% publisher's style.
+
+%% cross references %%
+\newcommand{\reffig}[1]{{Figure~\ref{#1}}}
+\newcommand{\refthm}[1]{{Theorem~\ref{#1}}}
+\newcommand{\refeq}[1]{{(\ref{#1})}}
+\newcommand{\refalg}[1]{{Algorithm~\ref{#1}}}
+\newcommand{\refex}[1]{{Example~\ref{#1}}}
+\newcommand{\refsec}[1]{{Section~\ref{#1}}}

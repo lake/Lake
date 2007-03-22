@@ -1,10 +1,16 @@
-FILES = ${shell ls *.tex 2> /dev/null}
-DIAGRAMS = ${shell ls diagrams/*.dia 2> /dev/null}
-PAPER_DEFAULT = paper
-PAPER = ${PAPER_DEFAULT}
-LATEX = pdflatex
-VIEWER = kpdf
-IMAGE_TYPE = png
-
-
-include Makefile.global
+CURRENT=paper
+# These local variables are prepended to the user's default setting for their
+# corresponding environment variables.  The idea is to allow people to access
+# the Tex and bibtex files in this repository, without interferring with the 
+# builder's access to the files they may access via their settings of these 
+# environment variables.
+#
+# Recall that the null entry `::' denotes the default system directories for
+# each of the global environment variables these local variables extend.  So, 
+# if environment variable is empty, these variables must end in `::'.
+LOCAL_TEXINPUTS=latex
+# Local bib files
+LOCAL_BIBINPUTS=Bib:latex
+# Local bib style files
+LOCAL_BSTINPUTS=latex
+include ./latex/Makefile
