@@ -43,21 +43,24 @@ XFIG_PDFTEX_T = $(XFIG_FILES:fig=pdftex_t)
 XFIG_TEMPS = $(wildcard Figures/*.bak) $(XFIG_FILES:fig=pdf) $(XFIG_PDFTEX_T)
 
 DOT=$(wildcard Figures/*.dot)
-#DOTEPS=$(DOT:.dot=.eps)
-DOTPDF=$(DOT:.dot=.pdf)
+#DOTEPS=$(DOT:dot=eps)
+DOTPDF=$(DOT:dot=pdf)
 
 NEATO=$(wildcard Figures/*.neato)
-#NEATOEPS=$(NEATO:.neato=.eps)
-NEATOPDF=$(NEATO:.neato=.pdf)
+#NEATOEPS=$(NEATO:neato=eps)
+NEATOPDF=$(NEATO:neato=pdf)
 
 GNUPLOT_SRC = $(wildcard Figures/*.gnuplot)
 GNUPLOT_TEX = $(GNUPLOT_SRC:gnuplot=tex)
 #GNUPLOT_FIG = $(GNUPLOT_SRC:gnuplot=fig)
-#GNUPLOTEPS=$(GNUPLOT:.gnuplot=.eps)
-#GNUPLOTPDF=$(GNUPLOT:.gnuplot=.pdf)
+#GNUPLOTEPS=$(GNUPLOT:gnuplot=eps)
+#GNUPLOTPDF=$(GNUPLOT:gnuplot=pdf)
 GNUPLOT_OUTPUT = $(GNUPLOT_TEX) #$(GNUPLOT_FIG)
 
-FIGURES = $(XFIG_PDFTEX_T) $(DOTPDF) $(NEATOPDF) $(GNUPLOT_OUTPUT)
+DIA_SRC = $(wildcard Figures/*.dia)
+DIA_OUTPUT = $(DIA_SRC:dia=$(IMAGE_TYPE))
+
+FIGURES = $(XFIG_PDFTEX_T) $(DOTPDF) $(NEATOPDF) $(GNUPLOT_OUTPUT) $(DIA_OUTPUT)
 
 export latex_count=3
 
@@ -87,6 +90,10 @@ xpdf: .xpdf-reload
 %.aux: %.tex $(TEX_SRC) $(BIB_FILES) $(FIGURES) 
 	#TODO use basename? as in pdflatex $(basename $<)
 	pdflatex $< #> /dev/null
+
+.PRECIOUS: %.$(IMAGE_TYPE)
+%.$(IMAGE_TYPE): $(DIA_SRC)
+	dia -t $(IMAGE_TYPE) $<
 
 .PRECIOUS: %.pdf
 %.pdf: %.eps
@@ -119,7 +126,7 @@ endif
 .PHONY: clean
 clean:
 	rm -f $(CURRENT).bbl $(CURRENT).blg $(CURRENT).log *.aux *.bak
-	rm -f *~ $(XFIG_TEMPS) $(GNUPLOT_OUTPUT) .xpdf-reload
+	rm -f *~ $(FIGURES) .xpdf-reload
 
 .PHONY: cleaner
 cleaner: clean

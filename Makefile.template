@@ -8,9 +8,11 @@ CURRENT=paper
 # Recall that the null entry `::' denotes the default system directories for
 # each of the global environment variables these local variables extend.  So, 
 # if environment variable is empty, these variables must end in `::'.
-LOCAL_TEXINPUTS=latex
+LOCAL_TEXINPUTS = latex
 # Local bib files
-LOCAL_BIBINPUTS=Bib:latex
+LOCAL_BIBINPUTS = Bib:latex
 # Local bib style files
-LOCAL_BSTINPUTS=latex
+LOCAL_BSTINPUTS = latex
+IMAGE_TYPE = png # Determines dia output
+VIEWER = xpdf
 include ./latex/Makefile
