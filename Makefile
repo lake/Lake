@@ -66,19 +66,24 @@ export latex_count=3
 
 #.PHONY: debug
 #debug: 
-#	@echo $(FIGURES)
+#	@echo $(VIEWER)
 
 .PHONY: all
-all: $(PAPER) xpdf
+ifneq ($(strip $(VIEWER)),xpdf)
+all: $(PAPER)
+else
+all: $(PAPER) .xpdf-reload
+endif
 
-.PHONY: xpdf
-xpdf: .xpdf-reload
-
+.PRECIOUS: .xpdf-reload
 .xpdf-reload: $(PAPER)
 	@touch $@
 	@xpdf -remote $(PAPER) -raise $(PAPER) &
 	
 %.pdf: %.tex %.aux %.bbl $(TEX_SRC) 
+	@if [ ! -e $(PAPER) ] ;\
+		then pdflatex $(basename $<) ;\
+	fi
 	@while egrep -s 'Rerun (LaTeX|to get cross-references right)' $(<:tex=log) && [ $$latex_count -gt 0 ] ;\
 	    do \
 		echo "Rerunning pdflatex...." ;\
@@ -106,12 +111,11 @@ xpdf: .xpdf-reload
 %.eps: %.neato
 	neato -Gepsilon=.000000001 $< -Tps > $@
 
+ifneq ($(strip $(BIB_FILES)),)
 .PRECIOUS: %.bbl
 %.bbl: %.tex %.aux $(BIB_FILES)
-ifneq ($(strip $(BIB_FILES)),)
-	bibtex $(basename $<);
+	bibtex -min-crossrefs=100 $(basename $<);
 endif
-	@echo "" #This a manual NOP.
 
 .PRECIOUS: %.tex
 %.tex: %.gnuplot
