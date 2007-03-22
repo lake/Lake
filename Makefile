@@ -80,9 +80,9 @@ endif
 	@touch $@
 	@xpdf -remote $(PAPER) -raise $(PAPER) &
 	
-%.pdf: %.tex %.aux %.bbl $(TEX_SRC) 
-	@if [ ! -e $(PAPER) ] ;\
-		then pdflatex $(basename $<) ;\
+%.pdf: %.aux %.bbl
+	@if [ ! -e $(PAPER) ] ; then\
+	    pdflatex $(basename $<) ;\
 	fi
 	@while egrep -s 'Rerun (LaTeX|to get cross-references right)' $(<:tex=log) && [ $$latex_count -gt 0 ] ;\
 	    do \
@@ -114,7 +114,7 @@ endif
 ifneq ($(strip $(BIB_FILES)),)
 .PRECIOUS: %.bbl
 %.bbl: %.tex %.aux $(BIB_FILES)
-	bibtex -min-crossrefs=100 $(basename $<);
+	bibtex -min-crossrefs=100 $(basename $<)
 endif
 
 .PRECIOUS: %.tex

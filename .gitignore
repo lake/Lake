@@ -1,0 +1,6 @@
+/latex
+/*.aux
+/*.log
+/*.pdf
+/diagrams/*.png
+*.swp
