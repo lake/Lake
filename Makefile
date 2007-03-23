@@ -111,11 +111,12 @@ endif
 %.eps: %.neato
 	neato -Gepsilon=.000000001 $< -Tps > $@
 
-ifneq ($(strip $(BIB_FILES)),)
 .PRECIOUS: %.bbl
 %.bbl: %.tex %.aux $(BIB_FILES)
+ifneq ($(strip $(BIB_FILES)),)
 	bibtex -min-crossrefs=100 $(basename $<)
 endif
+	@echo "" # manual NOP
 
 .PRECIOUS: %.tex
 %.tex: %.gnuplot
