@@ -1,0 +1,2 @@
+Further cleanup and document preamble.tex.  In particular, document each
+included package: what it provides, and any dependencies.
