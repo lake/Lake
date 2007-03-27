@@ -35,6 +35,7 @@ ifdef LOCAL_BSTINPUTS
 	endif
 endif
 TEX_INCLUDES = $(wildcard latex/*.tex)
+TEX_SRC = $(wildcard *.tex)
 BIB_FILES = $(wildcard *.bib) $(wildcard Bib/*.bib)
 
 XFIG_FILES = $(wildcard Figures/*.fig)
@@ -92,7 +93,7 @@ endif
 	    done
 
 .PRECIOUS: %.aux
-%.aux: %.tex $(TEX_INCLUDES) $(BIB_FILES) $(FIGURES) 
+%.aux: %.tex $(TEX_SRC) $(TEX_INCLUDES) $(BIB_FILES) $(FIGURES) 
 	#TODO use basename? as in pdflatex $(basename $<)
 	pdflatex $< #> /dev/null
 
