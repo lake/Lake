@@ -85,7 +85,7 @@ endif
 	@if [ ! -e $(PAPER) ] ; then\
 	    pdflatex $(basename $<) ;\
 	fi
-	@while egrep -s 'Rerun (LaTeX|to get cross-references right)' $(<:tex=log) && [ $$latex_count -gt 0 ] ;\
+	@while egrep -s 'Rerun (LaTeX|to get cross-references right)' $(<:aux=log) && [ $$latex_count -gt 0 ] ;\
 	    do \
 		echo "Rerunning pdflatex...." ;\
 		pdflatex $(basename $<) > /dev/null;\
