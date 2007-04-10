@@ -4,4 +4,11 @@
 /*.pdf
 /diagrams/*.png
 *.swp
+/*.lot
+/*.bbl
+/*.blg
+/*.lop
+/*.lof
+/*.toc
+*.bak
 .xpdf-reload
