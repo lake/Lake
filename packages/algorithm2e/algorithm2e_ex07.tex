@@ -1,0 +1,35 @@
+Let's have a look at what we can do
+with if-then-else and side comments\;
+\eIf{if-then-else test}{
+  no comment here\;
+  neither in then\;
+}{
+  nor in else\;
+}
+\eIf(\tcc*[f]{then comment}){test}{
+  then with a comment\;
+}(\tcc*[f]{comment in else})
+{
+  here we are in else\;
+}
+\eIf(\tcc*[f]{then comment}){test}{
+  again a comment in then\;
+}{
+  but not in else\;
+}
+\eIf{if-then-else test}{
+  this time, no comment in then\;
+}(\tcc*[f]{else comment})
+{
+  but one comment in else\;
+}
+Let's try with other if possibilities\;
+\lIf(\tcc*[h]{lif comment}){test}{text}
+\uIf(\tcc*[f]{uif comment}){test}{
+  then text\;
+}
+\uElseIf(\tcc*[f]{comment}){test}{
+  elseif text\;
+}
+\lElseIf(\tcc*[h]{comment}){test}{text}
+\lElse(\tcc*[f]{comment}){text}
