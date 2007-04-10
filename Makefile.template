@@ -8,9 +8,14 @@ CURRENT=paper
 # Recall that the null entry `::' denotes the default system directories for
 # each of the global environment variables these local variables extend.  So, 
 # if environment variable is empty, these variables must end in `::'.
+#
+# To include packages stored in the repository, add the appropriate package 
+# directory.  For example, to include algorithms and ucthesis, use
+#
+#LOCAL_TEXINPUTS = latex:latex/packages/algorithms:/latex/packages/ucthesis
 LOCAL_TEXINPUTS = latex
-# Local bib files
-LOCAL_BIBINPUTS = Bib:latex
+# Local bib database files files
+LOCAL_BIBINPUTS = Bib
 # Local bib style files
 LOCAL_BSTINPUTS = latex
 IMAGE_TYPE = png # Determines dia output
