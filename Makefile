@@ -76,10 +76,14 @@ else
 all: $(PAPER) .xpdf-reload
 endif
 
+.PHONY: view
+view: ${PAPER}
+	${PDF_VIEWER} ${PAPER}
+
 .xpdf-reload: $(PAPER)
 	@touch $@
 	@xpdf -remote $(PAPER) -raise $(PAPER) &
-	
+
 %.pdf: %.aux %.bbl
 	@if [ ! -e $(PAPER) ] ; then\
 	    pdflatex $(basename $<) ;\
