@@ -67,16 +67,15 @@ export latex_count=3
 
 #.PHONY: debug
 #debug: 
-#	@echo $(VIEWER)
+#	@echo $(PDF_VIEWER)
 
 .PHONY: all
-ifneq ($(strip $(VIEWER)),xpdf)
+ifneq ($(notdir $(PDF_VIEWER)),xpdf)
 all: $(PAPER)
 else
 all: $(PAPER) .xpdf-reload
 endif
 
-.PRECIOUS: .xpdf-reload
 .xpdf-reload: $(PAPER)
 	@touch $@
 	@xpdf -remote $(PAPER) -raise $(PAPER) &

@@ -19,5 +19,9 @@ LOCAL_BIBINPUTS = Bib
 # Local bib style files
 LOCAL_BSTINPUTS = latex
 IMAGE_TYPE = png # Determines dia output
-VIEWER = xpdf
+
+# The PDF viewer variable can't be a make file variable since doing so clutters
+# up status if two different viewers are in use.  Instead, set PDF_VIEWER
+# environment variable in your SHELL.
+
 include ./latex/Makefile

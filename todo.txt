@@ -1,2 +1,6 @@
 Further cleanup and document preamble.tex.  In particular, document each
 included package: what it provides, and any dependencies.
+
+A bug:  if the Bib directory exists, but the latex source contains no \cite
+or \nocite, the build fails.
+
