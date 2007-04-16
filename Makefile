@@ -67,14 +67,18 @@ export latex_count=3
 
 #.PHONY: debug
 #debug: 
-#	@echo $(VIEWER)
+#	@echo $(PDF_VIEWER)
 
 .PHONY: all
-ifneq ($(strip $(VIEWER)),xpdf)
+ifneq ($(strip $(PDF_VIEWER)),xpdf)
 all: $(PAPER)
 else
 all: $(PAPER) .xpdf-reload
 endif
+
+view: ${PAPER}
+	${PDF_VIEWER} ${PAPER}
+
 
 .PRECIOUS: .xpdf-reload
 .xpdf-reload: $(PAPER)

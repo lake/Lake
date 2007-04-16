@@ -19,5 +19,4 @@ LOCAL_BIBINPUTS = Bib
 # Local bib style files
 LOCAL_BSTINPUTS = latex
 IMAGE_TYPE = png # Determines dia output
-VIEWER = xpdf
 include ./latex/Makefile

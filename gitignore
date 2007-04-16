@@ -12,3 +12,4 @@
 /*.toc
 *.bak
 .xpdf-reload
+Makefile.global
