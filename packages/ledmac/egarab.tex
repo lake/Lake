@@ -1,0 +1,88 @@
+%%
+%% This is file `egarab.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledarab.dtx  (with options: `egarab')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+%%% egarab.tex
+\documentclass[12pt]{article}
+\addtolength{\textheight}{-10\baselineskip}
+\usepackage{ledmac}
+\setcounter{firstlinenum}{1} \setcounter{linenumincrement}{1}
+\linenummargin{right}
+
+\usepackage{arabtex}
+\usepackage{ledarab}
+
+\begin{document}
+
+Can we have non-arabic text in \verb?\edtext?
+
+\beginnumbering
+\pstart
+\noindent
+In \edtext{roman}{\Afootnote{not arabic}} text you
+can have critical notes. \\
+In \edtext{\RL{Arabic text}}{\Afootnote{not roman}} you
+can have critical notes. \\
+In \edtext{latin}{\Afootnote{\RL{Arabic text --- footnote}}} you
+can have critical notes. \\
+In \edtext{\RL{Arabic text}}{\Afootnote{\RL{Arabic text --- footnote}}} you
+can have critical notes.
+\pend
+\endnumbering
+
+Here the order is \verb?\beginnumbering \pstart \begin{arabtext} ...?
+
+\beginnumbering
+\pstart
+\begin{arabtext}
+ledmac is wonderful and so
+%%% arabic lemma, latin note
+\edtext{Arabic text}{\Bfootnote{Arabic text --- footnote}} is arabtex\\
+%%% arabic lemma, arabic note
+and \edtext{Arabic text}{\Bfootnote{\RL{Arabic text --- footnote}}} you
+can do critical notes here.
+\end{arabtext}
+\pend
+\endnumbering
+
+Here the order is \verb?\beginnumbering \begin{arabtext} \pstart...?
+
+\arablnumrep
+\beginnumbering
+\begin{arabtext}
+\pstart
+ledmac is wonderful and so
+%%% arabic lemma, screwed up arabic note
+\edtext{Arabic text}{\Cfootnote{Arabic text --- footnote}} is arabtex\\
+%%% arabic lemma, arabic note
+and \edtext{Arabic text}{\Cfootnote{\RL{Arabic text --- footnote}}} you
+can do critical notes here.
+\pend
+\end{arabtext}
+\endnumbering
+\restorelnumrep
+
+\end{document}
+\endinput
+%%
+%% End of file `egarab.tex'.

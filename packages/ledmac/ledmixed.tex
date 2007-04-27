@@ -1,0 +1,292 @@
+%%
+%% This is file `ledmixed.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledmac.dtx  (with options: `periph')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2003 -- 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+\documentclass{article}
+\usepackage{ledmac}
+
+ \noendnotes
+%% \overfullrule0 pt
+ \lefthyphenmin=3
+
+\let\Ma=$
+\let\aM=$
+\usepackage[delims]{lgreek}
+
+ % We need an addition to \no@expands since the \active $ in lgreek
+ % causes problems:
+ \newcommand{\morenoexpands}{\let$=0}
+
+\makeatletter
+
+ \newbox\lp@rbox
+
+ \newcommand{\ffootnote}[1]{%
+   \ifnumberedpar@
+     \xright@appenditem{\noexpand\vffootnote{f}{{\l@d@nums}{\@tag}{#1}}}%
+                                                 \to\inserts@list
+     \global\advance\insert@count by 1
+ %  \else         %% may be used only in numbered text
+ %    \vffootnote{f}{{0|0|0|0|0|0|0}{}{#1}}%
+   \fi\ignorespaces}
+
+ \newcommand{\gfootnote}[1]{%
+   \ifnumberedpar@
+     \xright@appenditem{\noexpand\vgfootnote{g}{#1}}%
+                                                 \to\inserts@list
+     \global\advance\insert@count by 1
+ %  \else         %% may be used only in numbered text
+ %    \vgfootnote{g}{#1}%
+   \fi\ignorespaces}
+
+ \newcommand{\setlp@rbox}[3]{%
+   {\parindent\z@\hsize=2.5cm\raggedleft\scriptsize
+   \baselineskip 9pt%
+   \global\setbox\lp@rbox=\vbox to\z@{\vss#3}}}
+
+ \newcommand{\vffootnote}[2]{\setlp@rbox#2}
+
+ \newcommand{\vgfootnote}[2]{\def\rd@ta{#2}}
+
+ \renewcommand{\do@line}{%
+  {\vbadness=10000 \splittopskip=0pt
+  \gdef\rd@ta{}% for right margin paragraph->always a few characters
+  \global\setbox\one@line=\vsplit\raw@text to\baselineskip}%
+  \unvbox\one@line \global\setbox\one@line=\lastbox
+  \getline@num
+ \hbox to\hsize{\affixline@num\add@inserts\hbox to\z@% inserts added here so
+   {\hss\box\lp@rbox\kern\linenumsep}%                 that margin pars are
+    \hfil\hbox to\wd\one@line{\new@line\unhbox\one@line%   included.
+       \hbox to\z@{\kern\linenumsep\notenumfont\rd@ta\hss}}}%
+  \add@penalties} % margin pars also included in line format
+
+ \renewcommand{\affixline@num}{%
+   \ifsublines@
+     \@l@dtempcntb=\subline@num
+     \ifnum\subline@num>\c@firstsublinenum
+       \@l@dtempcnta=\subline@num
+       \advance\@l@dtempcnta by-\c@firstsublinenum
+       \divide\@l@dtempcnta by\c@sublinenumincrement
+       \multiply\@l@dtempcnta by\c@sublinenumincrement
+       \advance\@l@dtempcnta by\c@firstsublinenum
+     \else
+       \@l@dtempcnta=\c@firstsublinenum
+     \fi
+     %
+     \ifcase\sub@lock
+       \or
+         \ifnum\sublock@disp=1
+            \@l@dtempcntb=0 \@l@dtempcnta=1
+         \fi
+       \or
+         \ifnum\sublock@disp=2 \else
+            \@l@dtempcntb=0 \@l@dtempcnta=1
+         \fi
+       \or
+         \ifnum\sublock@disp=0
+            \@l@dtempcntb=0 \@l@dtempcnta=1
+         \fi
+     \fi
+   \else
+     \@l@dtempcntb=\line@num
+     \ifnum\line@num>\c@firstlinenum
+        \@l@dtempcnta=\line@num
+        \advance\@l@dtempcnta by-\c@firstlinenum
+        \divide\@l@dtempcnta by\c@linenumincrement
+        \multiply\@l@dtempcnta by\c@linenumincrement
+        \advance\@l@dtempcnta by\c@firstlinenum
+     \else
+        \@l@dtempcnta=\c@firstlinenum
+     \fi
+     \ifcase\@lock
+        \or
+          \ifnum\lock@disp=1
+             \@l@dtempcntb=0 \@l@dtempcnta=1
+          \fi
+        \or
+          \ifnum\lock@disp=2 \else
+             \@l@dtempcntb=0 \@l@dtempcnta=1
+          \fi
+        \or
+          \ifnum\lock@disp=0
+             \@l@dtempcntb=0 \@l@dtempcnta=1
+          \fi
+     \fi
+   \fi
+   %
+   \ifnum\@l@dtempcnta=\@l@dtempcntb
+     \@l@dtempcntb=\line@margin
+     \ifnum\@l@dtempcntb>1
+       \advance\@l@dtempcntb by\page@num
+     \fi
+     \ifodd\@l@dtempcntb
+ %      #1\rlap{{\rightlinenum}}%
+        \xdef\rd@ta{\the\line@num}%
+     \else
+       \llap{{\leftlinenum}}%#1%
+     \fi
+   \else
+     %#1%
+   \fi
+   \ifcase\@lock
+   \or
+     \global\@lock=2
+   \or \or
+     \global\@lock=0
+   \fi
+   \ifcase\sub@lock
+   \or
+     \global\sub@lock=2
+   \or \or
+     \global\sub@lock=0
+   \fi}
+
+ \lineation{page}
+ \linenummargin{right}
+ \footparagraph{A}
+ \footparagraph{B}
+
+\renewcommand{\notenumfont}{\footnotesize}
+\newcommand{\notetextfont}{\footnotesize}
+
+ \let\Afootnoterule=\relax
+ \count\Afootins=825
+ \count\Bfootins=825
+
+ \newcommand{\Aparafootfmt}[3]{%
+   \ledsetnormalparstuff
+   \scriptsize
+   \notenumfont\printlines#1|\enspace
+ %      \lemmafont#1|#2\enskip
+   \notetextfont
+   #3\penalty-10\hskip 1em plus 4em minus.4em\relax}
+
+ \newcommand{\Bparafootfmt}[3]{%
+   \ledsetnormalparstuff
+   \scriptsize
+   \notenumfont\printlines#1|\enspace
+   \select@lemmafont#1|#2\rbracket\enskip
+   \notetextfont
+   #3\penalty-10\hskip 1em plus 4em minus.4em\relax }
+ \makeatother
+
+ \let\Afootfmt=\Aparafootfmt
+ \let\Bfootfmt=\Bparafootfmt
+ \def\lemmafont#1|#2|#3|#4|#5|#6|#7|{\scriptsize}
+ \parindent=1em
+
+ \newcommand{\lmarpar}[1]{\edtext{}{\ffootnote{#1}}}
+ \newcommand{\rmarpar}[1]{\edtext{}{\gfootnote{#1}}}
+ \emergencystretch40pt
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+ \beginnumbering
+ \pstart
+ \rmarpar{741C}
+ \noindent \edtext{Incipit Quartus $PERIFUSEWN$}{%
+ \lemma{incipit\ .~.~.\ $PERIFUSEWN$}\Bfootnote{\textit{om.\ R},
+ incipit quartus \textit{M}}}
+ \pend
+ \medskip
+
+ \pstart
+ \noindent \edtext{NVTRITOR}{\lemma{$ANAKEFALIOSIS$}\Bfootnote{\textit{
+ FJP, lege} $<anakefala'iwsis$}}.\lmarpar{$ANAKEFALIOSIS$
+ NATVRARVM} Prima nostrae
+ \edtext{Physiologiae}{\lemma{physiologiae}\Bfootnote{phisiologiae
+ \textit{P}, physeologiae \textit{R}}}
+ intentio praecipuaque mat\-e\-ria erat
+ \edtext{quod}{\Bfootnote{\textit{p}.\ natura \textit{transp.\ MR}}}
+ \edtext{$UPEROUSIADES$}{\Bfootnote{\textit{codd.\ Vtrum}
+ $<uperousi'wdhs$ (hoc est superessentialis) natura \textit{cum Gale
+ (p.160) an} $<uperousi'oths$ (hoc est superessentialis natura)
+ \textit{cum Floss (PL 122,741C) intelligendum sit, ambigitur}}}
+ (hoc est superessentialis) natura sit causa creatrix existentium et
+ non existentium omnium, a nullo creata, unum principium, una
+ origo, unus et uniuersalis uniuersorum fons, a nullo manans, dum
+ ab eo manant omnia, trinitas coessentialis in tribus substantiis,
+ $ANARQOS$ (hoc est sine principio), principium et finis, una
+ bonitas, deus unus,
+ \edtext{$OMOUSIOS$}{\Bfootnote{\textit{codd., lege} $<omoo'usios$}}
+ \edtext{et}{\lemma{\textbf{et}}\Bfootnote{\textit{
+ R}\textsuperscript{1}, \textit{om.\ R}\textsuperscript{0}}}
+ $UPEROUSIOS$ (id est coessentialis et superessentialis). Et, ut
+ ait sanctus Epifanius, episcopus Constantiae Cypri, in
+ \edtext{$AGKURATW$}{\Bfootnote{anchurato \textit{MR}}}
+ sermone
+ \edtext{de fide}{\Bfootnote{Glo\Ma\langle\aM ssa\Ma\rangle\aM: Ita
+ enim uocatur sermo eius de fide $AGKURATOS$, id est procuratus
+ \textit{mg.\ add.\ FJP}}}:
+ \begin{itshape}Tria sancta, tria consancta, tria
+ \edtext{agentia}{\Bfootnote{actiua \textit{MR}}},
+ tria coagentia, tria
+ \edtext{formantia}{\Bfootnote{formatiua \textit{MR}}},
+ tria conformantia, tria
+\edtext{operantia}{\Bfootnote{operatiua \textit{MR}}},
+ tria cooperantia, tria subsistentia, tria\rmarpar{742C}
+ consubsistentia sibi inuicem coexistentia. Trinitas haec
+ sancta uocatur: tria existentia, una consonantia, una deitas
+ \edtext{eiusdem}{\Bfootnote{eiusdemque \textit{M}}}
+ essentiae,
+ \edtext{eiusdem uirtutis, eiusdem
+   \edtext{subsistentiae}{\Bfootnote{substantiae \textit{R}}}}{%
+ \Bfootnote{\textit{om.\ M}}},
+ similia
+\edtext{similiter}{\Bfootnote{ex simili \textit{MR}}}
+ aequalitatem gratiae operantur patris et filii et sancti spiritus.
+ Quomodo autem
+ \edtext{sunt}{\Bfootnote{\textit{om.\ M}}},
+ ipsis relinquitur docere:
+ \edtext{`Nemo enim nouit patrem nisi filius, neque filium nisi pater,
+    et cuicumque filius reuelauerit'}{\Afootnote{Matth.\ 11, 27}};
+ reuelatur autem per spiritum sanctum. Non ergo haec tria existentia
+ aut ex ipso aut per ipsum aut ad ipsum in unoquoque digne intelliguntur,
+ \Ma\mid\! R, 264^{\rm r}\!\mid\aM\ sicut ipsa reuelant:\end{itshape}
+ $FWS, PUR, PNEUMA$
+ \edtext{(hoc est lux, ignis, spiritus)}{\Afootnote{EPIPHANIVS,
+  \textit{Ancoratus} 67; PG~43, 137C--140A; GCS 25, p.~82, 2--12}}.
+ \pend
+
+ \pstart
+ Haec, ut dixi, ab Epifanio tradita, ut quisquis interrogatus quae
+ tria et quid unum in sancta trinitate debeat credere, sana fide
+ \Ma\!\mid J, 1^{\rm v}\!\mid\aM\ respondere ualeat, aut ad
+ fidem accedens\rmarpar{743A} sic erudiatur. Et mihi uidetur
+ spiritum pro calore posuisse, quasi dixisset in similitudine:
+ lux, ignis, calor. Haec enim tria unius essentiae sunt. Sed cur
+ lucem primo dixit, non est mirum. Nam et pater lux est et ignis
+ et calor; et filius est lux, ignis, calor; et
+ \edtext{spiritus sanctus}{\Bfootnote{sanctus spiritus \textit{R}}}
+ lux, ignis, calor. Illuminat enim pater, illuminat filius, illuminat
+ spiritus sanctus: ex ipsis enim omnis scientia et sapientia donatur.
+ \pend
+ \endnumbering
+
+\end{document}
+
+\endinput
+%%
+%% End of file `ledmixed.tex'.

@@ -1,0 +1,149 @@
+%%
+%% This is file `ledioc.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledmac.dtx  (with options: `ioc')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2003 -- 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+%% ledioc.tex
+\documentclass{article}
+\usepackage{ledmac}
+
+ \noendnotes
+ \makeatletter
+
+ \newcommand{\os}{\scriptsize}
+ \setcounter{firstsublinenum}{1000}
+ \frenchspacing \setlength{\parskip}{0pt} \hyphenpenalty=1000
+
+ % Say \nolinenums if you want no line numbers in the notes.
+ \newif\ifnolinenums
+ \newcommand{\nolinenums}{\global\nolinenumstrue}
+ \newcommand{\linenums}{\global\nolinenumsfalse}
+
+ \renewcommand{\rightlinenum}{\ifbypage@\ifnum\line@num<10\kern.5em\fi\else
+ \ifnum\line@num<10\kern1em\else\ifnum\line@num<100
+   \kern.5em\fi\fi\fi\kern.5em\numlabfont\the\line@num
+   \ifnum\subline@num>0:\the\subline@num\fi}
+
+ \renewcommand{\leftlinenum}{\numlabfont\the\line@num
+   \ifnum\subline@num>0:\the\subline@num\fi \kern.5em}
+ \linenummargin{outer}
+ \lineation{page}
+
+ \newcommand{\ggfootfmt}[3]{%
+   \notefontsetup
+   \let\par=\endgraf
+   \rightskip=0pt \leftskip=0pt
+   \setlength{\parindent}{0pt} \parfillskip=0pt plus 1fil
+   \ifnolinenums\relax\else
+     \begingroup \os \printlines#1|\endgroup
+     \enskip
+   \fi
+   {\rmfamily #2\def\@tempa{#2}\ifx\@tempa\empty
+     \else]\enskip\fi#3\penalty-10 }}
+
+ % Now reset the \Afootnote parameters and macros:
+ \footparagraph{A}
+ \let\Afootfmt=\ggfootfmt
+ \dimen\Afootins=\vsize
+ \skip\Afootins=3pt plus9pt
+ \newcommand*{\ggfootstart}[1]{\vskip\skip\Afootins}
+ \let\Afootstart=\ggfootstart
+
+ \newcommand*{\stage}[1]{\pstart\startsub\parindent=0pt
+   \hangindent=3em\hangafter=0
+   {\itshape #1}\let\par=\finishstage}
+ \newcommand{\finishstage}{\pend\endsub}
+ \newcommand{\sen}{\leavevmode\lower1ex\hbox{\textrm{''}}}
+ \newcommand{\senspeak}[1]{\pstart\obeylines\setbox0=\hbox{\textrm{''}}%
+   \leavevmode
+   \lower1ex\copy0\kern-\wd0\hskip1em{\textit{#1}}%
+   \hbox to1ex{}\ignorespaces}
+ \newcommand*{\speak}[1]{\pstart\obeylines\hskip1em{\textit{#1}}%
+   \hbox to1ex{}\ignorespaces}
+ \def\nospeaker{\parindent=0em\pstart\let\par=\pend}
+ \newcommand*{\nospeak}{\pstart\obeylines}
+ \makeatother
+
+\begin{document}
+
+ \setlength{\parindent}{0pt}
+
+ \beginnumbering
+
+ \stage{Oedipus \edtext{entreth}{\Afootnote{\textit{intrat} MS}}.}
+
+ \nospeak
+ Or that with wrong the right and doubtlesse heire,
+ Shoulde banisht be out of his princely seate.
+ Yet thou O queene, so fyle thy sugred toung,
+ And with suche counsell decke thy mothers tale,
+ That peace may bothe the brothers heartes inflame,
+ And rancour yelde, that erst possest the same.
+ \pend
+
+ \speak{Eteocl.} Mother, beholde, youre hestes for to obey,
+ In person nowe am I resorted hither:
+ In haste therefore, fayne woulde I knowe what cause
+ With hastie speede, so moued hath your mynde
+ To call me nowe so causelesse out of tyme,
+ When common wealth moste craues my onely ayde:
+ Fayne woulde I knowe, what queynt commoditie
+ Persuades you thus to take a truce for tyme,
+ And yelde the gates wide open to my foe,
+ The gates that myght our stately state defende,
+ And nowe are made the path of our decay.
+ \pend
+
+ \senspeak{Ioca.}Represse deare son, those raging stormes of wrath,
+ \sen That so bedimme the eyes of thine intente,
+ \edtext{\sen As when \edtext{the}{\Afootnote{thie MS}} tongue %
+   (a redy Instrument)
+ \sen Would \edtext{fayne pronounce}{\Afootnote{faynest tell MS}} %
+   the meaning of \edtext{the minde}{\Afootnote{thy minde MS}},
+ \sen \edtext{It}{\lemma{It \dots\ worde.}\Afootnote{Thie %
+   swelling hart puft vp with wicked ire / Can scarce pronounce %
+   one inward louing thought. MS}} cannot speake one honest %
+   seemely worde.}{\lemma{As \dots\ worde.}\Afootnote{\textit{not %
+   in} \os73}}
+ \sen But when disdayne is shrunke, or sette asyde,
+ \sen And mynde of man with leysure can discourse
+ \sen What seemely woordes his tale may best beseeme,
+ \sen And that the toung vnfoldes without affectes
+ \sen Then may proceede an answere sage and graue,
+ \sen And euery sentence sawst with sobernesse:
+ Wherefore vnbende thyne angrie browes deare chylde,
+ And caste thy rolling eyes none other waye,
+ That here doost not \edtext{\textit{Medusaes}}{%
+ \Afootnote{One of the furies. {\os75}m}} face beholde,
+ But him, euen him, thy blood and brother deare.
+ And thou beholde, my \textit{Polinices} eke,
+ Thy brothers face, wherin when thou mayst see
+ Thine owne image, remember therwithall,
+ That what offence thou woldst to him were done,
+ \pend
+ \endnumbering
+
+\end{document}
+
+\endinput
+%%
+%% End of file `ledioc.tex'.

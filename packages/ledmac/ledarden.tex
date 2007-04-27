@@ -1,0 +1,179 @@
+%%
+%% This is file `ledarden.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledmac.dtx  (with options: `arden')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2003 -- 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+%% ledarden.tex
+\documentclass{article}
+\usepackage{ledmac}
+
+\makeatletter
+ \newcommand{\stage}[1]{\rlap{\hbox to \the\linenumsep{%
+                        \hfil\llap{[\textit{#1}]}}}}
+
+ \newcommand{\speaker}[1]{\pstart\hangindent2em\hangafter1
+   \leavevmode\textit{#1}\enspace\ignorespaces}
+
+ \newcommand{\exit}[1]{\hfill\stage{#1}}
+
+ % LEDMAC customizations:
+ \noendnotes
+ \setlength{\parindent}{0pt}
+ \setlength{\linenumsep}{.4in}
+ \rightskip\linenumsep
+
+ \renewcommand{\interparanoteglue}{1em plus.5em minus.1em}
+
+ \newcommand{\scf}{\tiny}
+ \let\Afootnoterule=\relax \let\Bfootnoterule=\relax
+
+ \renewcommand{\rightlinenum}{\numlabfont\llap{\the\line@num}}
+ \frenchspacing
+
+ % Footnote formats:
+ % \nonumparafootfmt is a footnote format without line numbers.
+ \newcommand{\nonumparafootfmt}[3]{%
+   \ledsetnormalparstuff
+   \rightskip=0pt
+   \select@lemmafont#1|#2\rbracket\enskip
+   \itshape #3\penalty-10 }
+
+ \newcommand{\newparafootfmt}[3]{%
+   \ledsetnormalparstuff
+   {\notenumfont\printlines#1|}\fullstop\enspace
+   {\select@lemmafont#1|#2}\rbracket\enskip
+   \itshape #3\penalty-10 }
+
+ \newcommand{\newtwocolfootfmt}[3]{%
+   \normal@pars
+   \hsize .48\hsize
+   \tolerance=5000
+   \rightskip=0pt \leftskip=0pt \parindent=5pt
+   \strut\notenumfont\printlines#1|\fullstop\enspace
+   \itshape #2\/\rbracket\penalty100\hskip .5em plus .5em
+   \normalfont #3\strut\goodbreak}
+
+ % Footnote style selections etc. (done last):
+ \footparagraph{A}
+ \foottwocol{B}
+ \let\Afootfmt=\newparafootfmt
+ \let\Bfootfmt=\newtwocolfootfmt
+ \let\collation=\Afootnote
+ \let\note=\Bfootnote
+ \lineation{section}
+ \linenummargin{right}
+ \makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+ \pagestyle{empty}
+
+ % Initially, we don't want line numbers.
+ \let\Afootfmt=\nonumparafootfmt
+
+ \beginnumbering
+ \pstart
+ \centerline{[\edtext{SCENE III}{
+   \lemma{Scene III}
+   \collation{Capell; om. Q, F; \textnormal{Scene IV} Pope.}}.---%
+   \edtext{\textit{Venice}}{
+   \collation{om. Q, F; Shylock's house Theobald; The same.
+   A Room in Shylock's House Capell.}}.]}
+ \pend
+ \bigskip
+
+ \pstart
+ \centerline{\textit{Enter} JESSICA \textit{and}
+   [\edtext{LAUNCELOT}{
+   \lemma{Launcelot}
+   \collation{Rowe; om. Q, F.}}] \textit{the clown.}} \pend \bigskip
+
+ \let\Afootfmt=\newparafootfmt % we do want line numbers from now
+
+  \setline{0}%
+
+ \speaker{Jes.}\edtext{I am}{
+   \collation{Q, F; \textnormal{I'm} Pope.}}
+                       sorry thou wilt leave my father so,\\
+ Our house is hell, and thou (a merry devil)\\
+ Didst rob it of some taste of tediousness,---\\
+ But fare thee well, there is a ducat for thee,\\
+ And Launcelot, \edtext{soon}{
+   \note{early.}}
+                        at supper shalt thou see\\
+ Lorenzo, who is thy new master's guest,\\
+ Give him this letter,---do it secretly,---\\
+ And so farewell: I would not have my father\\
+ See me \edtext{in}{
+   \collation{Q; om. F.}}
+              talk with thee.
+ \pend
+
+ \speaker{Laun.}
+   \edtext{}{\lemma{\textit{Laun.}}\collation{Q2; Clowne. Q, F.}}%
+ \edtext{Adieu!}{
+   \collation{\textnormal{Adiew}, Q, F.}}
+ tears \edtext{exhibit}{
+   \note{Eccles paraphrased ``My tears serve to express what my
+   tongue should, if sorrow would permit it,'' but probably it is
+   Launce\-lot's blunder for prohibit (Halliwell) or inhibit
+   (Clarendon).}}
+ my tongue, most beautiful \edtext{pagan}{
+   \note{This may have a scurrilous undertone: cf. \textit{2 H 4,}
+   {\scf II.} \textrm{ii. 168.}}}%
+ , most sweet \edtext{Jew!}{
+   \collation{\textnormal{Iewe}, Q, F. \quad \textnormal{do]} Q, F;
+              \textnormal{did} F2.}}%
+ ---if a Christian \edtext{do}{
+   \note{Malone upheld the reading of Qq and F by comparing {\scf II.}
+    vi. 23: ``When you shall please to play the thieves for
+   wives''; Launcelot seems fond of hinting at what is going to
+   happen (cf. {\scf II.} v. 22--3). If F2's ``did'' is accepted,
+   \textit{get} is used for beget, as in {\scf III.} v. 9.}}
+ not play the knave and get thee, I am much deceived; but \edtext{adieu!}{
+   \collation{\textnormal{adiew}, Q, F.}}
+ these \edtext{foolish drops do \edtext{something}{
+   \collation{Q; \textnormal{somewhat} F.}}
+ drown my manly spirit}{
+   \lemma{foolish\textnormal{\dots}spirit}
+   \note{``tears do not become a man'' (\textit{AYL.}, {\scf III.}
+   iv. 3); cf. also \textit{H 5,} {\scf IV.} vi. 28--32.}}%
+ : \edtext{adieu!}{
+   \collation{\textnormal{adiew}. Q, F. \quad \textnormal{S. D.]} Q2, F; om. Q;
+   after l. 15 Capell.}}
+ \exit{Exit.}
+ \pend
+
+ \speaker{Jes.}
+ Farewell good Launcelot.\\
+ Alack, what heinous sin is it in me\\
+ To be ashamed to be my father's \edtext{child!}{
+   \collation{\textnormal{child}, Q, F; \textnormal{Child?} Rowe.}}
+ \pend
+ \endnumbering
+
+\end{document}
+
+\endinput
+%%
+%% End of file `ledarden.tex'.

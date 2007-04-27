@@ -1,0 +1,157 @@
+%%
+%% This is file `villon.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledpar.dtx  (with options: `villon')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2004, 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+
+%%% villon.tex Example parallel columns
+\documentclass{article}
+\addtolength{\textheight}{-10\baselineskip}
+\usepackage{ledmac,ledpar}
+%% Use r instead of R to flag right text line numbers
+\renewcommand{\Rlineflag}{r}
+%% Use the flag in the notes
+\let\oldBfootfmt\Bfootfmt
+\renewcommand{\Bfootfmt}[3]{%
+  \let\printlines\printlinesR
+  \oldBfootfmt{#1}{#2}{#3}}
+\begin{document}
+
+I thought that limericks were peculiarly English, but this appears not
+to be the case. As with most limericks this one is by Anonymous.
+
+\vspace*{\baselineskip}
+
+\begin{pairs}
+%% no indentation
+\setstanzaindents{0,0,0,0,0,0,0,0,0}
+%% no number flag
+\renewcommand{\Rlineflag}{}
+%% draw a rule and widen the columns
+\setlength{\columnrulewidth}{0.4pt}
+\setlength{\Lcolwidth}{0.46\textwidth}
+\setlength{\Rcolwidth}{\Lcolwidth}
+
+\begin{Leftside}
+%% set left text line numbering sequence
+\firstlinenum{2}
+\linenumincrement{2}
+\linenummargin{left}
+\beginnumbering
+\stanza
+Il y avait un jeune homme de Dijon, &
+Qui n'avait que peu de religion. &
+Il dit: `Quant \`{a} moi, &
+Je d\'{e}teste tous les trois, &
+Le P\`{e}re, et le Fils, et le Pigeon.' \&
+\endnumbering
+\end{Leftside}
+
+\begin{Rightside}
+%% different right text line numbering sequence
+\firstlinenum{1}
+\linenumincrement{2}
+\linenummargin{right}
+\beginnumbering
+\stanza
+There was a young man of Dijon, &
+Who had only a little religion, &
+He said: `As for me, &
+I detest all the three, &
+The Father, the Son, and the Pigeon.' \&
+\endnumbering
+\end{Rightside}
+
+\Columns
+\end{pairs}
+
+\vspace*{\baselineskip}
+
+    The following is verse \textsc{lxxiii} of Fran\c{c}ois Villon's
+\textit{Le Testament} (The Testament), composed in 1461.
+
+%% Allow for hanging indentation for long lines
+\setstanzaindents{1,0,0,0,0,0,0,0,0}
+%% Columns wider than the default
+\setlength{\Lcolwidth}{0.46\textwidth}
+\setlength{\Rcolwidth}{\Lcolwidth}
+\vspace*{\baselineskip}
+
+\begin{pairs}
+\begin{Leftside}
+\firstlinenum{2}
+\linenumincrement{2}
+\linenummargin{left}
+\beginnumbering
+\stanza
+Dieu mercy et Tacque Thibault, &
+Qui tant d'eaue froid m'a fait boire, &
+Mis en bas lieu, non pas en hault, &
+Mengier d'angoisse maints \edtext{poire}{\lemma{poire d'angoisse}%
+  \Afootnote{This has a triple meaning: literally it is the fruit of the
+  choke pear,
+  figuratively it means `bitter fruit', and it also refers to a torture
+  instrument.}}, &
+Enferr\'{e} \ldots Quant j'en ay memoire, &
+Je Prie pour luy \edtext{\textit{et reliqua}}{\Afootnote{and so on}}, &
+Que Dieu luy doint, et voire, voire! &
+Ce que je pense \ldots \textit{et cetera}. \&
+\endnumbering
+\end{Leftside}
+
+\begin{Rightside}
+\firstlinenum{2}
+\linenumincrement{2}
+\linenummargin{right}
+\beginnumbering
+\stanza
+Thanks to God --- and to \edtext{Tacque Thibaud}{%
+  \Bfootnote{A favourite of Jean, Duc de Berry and loathed for his exactions
+  and debauchery. Villon uses his name as an insulting nickname for
+  Thibaud d'Auxigny, the Bishop of Orl\'{e}ans.}}  &
+Who made me drink so much \edtext{cold water}{%
+  \Bfootnote{Can either refer to the normal prison diet of bread and
+   water or to a common medieval torture which involved forced drinking
+   of cold water.}}, &
+Put me underground instead of higher up &
+And made me eat such bitter fruit, &
+In chains \ldots When I think of this, &
+I pray for him---\textit{et reliqua;} &
+May God grant him (yes, by God) &
+What I think \ldots \textit{et cetera}. \&
+\endnumbering
+\end{Rightside}
+
+\Columns
+\end{pairs}
+
+\vspace*{\baselineskip}
+
+    The translation and notes are by Anthony Bonner,
+\textit{The Complete Works of Fran\c{c}ois Villon}, published by
+Bantam Books in 1960.
+
+\end{document}
+
+\endinput
+%%
+%% End of file `villon.tex'.

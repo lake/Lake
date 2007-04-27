@@ -1,0 +1,293 @@
+%%
+%% This is file `djd17nov.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledpar.dtx  (with options: `djd17nov')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2004, 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+
+%%% This is djd17nov.tex, a sample critical text edition
+%%% written in LaTeX2e with the ledmac and ledpar packages.
+%%% (c) 2003--2004 by Dr. Dirk-Jan Dekker,
+%%% Radboud University, Nijmegen (The Netherlands)
+%%% (PRW) Modified slightly by PRW to fit the ledpar manual
+
+\documentclass[10pt, letterpaper, twoside]{article}
+\usepackage[latin,english]{babel}
+\usepackage{makeidx}
+\usepackage{ledmac,ledpar}
+\lineation{section}
+\linenummargin{inner}
+\sidenotemargin{outer}
+
+\makeindex
+
+\renewcommand{\notenumfont}{\footnotesize}
+\newcommand{\notetextfont}{\footnotesize}
+
+\let\Bfootnoterule=\relax
+\let\Cfootnoterule=\relax
+
+\addtolength{\skip\Afootins}{1.5mm}
+
+\makeatletter
+
+\renewcommand*{\para@vfootnote}[2]{%
+  \insert\csname #1footins\endcsname
+  \bgroup
+    \notefontsetup
+    \interlinepenalty=\interfootnotelinepenalty
+    \floatingpenalty=\@MM
+    \splittopskip=\ht\strutbox \splitmaxdepth=\dp\strutbox
+    \leftskip=\z@skip \rightskip=\z@skip
+    \l@dparsefootspec #2\ledplinenumtrue%                  new from here
+    \ifnum\@nameuse{previous@#1@number}=\l@dparsedstartline\relax
+      \ledplinenumfalse
+     \fi
+     \ifnum\previous@page=\l@dparsedstartpage\relax
+     \else \ledplinenumtrue \fi
+     \ifnum\l@dparsedstartline=\l@dparsedendline\relax
+     \else \ledplinenumtrue \fi
+     \expandafter\xdef\csname previous@#1@number\endcsname{\l@dparsedstartline}%
+     \xdef\previous@page{\l@dparsedstartpage}%            to here
+     \setbox0=\vbox{\hsize=\maxdimen
+       \noindent\csname #1footfmt\endcsname#2}%
+      \setbox0=\hbox{\unvxh0}%
+      \dp0=0pt
+      \ht0=\csname #1footfudgefactor\endcsname\wd0
+      \box0
+      \penalty0
+  \egroup
+}
+
+\newcommand*{\previous@A@number}{-1}
+\newcommand*{\previous@B@number}{-1}
+\newcommand*{\previous@C@number}{-1}
+\newcommand*{\previous@page}{-1}
+
+\newcommand{\abb}[1]{#1%
+        \let\rbracket\nobrak\relax}
+\newcommand{\nobrak}{\textnormal{}}
+\newcommand{\morenoexpands}{%
+        \let\abb=0%
+}
+
+\newcommand{\Aparafootfmt}[3]{%
+  \ledsetnormalparstuff
+  \scriptsize
+  \notenumfont\printlines#1|\enspace
+  \notetextfont
+  #3\penalty-10\hskip 1em plus 4em minus.4em\relax}
+
+\newcommand{\Bparafootfmt}[3]{%
+  \ledsetnormalparstuff
+  \scriptsize
+  \notenumfont\printlines#1|%
+  \ifledplinenum
+   \enspace
+  \else
+   {\hskip 0em plus 0em minus .3em}%
+  \fi
+  \select@lemmafont#1|#2\rbracket\enskip
+  \notetextfont
+  #3\penalty-10\hskip 1em plus 4em minus.4em\relax }
+
+\newcommand{\Cparafootfmt}[3]{%
+  \ledsetnormalparstuff
+  \scriptsize
+  \notenumfont\printlines#1|\enspace
+  \notetextfont
+  #3\penalty-10\hskip 1em plus 4em minus.4em\relax}
+
+\makeatother
+
+\footparagraph{A}
+\footparagraph{B}
+\footparagraph{C}
+
+\let\Afootfmt=\Aparafootfmt
+\let\Bfootfmt=\Bparafootfmt
+\let\Cfootfmt=\Cparafootfmt
+
+\renewcommand*{\Rlineflag}{}
+
+\emergencystretch40pt
+
+\author{Guillelmus de Berchen}
+\title{Chronicon Geldriae}
+\date{}
+\hyphenation{archi-epi-sco-po Huns-dis-brug li-be-ra No-vi-ma-gen-si}
+\begin{document}
+\begin{pages}
+\begin{Leftside}
+\beginnumbering\pstart
+\selectlanguage{latin}
+\section{De ecclesia S. Stephani Novimagensi}
+
+\noindent\setline{1}
+Nobilis itaque comes Otto\protect\edindex{Otto II of Guelders}
+imperio et dominio Novimagensi sibi, ut praefertur, impignoratis
+et commissis
+\edtext{proinde}{\Bfootnote{primum D}} praeesse cupiens, anno
+\textsc{liiii} superius descripto, mense
+Iu\edtext{}{\Afootnote{p.\ 227~R}}nio, una cum iudice, scabinis ceterisque
+civibus civitatis Novimagensis, pro ipsius et inhabitantium in ea
+necessitate,\edtext{}{\Afootnote{p.\ 97~N}} commodo et utilitate,
+ut \edtext{ecclesia eius}{\Bfootnote{ecclesia D: eius eius H}} parochialis
+\edtext{\abb{extra civitatem}}{\Bfootnote{\textit{om.}~H}} sita
+destrueretur et \edtext{infra}{\Bfootnote{intra D}} muros
+\edtext{transfer\edtext{}{\Afootnote{p.\ 129~D}}retur}%
+{\Bfootnote{transferreretur NH}}
+ac de novo construeretur,
+\edtext{a reverendo patre domino
+Conrado\protect\edindex{Conrad of Hochstaden} de
+\edtext{Hofsteden}{\Bfootnote{Hoffstede D: Hoffsteden H}}, archiepiscopo
+\edtext{Coloniensi}{\Bfootnote{Colononiensi H}}, licentiam}%
+{\Cfootnote{William is confusing two charters that are five years
+apart. Permission from St.\ Apostles' Church in Cologne had been
+obtained as early as 1249. Cf.\
+Sloet\protect\index{Sloet van de Beele, L.A.J.W.},
+\textit{Oorkondenboek} nr.\ 707 (14 November 1249):
+``\ldots{}nos devotionis tue precibus annuentes, ut ipsam ecclesiam
+faciens demoliri transferas in locum alium competentem, tibi
+auctoritate presentium indulgemus\ldots''}}, et a venerabilibus
+\edtext{dominis}{\Bfootnote{viris H}} decano et capitulo sanctorum
+Apostolorum\protect\edindex{St. Apostles' (Cologne)}
+\edtext{Coloniensi}{\Bfootnote{Coloniae H}}, ipsius ecclesiae ab
+antiquo veris et pacificis patronis, consensum, citra tamen
+praeiudicium, damnum aut gravamen \edtext{iurium}{\Bfootnote{virium D}}
+et bonorum eorundem, impetravit.
+\pend
+
+\pstart
+\edtext{Et exinde \edtext{liberum}{\Bfootnote{librum H}}
+locum eiusdem civitatis
+\edtext{qui}{\Bfootnote{quae D}} dicitur
+\edtext{Hundisburg}{\Bfootnote{Hundisburch D: Hundisbrug HMN:
+Hunsdisbrug R}}\protect\edindex{Hundisburg},
+de praelibati Wilhelmi\protect\edindex{William II of Holland} Romanorum
+\edtext{regis}{\Bfootnote{imperatoris D}}, ipsius fundi
+do\edtext{}{\Afootnote{f.\ 72v~M}}mini, consensu, ad aedificandum
+\edtext{\abb{et consecrandum}}{\Bfootnote{\textit{om.}\ H}}
+ecclesi\edtext{}{\Afootnote{p.\ 228~R}}am et coemeterium,
+\edtext{eisdem}{\Bfootnote{eiusdem D}} decano et capitulo de expresso
+eiusdem civitatis assensu libera contradiderunt voluntate, obligantes
+se ipsi \edtext{comes}{\Bfootnote{comites D}} et civitas
+\edtext{\abb{dictis}}{\Bfootnote{\textit{om.}\ H}} decano et capitulo,
+quod in recompensationem illius areae infra castrum et portam, quae
+fuit dos ecclesiae, in qua plebanus habitare solebat---quae
+\edtext{tunc}{\Bfootnote{nunc H}} per novum fossatum civitatis est
+destructa---aliam aream competentem et ecclesiae novae,
+\edtext{ut praefertur, aedificandae}{%
+\lemma{\abb{ut\ldots aedificandae}}\Bfootnote{\textit{om.}\ H}} satis
+\edtext{contiguam}{\Bfootnote{contiguum M}}, ipsi plebano darent et
+assignarent.}{\Cfootnote{Cf.\ Sloet, \textit{Oorkondenboek} nr.\ 762
+(June 1254)}} Et desuper
+\edtext{\abb{apud}}{\Bfootnote{\textit{om.}\ H}} dictam ecclesiam
+sanctorum Apostolorum \edtext{est}{\Bfootnote{et H}}
+\edtext{littera}{\Bfootnote{litteram H}} sigillis ipsorum
+Ottonis\edtext{}{\Afootnote{p.\ 130~D}} comitis et civitatis
+\edtext{Novimagensis}{\Bfootnote{Novimagii D}}
+\edtext{sigillata}{\Bfootnote{sigillis communita H}}.
+\pend
+
+\pstart
+ // One additional line to show synchronization. //
+\pend
+\endnumbering
+\end{Leftside}
+
+\begin{Rightside}
+\sidenotemargin{right}\selectlanguage{english}
+\beginnumbering
+\pstart
+\addtocounter{section}{-1}%
+\leavevmode\section{St.\ Stephen's Church in Nijmegen}
+
+\noindent\setline{1}%
+After the noble count Otto had taken in pledge the power over
+Nijmegen,\footnote{In 1247 William II\protect\index{William II of Holland}
+(1227--1256) count of Holland needed money to fight his way to
+Aachen\protect\index{Aachen} to be crowned King of the Holy Roman
+Empire. He gave the town of Nijmegen in pledge to Otto
+II\protect\index{Otto II of Guelders} (1229--1271) count of Guelders.}
+like I have written above, he wanted to protect the town. So in June
+1254\ledsidenote{1254} he and the judge, the sheriffs and other
+citizens of Nijmegen obtained permission to demolish the parish
+church that lay outside the town walls,\footnote{Since the early
+seventh century old St.\ Stephen's church had been located close
+to the castle, at today's
+Kelfkensbos\protect\index{Kelfkensbos (Nijmegen)} square.
+Traces of the church and the presbytery were found during excavations
+in 1998--1999.} to move it inside the walls and to rebuild it new.
+This operation was necessary and useful both for Otto himself and
+for the inhabitants of the town. The reverend father Conrad of
+Hochstaden, archbishop of
+Cologne,\footnote{Conrad of Hochstaden ({\textdagger} 1261) was
+archbishop of Cologne in 1238--1261. Nijmegen belonged to the
+archdiocese of Cologne until 1559.} gave his permission. So did the
+reverend dean and canons of the chapter of St.\
+Apostles'\protect\index{St. Apostles' (Cologne)} in Cologne, who had
+long\footnote{They probably became the patrons when the chapter was
+established in the early eleventh century. About the church and the
+chapter, see Gottfried Stracke\protect\index{Stracke, G.},
+\textit{K\"{o}ln:\ St.\ Aposteln}, Stadtspuren -- Denkm\"{a}ler in
+K\"{o}ln, vol.\ 19, K\"{o}ln: J.\,P.\ Bachem, 1992.} been the true
+and benevolent patrons of the church---but they did not allow Otto
+to do anything without their knowledge, nor to infringe their rights,
+nor to damage their property.
+\pend
+
+\pstart
+And so the count and the town voluntarily gave an open space in town
+called Hundisburg, which was owned by the aforementioned king William,
+to the dean and chapter of St.\ Apostles' in order to build and
+consecrate a church and graveyard. King William approved and the
+town of Nijmegen explicitly expressed its assent. A new ditch was dug
+on property of the church near the castle and the
+harbour,\footnote{Nowadays, the exact location of the medieval
+ditch---and of two Roman ones---can be seen in the pavement of
+Kelfkensbos\protect\index{Kelfkensbos (Nijmegen)} square.} causing
+the demolition of the presbytery. In compensation, the count and
+citizens committed themselves to giving the parish priest another
+suitable space close enough to the new church that was about to be
+built. A letter about these transactions, with the seals of count
+Otto and the town of Nijmegen, is kept at St.\ Apostles'
+church.\footnote{The original letter is lost. A 15th century
+transcription of it is kept at the Historisches Archiv der
+Stadt K\"{o}ln (HAStK).}
+\pend
+
+\pstart
+// One additional line to show synchronization. //
+\pend
+\endnumbering
+\end{Rightside}
+\Pages
+\end{pages}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\printindex
+\end{document}
+%%%%%%%%%%%%%%%%%%
+
+\endinput
+%%
+%% End of file `djd17nov.tex'.

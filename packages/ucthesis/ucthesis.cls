@@ -210,6 +210,10 @@
 %
 % \listoftables:
 \def\listtablename{List of Tables}
+%                   ~~~~~~~~~~~~~~~
+%
+% \listoftables:
+\def\listlistingname{List of Listings}
 %                  ~~~~~~~~~~~~~~
 %
 % \thebibliography:
@@ -905,6 +909,25 @@ Dissertation Committee Chair
 
 
 \let\l@table\l@figure
+
+% LIST OF LISTINGS
+%
+\def\listoflisting{\@restonecolfalse
+  \if@twocolumn\@restonecoltrue\onecolumn\fi
+  \chapter*{\listlistingname\@mkboth{\uppercase{\listtablename}}%
+   {\uppercase{\listlistingname}}}\@starttoc{lol}\if@restonecol
+  \twocolumn\fi}
+\def\listoflistings{\@restonecolfalse
+  \if@twocolumn\@restonecoltrue\onecolumn\fi
+  \chapter*{\listlistingname\@mkboth{\uppercase{\listtablename}}%
+{\uppercase{\listlistingname}}}
+   \addcontentsline{toc}{chapter}{\listlistingname}
+   {\ssp\@starttoc{lol}}\if@restonecol
+  \twocolumn\fi}
+
+
+\let\l@listing\l@figure
+
 
 
 

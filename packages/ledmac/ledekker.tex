@@ -1,0 +1,208 @@
+%%
+%% This is file `ledekker.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledmac.dtx  (with options: `dekker')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2003 -- 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+%%% This is ledekker.tex, a sample critical text edition
+%%% written in LaTeX2e with the ledmac package.
+%%% (c) 2003--2004 by Dr. Dirk-Jan Dekker,
+%%% University of Nijmegen (The Netherlands)
+%%% (PRW) Modified slightly by PRW to fit the ledmac manual
+
+\documentclass[10pt, letterpaper, oneside]{article}
+\usepackage[latin]{babel}
+\usepackage{ledmac}
+
+\lineation{section}
+\linenummargin{left}
+\sidenotemargin{outer}
+
+\renewcommand{\notenumfont}{\footnotesize}
+\newcommand{\notetextfont}{\footnotesize}
+
+\let\Bfootnoterule=\relax
+\let\Cfootnoterule=\relax
+
+\addtolength{\skip\Afootins}{1.5mm}
+
+\makeatletter
+
+\renewcommand*{\para@vfootnote}[2]{%
+  \insert\csname #1footins\endcsname
+  \bgroup
+    \notefontsetup
+    \footsplitskips
+    \l@dparsefootspec #2\ledplinenumtrue % new from here
+    \ifnum\@nameuse{previous@#1@number}=\l@dparsedstartline\relax
+      \ledplinenumfalse
+     \fi
+     \ifnum\previous@page=\l@dparsedstartpage\relax
+     \else \ledplinenumtrue \fi
+     \ifnum\l@dparsedstartline=\l@dparsedendline\relax
+     \else \ledplinenumtrue \fi
+     \expandafter\xdef\csname previous@#1@number\endcsname{\l@dparsedstartline}
+     \xdef\previous@page{\l@dparsedstartpage} % to here
+     \setbox0=\vbox{\hsize=\maxdimen
+       \noindent\csname #1footfmt\endcsname#2}%
+      \setbox0=\hbox{\unvxh0}%
+      \dp0=0pt
+      \ht0=\csname #1footfudgefactor\endcsname\wd0
+      \box0
+      \penalty0
+  \egroup
+}
+
+\newcommand*{\previous@A@number}{-1}
+\newcommand*{\previous@B@number}{-1}
+\newcommand*{\previous@C@number}{-1}
+\newcommand*{\previous@page}{-1}
+
+\newcommand{\abb}[1]{#1%
+        \let\rbracket\nobrak\relax}
+\newcommand{\nobrak}{\textnormal{}}
+\newcommand{\morenoexpands}{%
+        \let\abb=0%
+}
+
+\newcommand{\Aparafootfmt}[3]{%
+  \ledsetnormalparstuff
+  \scriptsize
+  \notenumfont\printlines#1|\enspace
+  \notetextfont
+  #3\penalty-10\hskip 1em plus 4em minus.4em\relax}
+
+\newcommand{\Bparafootfmt}[3]{%
+  \ledsetnormalparstuff
+  \scriptsize
+  \notenumfont\printlines#1|%
+  \ifledplinenum
+   \enspace
+  \else
+   {\hskip 0em plus 0em minus .3em}
+  \fi
+  \select@lemmafont#1|#2\rbracket\enskip
+  \notetextfont
+  #3\penalty-10\hskip 1em plus 4em minus.4em\relax }
+
+\newcommand{\Cparafootfmt}[3]{%
+  \ledsetnormalparstuff
+  \notenumfont\printlines#1|\enspace
+  \notetextfont
+  #3\penalty-10\hskip 1em plus 4em minus.4em\relax}
+
+\makeatother
+
+\footparagraph{A}
+\footparagraph{B}
+\footparagraph{C}
+
+\let\Afootfmt=\Aparafootfmt
+\let\Bfootfmt=\Bparafootfmt
+\let\Cfootfmt=\Cparafootfmt
+
+\emergencystretch40pt
+
+\author{Guillelmus de Berchen}
+\title{Chronicle of Guelders}
+\date{}
+\hyphenation{archi-epi-sco-po Huns-dis-brug li-be-ra No-vi-ma-gen-si}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\section*{St.\ Stephen's Church in Nijmegen}
+\beginnumbering
+\autopar
+
+\noindent
+Nobilis itaque comes Otto imperio et dominio Novimagensi sibi,
+ut praefertur, impignoratis et commissis
+\edtext{proinde}{\Bfootnote{primum D}} praeesse cupiens, anno
+\textsc{liiii}\ledsidenote{1254} superius descripto, mense
+Iu\edtext{}{\Afootnote{p.\ 227~R}}nio, una cum iudice, scabinis
+ceterisque civibus civitatis Novimagensis, pro ipsius et
+inhabitantium in ea necessitate,\edtext{}{\Afootnote{p.\ 97~N}}
+commodo et utilitate, ut
+\edtext{ecclesia eius}{\Bfootnote{ecclesia D: eius eius H}}
+parochialis
+\edtext{\abb{extra civitatem}}{\Bfootnote{\textit{om.}~H}} sita
+destrueretur et \edtext{infra}{\Bfootnote{intra D}} muros
+\edtext{transfer\edtext{}{\Afootnote{p.\ 129~D}}retur}%
+{\Bfootnote{transferreretur NH}}
+ac de novo construeretur, \edtext{a reverendo patre domino
+\edtext{Conrado de \edtext{Hofsteden}%
+{\Bfootnote{Hoffstede D: Hoffsteden H}},
+archiepiscopo
+\edtext{Coloniensi}{\Bfootnote{Colononiensi H}}}%
+{\Cfootnote{Conrad of Hochstaden was archbishop of Cologne in
+1238--1261}}, licentiam}{\Cfootnote{William is confusing two
+charters that are five years apart. Permission from St.\ Apostles'
+Church in Cologne had been obtained as early as 1249. Cf.\ Sloet,
+\textit{Oorkondenboek} nr.\ 707 (14 November 1249):
+``\ldots{}nos devotionis tue precibus annuentes, ut ipsam
+ecclesiam faciens demoliri transferas in locum alium competentem,
+tibi auctoritate presentium indulgemus\ldots{}''}}, et a
+venerabilibus \edtext{dominis}{\Bfootnote{viris H}} decano et
+capitulo sanctorum Apostolorum
+\edtext{Coloniensi}{\Bfootnote{Coloniae H}}, ipsius ecclesiae ab
+antiquo veris et pacificis patronis, consensum, citra tamen
+praeiudicium, damnum aut gravamen
+\edtext{iurium}{\Bfootnote{virium D}} et bonorum eorundem,
+impetravit.
+
+\edtext{Et exinde \edtext{liberum}{\Bfootnote{librum H}} locum
+eiusdem civitatis \edtext{qui}{\Bfootnote{quae D}} dicitur
+\edtext{Hundisbrug}{\Bfootnote{Hundisburch D: Hunsdisbrug R}},
+de praelibati Wilhelmi Romanorum
+\edtext{regis}{\Bfootnote{imperatoris D}}, ipsius fundi
+do\edtext{}{\Afootnote{f.\ 72v~M}}mini, consensu, ad aedificandum
+\edtext{\abb{et consecrandum}}{\Bfootnote{\textit{om.}\ H}}
+ecclesi\edtext{}{\Afootnote{p.\ 228~R}}am et coemeterium,
+\edtext{eisdem}{\Bfootnote{eiusdem D}} decano et capitulo de
+expresso eiusdem civitatis assensu libera contradiderunt voluntate,
+obligantes se ipsi \edtext{comes}{\Bfootnote{comites D}} et civitas
+\edtext{\abb{dictis}}{\Bfootnote{\textit{om.}\ H}} decano et
+capitulo, quod in recompensationem illius areae infra castrum et
+portam, quae fuit dos ecclesiae, in qua plebanus habitare
+solebat---quae \edtext{tunc}{\Bfootnote{nunc H}} per novum fossatum
+civitatis est destructa---aliam aream competentem et ecclesiae
+novae,
+\edtext{ut praefertur, aedificandae}{\lemma{\abb{ut\ldots aedificandae}}%
+\Bfootnote{\textit{om.}\ H}} satis
+\edtext{contiguam}{\Bfootnote{contiguum M}}, ipsi plebano darent
+et assignarent. Et desuper
+\edtext{\abb{apud}}{\Bfootnote{\textit{om.}\ H}} dictam ecclesiam
+sanctorum Apostolorum \edtext{est}{\Bfootnote{et H}}
+\edtext{littera}{\Bfootnote{litteram H}} sigillis ipsorum
+Ottonis\edtext{}{\Afootnote{p.\ 130~D}} comitis et civitatis
+\edtext{Novimagensis}{\Bfootnote{Novimagii D}}
+\edtext{sigillata}{\Bfootnote{sigillis communita H}}.}%
+{\Cfootnote{Cf.\ Sloet, \textit{Oorkondenboek} nr.\ 762 (June 1254)}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\endnumbering
+\end{document}
+%%%%%%%%%%%%%%%%%%
+
+\endinput
+%%
+%% End of file `ledekker.tex'.

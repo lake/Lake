@@ -1,0 +1,164 @@
+%%
+%% This is file `ledfeat.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledmac.dtx  (with options: `features')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2003 -- 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+\documentclass{article}
+\usepackage{ledmac}
+
+\noendnotes  % we aren't having any endnotes
+
+ \makeatletter
+ % I'd like a spaced out colon after the lemma:
+ \newcommand{\spacedcolon}{{\rmfamily\thinspace:\thinspace}}
+ \renewcommand*{\normalfootfmt}[3]{%
+   \ledsetnormalparstuff
+   {\notenumfont\printlines#1|}\strut\enspace
+   {\select@lemmafont#1|#2}\spacedcolon\enskip#3\strut\par}
+
+ % And I'd like the 3-col notes printed with a hanging indent:
+ \renewcommand*{\threecolfootfmt}[3]{%
+   \normal@pars
+   \hsize .3\hsize
+   \setlength{\parindent}{0pt}
+   \tolerance=5000       % high, but not infinite
+   \raggedright
+   \hangindent1.5em \hangafter1
+   \leavevmode
+   \strut\hbox to 1.5em{\notenumfont\printlines#1|\hfil}\ignorespaces
+   {\select@lemmafont#1|#2}\rbracket\enskip
+   #3\strut\par\allowbreak}
+
+ % And I'd like the 2-col notes printed with a double colon:
+ \newcommand*{\doublecolon}{{\rmfamily\thinspace::\thinspace}}
+ \renewcommand*{\twocolfootfmt}[3]{%
+   \normal@pars
+   \hsize .45\hsize
+   \setlength{\parindent}{0pt}
+   \tolerance=5000
+   \raggedright
+   \leavevmode
+   \strut{\notenumfont\printlines#1|}\enspace
+   {\select@lemmafont#1|#2}\doublecolon\enskip
+   #3\strut\par\allowbreak}
+
+ % And in the paragraphed footnotes, I'd like a colon too:
+ \renewcommand*{\parafootfmt}[3]{%
+   \ledsetnormalparstuff
+   {\notenumfont\printlines#1|}\enspace
+   {\select@lemmafont#1|#2}\spacedcolon\enskip
+   #3\penalty-10 }
+ \makeatother
+
+ % I'd like the line numbers picked out in bold.
+ \renewcommand{\notenumfont}{\bfseries}
+ \lineation{page}
+ \linenummargin{inner}
+ \setcounter{firstlinenum}{3}       % just because I can
+ \setcounter{linenumincrement}{1}
+ \foottwocol{A}
+ \footthreecol{B}
+ \footparagraph{E}
+ % I've changed \normalfootfmt, so invoke it again for C and D notes.
+ \footnormal{C}
+ \footnormal{D}
+
+\begin{document}
+
+ \beginnumbering
+
+ \pstart
+ This is an \edtext{example}{
+   \Afootnote{eximemple C, D.}}
+ of some %\footnote{A normal footnote}
+ text with \edtext{variant}{
+   \Afootnote{alternative, A, B.}}
+ readings recorded as `A' footnotes.  From here on, \edtext{though}{
+   \Afootnote{however $\alpha$, $\beta$}},
+ we shall have \edtext{`C'}{
+   \Bfootnote{B, \textit{pace} the text}}.
+ \edtext{For spice, let us mark a longer passage, but give a different
+   lemma for it, so that we don't get a \edtext{huge}{
+     \Dfootnote{vast E, F; note that this is
+     a `D' note to section of text within a longer lemma}}
+   amount of text in a note}{\lemma{For spice \dots\ note}
+   \Cfootnote{The note here is type `C'}}.
+ \edtext{Finally}{
+   \Efootnote{in the end X, Y}},
+ \edtext{we}{
+   \Efootnote{us K}}
+ \edtext{shouldn't}{
+   \Efootnote{ought not to L, M}}
+ \edtext{forget the}{
+   \Efootnote{omit to mention the \S, \P}}
+ \edtext{paragraphed}{
+   \Efootnote{blocked M, N}}
+ \edtext{notes}{
+   \Efootnote{variants HH, KK}},
+ which are so \edtext{useful}{
+   \Efootnote{truly useful L, P}}
+ when there are \edtext{a great number of}{
+   \Efootnote{many, many (preferably)}}
+ short notes to be \edtext{recorded}{
+   \Efootnote{noted: repetition}}.
+ \pend
+
+ \pstart
+ This is a second paragraph, giving more \textit{\edtext{examples}{
+   \Afootnote{eximples L, M.}}}
+ of text with \edtext{variant}{
+   \Afootnote{alternative, A, B.}}
+ readings recorded as `A' footnotes.  From here on, \edtext{though}{
+   \Bfootnote{however $\alpha$, $\beta$}},
+ we  shall have \edtext{`B'}{
+   \Bfootnote{B, as correctly stated in the text}} notes in the text.
+ \edtext{For spice, let us mark a longer passage, but give a different
+   lemma for it, so that we don't get a \textit{\edtext{huge}{
+     \Dfootnote{vast E, F; note that this is
+     a `D' note to text within a longer lemma.}}}
+   amount of text in a note}{\lemma{For spice, \dots\ note}
+   \Cfootnote{This is a rogue note of type `C'.}}.
+ \edtext{Finally}{
+   \Bfootnote{In the end X, Y}},
+ \edtext{we}{
+   \Bfootnote{we here K}}
+ \edtext{shouldn't}{
+   \Bfootnote{ought not to L, M}}
+ \edtext{forget the}{
+   \Bfootnote{omit to mention the \S, \P}}
+ \edtext{column}{
+   \Bfootnote{blocked M, N}}
+ \edtext{notes}{
+   \Bfootnote{variants H}},
+ which are so \edtext{useful}{
+   \Bfootnote{very, very useful L, P}}
+ when there are \edtext{many}{
+   \Bfootnote{lots of Z}}
+ short notes to be \edtext{recorded}{
+   \Bfootnote{recorded and put down: M (repetition)}}.
+ \pend
+
+ \endnumbering
+\end{document}
+\endinput
+%%
+%% End of file `ledfeat.tex'.

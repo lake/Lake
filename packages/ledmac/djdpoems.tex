@@ -1,0 +1,200 @@
+%%
+%% This is file `djdpoems.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledpar.dtx  (with options: `djdpoems')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2004, 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+
+%%% djdpoems.tex  example parallel verses on facing pages
+\documentclass{article}
+\usepackage{ledmac,ledpar}
+\addtolength{\textheight}{-15\baselineskip}
+
+\maxchunks{24} % default value = 10
+\setstanzaindents{6,0,1,0,1}
+
+\newcommand{\longdash}{---------}
+
+\footparagraph{A} % for left pages
+\footparagraph{B} % for right pages
+\firstlinenum{1}
+\linenumincrement{1}
+
+\let\oldBfootfmt\Bfootfmt
+\renewcommand{\Bfootfmt}[3]{%
+   \let\printlines\printlinesR
+   \oldBfootfmt{#1}{#2}{#3}}
+
+\begin{document}
+
+\newcommand{\interstanza}{\pstart\centering\longdash\skipnumbering\pend}
+
+\begin{pages}
+\begin{Leftside}
+\def\endstanzaextra{\interstanza}
+\beginnumbering
+
+\stanza
+Arma gravi numero violentaque bella parabam &
+ edere, materi\={a} conveniente modis. &
+Par erat inferior versus---risisse Cupido &
+ dicitur atque unum surripuisse pedem. \&
+
+\stanza
+``Quis tibi, saeve puer, dedit hoc in carmina iuris? &
+ Pieridum vates, non tua turba \edtext{sumus}{\Afootnote{note lost}}. &
+Quid si praeripiat flavae V\u{e}nus arma Minervae, &
+ ventilet accensas flava Minerva faces? \&
+
+\stanza
+Quis probet in silvis Cererem regnare iugosis, &
+ lege pharetratae Virginis arva coli? &
+Crinibus insignem quis \edtext{acuta}{\Afootnote{acut\={a} (abl.\ abs.)}}
+cuspide Phoebum &
+ instruat, Aoniam Marte movente lyram? \&
+\endnumbering
+\end{Leftside}
+
+\begin{Rightside}
+\def\endstanzaextra{\interstanza}
+\beginnumbering
+\firstlinenum{1}
+\linenumincrement{1}
+\setstanzaindents{6,0,1,0,1,0}
+
+\stanza
+I was preparing to sing of weapons and violent wars, &
+in heavy numbers, with the subject matter suited to the verse measure. &
+The even lines were as long as the odd ones, but Cupid laughed, &
+they said, and he stole away one foot.\footnote{I.e., the even lines,
+which were hexameters (with six feet) became pentameters
+(with five feet).} \&
+
+\stanza
+``O cruel boy, who gave you the right over poetry? &
+We poets belong to the Pierides,\footnote{Muses} we are not your folk. &
+\edlabel{beginparadox}What if Venus should seize away the arms of
+Minerva with the golden hair, &
+ if Minerva with the golden hair should fan alight the kindled torch
+of love? \&
+
+\stanza
+Who would approve of Ceres\footnote{Ceres was the Roman goddess of
+the harvest.} reigning on the woodland ridges, &
+ and of land tilled under the law of the Maid with the
+quiver\footnote{By `\textit{Virgo}' (`Virgin') Ovid means Diana, the
+Roman goddess of the hunt.}? &
+Who would provide Phoebus with his beautiful hair with a sharp-pointed
+spear, &
+ while Mars stirs the \edtext{Aonian}{\Bfootnote{Mount Parnassus,
+where the Muses live, is located in Aonia.}}
+lyre?\edlabel{endparadox}\footnote{Lines
+\xlineref{beginparadox}--\xlineref{endparadox} show some paradoxical
+situations that would occur if the gods didn't stay with their own
+business.} \&
+\endnumbering
+\end{Rightside}
+
+\Pages
+\end{pages}
+
+\begin{pages}
+\begin{Leftside}
+\def\endstanzaextra{\interstanza}
+\beginnumbering
+
+\begin{astanza}
+Arma gravi numero violentaque bella parabam &
+ edere, materi\={a} conveniente modis. &
+Par erat inferior versus---risisse Cupido &
+ dicitur atque unum surripuisse pedem. \&
+\end{astanza}
+
+\begin{astanza}
+``Quis tibi, saeve puer, dedit hoc in carmina iuris? &
+ Pieridum vates, non tua turba \edtext{sumus}{\Afootnote{note lost}}. &
+Quid si praeripiat flavae V\u{e}nus arma Minervae, &
+ ventilet accensas flava Minerva faces? \&
+\end{astanza}
+
+\begin{astanza}
+Quis probet in silvis Cererem regnare iugosis, &
+ lege pharetratae Virginis arva coli? &
+Crinibus insignem quis \edtext{acuta}{\Afootnote{acut\={a} (abl.\ abs.)}}
+cuspide Phoebum &
+ instruat, Aoniam Marte movente lyram? \&
+\end{astanza}
+
+\endnumbering
+\end{Leftside}
+
+\begin{Rightside}
+\def\endstanzaextra{\interstanza}
+\beginnumbering
+\firstlinenum{1}
+\linenumincrement{1}
+\setstanzaindents{6,0,1,0,1,0}
+
+\begin{astanza}
+I was preparing to sing of weapons and violent wars, &
+in heavy numbers, with the subject matter suited to the verse measure. &
+The even lines were as long as the odd ones, but Cupid laughed, &
+they said, and he stole away one foot.\footnote{I.e., the even lines,
+which were hexameters (with six feet) became pentameters
+(with five feet).} \&
+\end{astanza}
+
+\begin{astanza}
+``O cruel boy, who gave you the right over poetry? &
+We poets belong to the Pierides,\footnote{Muses} we are not your folk. &
+\edlabel{beginparadox}What if Venus should seize away the arms of
+Minerva with the golden hair, &
+ if Minerva with the golden hair should fan alight the kindled torch
+of love? \&
+\end{astanza}
+
+\begin{astanza}
+Who would approve of Ceres\footnote{Ceres was the Roman goddess of the
+harvest.} reigning on the woodland ridges, &
+ and of land tilled under the law of the Maid with the
+quiver\footnote{By `\textit{Virgo}' (`Virgin') Ovid means Diana,
+the Roman goddess of the hunt.}? &
+Who would provide Phoebus with his beautiful hair with a sharp-pointed
+spear, &
+ while Mars stirs the \edtext{Aonian}{\Bfootnote{Mount Parnassus, where
+the Muses live, is located in Aonia.}}
+lyre?\edlabel{endparadox}\footnote{Lines
+\xlineref{beginparadox}--\xlineref{endparadox} show some paradoxical
+situations that would occur if the gods didn't stay with their
+own business.} \&
+\end{astanza}
+
+\endnumbering
+\end{Rightside}
+
+\Pages
+\end{pages}
+
+\end{document}
+
+\endinput
+%%
+%% End of file `djdpoems.tex'.

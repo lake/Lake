@@ -1,0 +1,139 @@
+%%
+%% This is file `egarabpar.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ledarab.dtx  (with options: `egarabpar')
+%% 
+%%   Author: Peter Wilson (Herries Press) herries dot press at earthlink dot net
+%%   Copyright 2005 Peter R. Wilson
+%% 
+%%   This work may be distributed and/or modified under the
+%%   conditions of the LaTeX Project Public License, either
+%%   version 1.3 of this license or (at your option) any
+%%   later version.
+%%   The latest version of the license is in
+%%      http://www.latex-project.org/lppl.txt
+%%   and version 1.3 or later is part of all distributions of
+%%   LaTeX version 2003/06/01 or later.
+%% 
+%%   This work has the LPPL maintenance status "author-maintained".
+%% 
+%%   This work consists of the files listed in the README file.
+%% 
+%%% egarabpar.tex  ledmac & parallel arabic text
+\documentclass[12pt]{article}
+\addtolength{\textheight}{-4\baselineskip}
+\usepackage{ledmac}
+\usepackage{ledpar}
+\setcounter{firstlinenum}{1} \setcounter{linenumincrement}{1}
+\usepackage{arabtex}
+\usepackage{ledarab}
+%%
+\makeatletter
+\def\printlinesAR#1|#2|#3|#4|#5|#6|#7|{\begingroup
+  \setprintlines{#1}{#2}{#3}{#4}{#5}{#6}%
+  \ifl@d@pnum #1\fullstop\fi
+  \ifledplinenum \RL{#2}\Rlineflag\else \symplinenum\fi
+  \endgroup}
+\makeatother
+
+%%% We will use the Bfootnote series for the arabic right texts,
+%%% in paragraph style
+\footparagraph{B}
+
+%%% right text numbering
+\let\oldBfootfmt\Bfootfmt
+\renewcommand{\Bfootfmt}[3]{%
+  \let\printlines\printlinesR
+  \oldBfootfmt{#1}{#2}{#3}}
+
+\begin{document}
+
+Here is an example pair of texts. The arabic version is on the right.
+
+\vspace{\baselineskip}
+
+\begin{pairs}
+
+\begin{Leftside}
+\beginnumbering
+\pstart
+\noindent
+gUyand kasAn behe \edtext{st}{\Afootnote{Western side}} bA .hUr  hOs ast \\
+man mIgUyam keh 'Ab-i angUr hOs ast \\
+In naqd begIr wa-dast az 'An nesiyeh bedAr \\
+k-'AwAz-i dohol sanIdan az dUr hOs ast.
+\pend
+\end{Leftside}
+
+\renewcommand{\Rlineflag}{r} % writes r in latin
+\begin{Rightside}
+\firstlinenum{2} \linenumincrement{2}
+\begin{arabtext}
+\beginnumbering
+\pstart
+\noindent
+gUyand kasAn behe \edtext{st}{\Bfootnote{Eastern side}} bA .hUr  hOs ast \\
+man mIgUyam keh 'Ab-i angUr hOs ast \\
+In naqd begIr wa-dast az 'An nesiyeh bedAr \\
+k-'AwAz-i dohol sanIdan az dUr hOs ast.
+\pend
+\end{arabtext}
+\end{Rightside}
+
+\Columns
+
+\end{pairs}
+
+\vspace{\baselineskip}
+
+The same texts but more oriented towards arabic.
+
+\vspace{\baselineskip}
+
+\begin{pairs}
+
+\begin{Leftside}
+\pstart
+\noindent
+gUyand kasAn behe st bA .hUr  hOs ast \\
+man mIgUyam \edtext{keh}{\Afootnote{\RL{Western side}}} 'Ab-i angUr hOs ast \\
+In naqd begIr wa-dast az 'An nesiyeh bedAr \\
+k-'AwAz-i dohol sanIdan az dUr hOs ast.
+\pend
+\endnumbering
+\end{Leftside}
+
+%%% right full arabic note numbering
+\renewcommand{\Bfootfmt}[3]{%
+  \let\printlines\printlinesAR
+  \oldBfootfmt{#1}{#2}{#3}}
+\renewcommand{\Rlineflag}{\RL{r}} % writes r in arabic
+
+\begin{Rightside}
+\firstlinenum{1} \linenumincrement{1}
+\arablnumrepR % changes the number to arabic
+\begin{arabtext}
+\pstart
+\noindent
+gUyand kasAn behe st bA .hUr  hOs ast \\
+man mIgUyam \edtext{keh}{\Bfootnote{\RL{Eastern side}}} 'Ab-i angUr hOs ast \\
+In naqd begIr wa-dast az 'An nesiyeh bedAr \\
+k-'AwAz-i dohol sanIdan az dUr hOs ast.
+\pend
+\endnumbering
+\end{arabtext}
+\end{Rightside}
+
+\begin{arabtext}
+\Columns
+\end{arabtext}
+
+\end{pairs}
+
+\end{document}
+\endinput
+%%
+%% End of file `egarabpar.tex'.
