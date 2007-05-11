@@ -101,7 +101,7 @@ view: ${PAPER}
 	pdflatex $< #> /dev/null
 
 .PRECIOUS: %.$(IMAGE_TYPE)
-%.$(IMAGE_TYPE): $(DIA_SRC)
+%.$(IMAGE_TYPE): %.dia
 	dia -t $(IMAGE_TYPE) $<
 
 .PRECIOUS: %.pdf
@@ -111,7 +111,6 @@ view: ${PAPER}
 %.eps: %.dot
 	dot $< -Tps > $@
 
-#TODO: not sure I really want -Gepsilon?
 %.eps: %.neato
 	neato -Gepsilon=.000000001 $< -Tps > $@
 
@@ -135,11 +134,15 @@ endif
 .PHONY: clean
 clean:
 	rm -f $(CURRENT).bbl $(CURRENT).blg $(CURRENT).log *.aux *.bak
-	rm -f *~ $(FIGURES) .xpdf-reload
+	rm -f .xpdf-reload
 
 .PHONY: cleaner
 cleaner: clean
 	rm -f $(CURRENT).pdf
+
+.PHONY: cleanest
+cleanest: cleaner
+	rm -f *~ $(FIGURES)
 
 todo:
 	grep "TODO" -R *.tex
