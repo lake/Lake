@@ -65,10 +65,6 @@ FIGURES = $(XFIG_PDFTEX_T) $(DOTPDF) $(NEATOPDF) $(GNUPLOT_OUTPUT) $(DIA_OUTPUT)
 
 export latex_count=3
 
-#.PHONY: debug
-#debug: 
-#	@echo $(PDF_VIEWER)
-
 .PHONY: all
 ifneq ($(notdir $(PDF_VIEWER)),xpdf)
 all: $(PAPER)
