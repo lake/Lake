@@ -13,3 +13,4 @@
 *.bak
 .xpdf-reload
 Makefile.global
+.vimspell.utf8.add.spl
