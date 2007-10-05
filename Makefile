@@ -35,11 +35,11 @@ ifdef LOCAL_BSTINPUTS
 	endif
 endif
 TEX_INCLUDES = $(wildcard latex/*.tex)
-TEX_SRC = $(wildcard *.tex)
+TEX_SRC = $(shell find . -name \*.tex)
 BIB_FILES = $(wildcard *.bib) $(wildcard Bib/*.bib)
 
-XFIG_FILES = $(wildcard Figures/*.fig)
-#XFIG_FILES = $(shell find ./Figures -name \*.fig)  If I want to use subdirs.
+#XFIG_FILES = $(wildcard Figures/*.fig) #no subdirs
+XFIG_FILES = $(shell find ./Figures -name \*.fig) 
 XFIG_PDFTEX_T = $(XFIG_FILES:fig=pdftex_t)
 XFIG_TEMPS = $(wildcard Figures/*.bak) $(XFIG_FILES:fig=pdf) $(XFIG_PDFTEX_T)
 
@@ -51,12 +51,17 @@ NEATO=$(wildcard Figures/*.neato)
 #NEATOEPS=$(NEATO:neato=eps)
 NEATOPDF=$(NEATO:neato=pdf)
 
-GNUPLOT_SRC = $(wildcard Figures/*.gnuplot)
-GNUPLOT_TEX = $(GNUPLOT_SRC:gnuplot=tex)
+GNUPLOT_STEX = $(shell find ./Figures -name \*.gtex)
+GNUPLOT_SPNG = $(shell find ./Figures -name \*.gpng)
+GNUPLOT_SJPG = $(shell find ./Figures -name \*.gjpg)
+GNUPLOT_TEX = $(GNUPLOT_STEX:gtex=tex)
+GNUPLOT_PNG = $(GNUPLOT_SPNG:gpng=png)
+GNUPLOT_JPG = $(GNUPLOT_SJPG:gjpg=jpg)
 #GNUPLOT_FIG = $(GNUPLOT_SRC:gnuplot=fig)
 #GNUPLOTEPS=$(GNUPLOT:gnuplot=eps)
 #GNUPLOTPDF=$(GNUPLOT:gnuplot=pdf)
-GNUPLOT_OUTPUT = $(GNUPLOT_TEX) #$(GNUPLOT_FIG)
+GNUPLOT_SRC = $(GNUPLOT_STEX) $(GNUPLOT_SPNG) $(GNUPLOT_STJPG)
+GNUPLOT_OUTPUT = $(GNUPLOT_TEX) $(GNUPLOT_PNG) $(GNUPLOT_JPG)
 
 DIA_SRC = $(wildcard Figures/*.dia)
 DIA_OUTPUT = $(DIA_SRC:dia=$(IMAGE_TYPE))
@@ -68,6 +73,9 @@ export latex_count=3
 .PHONY: all
 ifneq ($(notdir $(PDF_VIEWER)),xpdf)
 all: $(PAPER)
+#all:
+#	@echo source $(GNUPLOT_SRC)
+#	@echo output $(GNUPLOT_OUTPUT)
 else
 all: $(PAPER) .xpdf-reload
 endif
@@ -117,9 +125,20 @@ ifneq ($(strip $(BIB_FILES)),)
 endif
 	@echo "" # manual NOP
 
+# gnuplot's latex terminal
 .PRECIOUS: %.tex
-%.tex: %.gnuplot
-	gnuplot $< > $(<:gnuplot=tex)
+%.tex: %.gtex
+	gnuplot $< > $(<:gtex=tex)
+
+# gnuplot's png terminal
+.PRECIOUS: %.png
+%.png: %.gpng
+	gnuplot $< > $(<:gpng=png)
+
+# gnuplot's jpeg terminal
+.PRECIOUS: %.jpg
+%.jpg: %.gjpg
+	gnuplot $< > $(<:gjpg=jpg)
 
 #Without -p, graphics are not output, only text.
 .PRECIOUS: %.pdftex_t
