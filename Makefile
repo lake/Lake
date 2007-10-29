@@ -38,8 +38,8 @@ TEX_INCLUDES = $(wildcard latex/*.tex)
 TEX_SRC = $(wildcard *.tex)
 BIB_FILES = $(wildcard *.bib) $(wildcard Bib/*.bib)
 
-XFIG_FILES = $(wildcard Figures/*.fig)
-#XFIG_FILES = $(shell find ./Figures -name \*.fig)  If I want to use subdirs.
+#XFIG_FILES = $(wildcard Figures/*.fig) #no subdirs
+XFIG_FILES = $(shell find ./Figures -name \*.fig) 
 XFIG_PDFTEX_T = $(XFIG_FILES:fig=pdftex_t)
 XFIG_TEMPS = $(wildcard Figures/*.bak) $(XFIG_FILES:fig=pdf) $(XFIG_PDFTEX_T)
 
@@ -51,7 +51,8 @@ NEATO=$(wildcard Figures/*.neato)
 #NEATOEPS=$(NEATO:neato=eps)
 NEATOPDF=$(NEATO:neato=pdf)
 
-GNUPLOT_SRC = $(wildcard Figures/*.gnuplot)
+#GNUPLOT_SRC = $(wildcard Figures/*.gnuplot) #no subdirs
+GNUPLOT_SRC = $(shell find ./Figures -name \*.gnuplot)
 GNUPLOT_TEX = $(GNUPLOT_SRC:gnuplot=tex)
 #GNUPLOT_FIG = $(GNUPLOT_SRC:gnuplot=fig)
 #GNUPLOTEPS=$(GNUPLOT:gnuplot=eps)
