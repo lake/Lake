@@ -1,0 +1,45 @@
+This is a revision of Paul King's oz.sty macros for typesetting Object Z,
+updated for LaTeX2e. Users should run ozguide.tex through \LaTeX\ (after
+installation!) for details of usage.
+
+Install by running \TeX\ on oz.ins and install oz.sty where \LaTeX\
+can find it.
+
+UPDATE NOVEMBER 1996
+********************
+
+The Formal Methods Group in the Computer Science Department at the
+University of Queensland recently released 'wizard', a type checker
+for Object-Z specifications.  Included in the wizard release was an
+updated version of the oz.sty file for LaTeX 2.09.
+
+I have implemented all changes made in the oz.sty for LaTeX 2.09,
+since it's last official release in late 1990, into the oz.dtx file
+which you maintain for LaTeX 2e.  I have attached my updated version
+of oz.dtx to this message so that you may check these modifications
+and officially release the updated version.
+
+The changes were made to the oz.dtx file with last changes logged
+on 22 Feb 95 (this is the version currently available from CTAN).
+All modifications and additions I have made are clearly indicated in
+the updated file for your convenience.
+
+Should you need to compare my changes with the updated oz.sty file for
+LaTeX 2.09, you can download the wizard archive from the following url:
+
+	ftp://ftp.cs.uq.edu.au/pub/SVRC/software/wizard.tar.gz
+
+The new oz.sty file and oz.tex file are located in the wizard/tex
+subdirectory when the archive is extracted.
+
+Please contact me if you need to.
+
+Thanks.
+
+Dave.
+--
+David Leadbetter                                    Email: davidl@cs.uq.edu.au
+PhD Student                                         Phone: + 61 7 3365 1204
+Department of Computer Science                      FAX:   + 61 7 3365 1999
+The University Of Queensland 4072 AUSTRALIA
+

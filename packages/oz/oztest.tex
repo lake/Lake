@@ -1,0 +1,206 @@
+\documentclass[11pt]{article}
+\usepackage{oz}
+\def\Out#1{#1 \!\!\rightarrow}
+\def\In#1{\rightarrow\!\! #1}
+\begin{document}
+
+Multi-letter identifiers have been changed to look
+better than they do with vanilla \LaTeX: instead of
+$\mathit{specifications}$, you get $specifications$.
+The letters haven't been spread apart, and the
+ligature $fi$ has been used.
+
+{\tt This is in typewriter font}
+
+
+\begin{schema}{BirthdayBook}
+    known: \pset NAME \\
+    birthday: NAME \pfun DATE
+\ST
+    known = \dom birthday
+\end{schema}
+
+\begin{axdef}
+limit : \nat
+\ST
+limit \leq 65536
+\end{axdef}
+
+\begin{class}{Shape}
+\also
+colour : Colour \\
+\end{class}
+
+\begin{axdef}
+perim : \real
+\ST
+perim > 0
+\end{axdef} 
+
+\begin{axdef}
+ini:State \cross Occ \cross T \fun Bool
+\where
+\forall S:State, i: Occ, t:T \dot ini(S,i,t) \iff \\
+\t1 \theta(\Out{S}, 1,0)\land\\
+\t2 \exi t_{1}:T \dot \theta(\In{S},i,t_{1}) \land
+t_{1}\leq t \land \forall t_{2}:T \dot t_{2} < t \imp \neg \theta(\Out{S},i+1,t_{2}
+)\\
+\t1 \lor \theta(\In{S}, 1,0)\land\\
+\t2 \exi t_{1}:T \dot \theta(\In{S},i,t_{1}) \land
+t_{1}\leq t \land \forall t_{2}:T \dot t_{2} < t \imp \neg
+\theta(\Out{S},i,t_{2})
+\end{axdef}
+
+Let us see if \verb|zbreak| works:
+\typeout{*************************************}
+\typeout{If you get large overfull vboxes now, Oz is not working}
+\typeout{*************************************}
+
+\def \comm{\comment}
+
+\begin{schema}{MakePlan}
+        c? : Company \comm{The company that is making the plan}\\
+        t? : Month \comm{Time period} \\
+        \Xi NFMM \\
+        \Xi AttrOfMarkets \comm{OpenMarkets} \\
+        \Xi Cost \\
+        \Xi AttrOfEconomy \comm{Buying and selling price of quota }\\
+        \Xi AttrOfQuota \\
+        \Xi AttrOfProduction \\
+        \Xi FishingLimitations \\
+        Plans! : Company \fun  Plan \comm{The output is the plan for
+          the company} \\
+\zbreak
+\where
+        \forall v: Vessel; f: Fishery; s: QuotaStock; p: Product; \\
+\t0     l: Landing; t: Month; i: Input @ \\
+\t0     \exists  plan: Plan; Months: \power Month;   \\
+\t0     vs : \power Vessel; fs: \power Fishery ; qs: \power QuotaStock; ls: \power Landing; \\
+\t0     ps : \power Product; \\ 
+\t0     catch: Vessel  \cross Fishery \cross QuotaStock \pfun Tons;  \\
+\t0     MAXnet\_profit:Kronur; fishing\_cost:Kronur; \\
+        \t1  production\_earnings:Kronur; \\
+        \t1  production\_cost:Kronur; quota\_trading\_profit:Kronur;  \\
+\t0     fishing\_days: Vessel \cross Fishery \cross Month \pfun \nat; \\
+\t0     value\_landing: Vessel \fun Kronur;  \\
+\t0     export: Vessel \cross Landing \cross Month \pfun Tons; \\
+        \t1 trade\_in, trade\_out: Landing \cross Month \pfun Tons; \\
+        \t1 prod: Product \cross Month \fun Tons;  \\
+\t0     quota\_rent\_in, quota\_rent\_out, quota\_next\_to, \\
+        \t1 quota\_next\_from, quota\_exch\_to, quota\_exch\_from,\\
+        \t1 quota\_trans\_from, quota\_trans\_to: Vessel \cross QuotaStock \pfun Tons;  \\
+\t0     ExchangeCharge: \num; \comm{charge for changing one species into another} \\
+\t0     quota\_used: Vessel \cross QuotaStock \pfun Tons @  \\
+\zbreak 
+        \t0 Plans! = Plans! \oplus \{c? \mapsto  plan \} \land \\
+        \t0 Months = t? \upto 12  \land \\
+        \t0 i \in Inputs \land \\
+        \t0 vs = Vessels ~ c?  \land  v \in vs \land\\
+        \t0 fs = \{f: Fishery | f \in  \\
+        \t1     (\bigcup \{ v: Vessel | v \in vs @ Fisheries(v) \}) @ f \} \land f \in fs \land \\
+        \t0 qs = \{s: QuotaStock; f: Fishery | \\
+        \t1      f \in fs \land s \in QuotaStocks (f) @ s \} \land s \in qs \land \\
+        \t0 ls = \{s: QuotaStock; f: Fishery | f \in fs \land s \in qs @ \\
+        \t1     Landings~(f,s)  \}  \land l \in ls \land \\
+        \t0 ps = \{p: Product | \\
+        \t1     p \in \bigcup \{ fa: Factory | fa \in Factories~c? @ Products(fa) \} @ p \}  \land  \\
+        \t0 p \in ps \land \\
+\comm{The overall goal is to maximize net profits} \\
+        \t0 MAXnet\_profit = -fishing\_cost+production\_earnings + \\
+        \t1     -production\_cost + quota\_trading\_profit   \land   \comm{A.1}\\
+        \t0 catch ~(v,f,s) = ExpCatch~(v,f,s)* \comm{A.4}\\
+        \t1     \sum_{t: Month | t \in Months} fishing\_days~(v,f,t) \land \\
+\comm{One of the prices LandingPrice or ExportPrice is always zero for any l} \\
+        \t0 (\forall l | l \in ls @ LandingPrice (l) = 0 \lor ExportPrice(l) = 0 \land \\
+        \t1  LandingPrice(l) \neq ExportPrice(l) )  \land \\
+        \t0 value\_landing= \comm{A.3}  \\
+        \t1     \{v: Vessel | v \in vs @ v \mapsto \\
+        \t1     \sum_{ l: Landing | l \in ls}  LandingPrice (l)* ExportPriceConst(l) * \\
+        \t1     \sum_{f: Fishery | f \in fs} \sum_{s: QuotaStock | s \in qs} (SpeciesToLandings~(s,f,l) *(catch~(v,f,s)) \}\land  \\
+        \t0 fishing\_cost = \sum_{v: Vessel | v \in vs} Share (v)*value\_landing(v) + \comm{A.2}\\
+        \t1    \sum_{ f: Fishery | f \in fs} CostFishDay ~ (v, f)  * \\
+        \t1    \sum_{t: Month | t \in Months}  fishing\_days~(v,f,t) \land \\
+\zbreak 
+        \t0 production\_earnings = \comm{A.5}\\
+        \t1     \sum_{l: Landing | l \in ls} \sum_{ t: Month | t \in Months} \\
+        \t3     (ExportPrice~(l,t))*(1-0.002)*t)* \\
+        \t3     \sum_{v: Vessel | v \in vs} export~(v,l,t) \\
+        \t1     -WetfishBuyingPrice(l) * (1-0.002)*t)*trade\_in~(l,t)  \\
+        \t1     +WetfishSellingPrice(l) * (1-0.002)*t)*trade\_out~(l,t)  \\
+        \t1     +\sum_{p: Product | p \in ps} ProductPrice~(p,t) *(1-0.002)*t)* \\
+        \t1      \sum_{t:Month | t \in Months} prod~ (p,t) \land \\
+        \t0 production\_cost = \sum_{i: Input | i \in Inputs} InputCost(i)* \comm{A.6}\\
+        \t1     \sum_{p: Product | p \in ps} InputForProduct(p,i) *    \\
+        \t1     \sum_{ t: Month | t \in Months} prod(p,t) \land \\
+        \t0 ExchangeCharge = 0.005*NextPrice(s) \land  \\
+        \t0 quota\_trading\_profit = -(\sum_{s: QuotaStock | s \in qs } QuotaRentInPrice(s) * \\
+        \t1     \sum_{v: Vessel | v \in vs }  quota\_rent\_in~(v,s)  ) \comm{A.7}\\
+        \t1 + \sum_{s: QuotaStock | s \in qs } QuotaRentOutPrice(s)* \\
+        \t1     \sum_{v: Vessel | v \in vs }  quota\_rent\_out~(v,s)   \\
+        \t1 + \sum_{s: QuotaStock | s \in qs } NextCharge *NextPrice(s)*(1-InterestRate)* \\
+        \t1     \sum_{v: Vessel | v \in vs } quota\_next\_to~(v,s)   \\
+        \t1 + \sum_{s: QuotaStock | s \in qs }  NextPrice(s)*(1-InterestRate) * \\
+        \t1     \sum_{v: Vessel | v \in vs }  quota\_next\_from~(v,s)   \\      
+        \t1 -ExchangeCharge*\sum_{v: Vessel | v \in vs }\sum_{s: QuotaStock | s \in qs } quota\_exch\_to(v,s)   \\
+        \t1 -TransferCharge*\sum_{v: Vessel | v \in vs }\sum_{s: QuotaStock | s \in qs } quota\_trans\_to~(v,s)   \land \\      
+        \t0 \sum_{ f: Fishery | f \in fs } fishing\_days~(v,f,t)  \leq MaxTotFishingDays ~(v,t)  \land \comm{A.9}\\
+\comm{A.6.1 Constraints on fishing time } \\
+        \t0 l \in ExportLandings  \implies \\
+        \t1 \sum_{f: Fishery | f \in fs } \sum_{s: QuotaStock | s \in qs } \comm{A.10} \\
+        \t2     SpeciesToLandings~(s,f,l) * ExpCatch (v,f,s)*fishing\_days(v,f,t)   =  \\
+        \t3             export~(v,l,t) \land \\
+\comm{A.6.2 Processing and selling the catch } \\
+        \t0 l \notin ExportLandings \implies \\
+        \t1 \sum_{v: Vessel | v \in vs } \sum_{f: Fishery | f \in fs } \sum_{s: QuotaStock | s \in qs } \\
+        \t2     SpeciesToLandings~(s,f,l)*ExpCatch~(v,f,s)*fishing\_days~(v,f,t)    \\
+        \t1 = (1 / LandingsToProducts~(p,l)) * prod~(p,t) - trade\_in~(l,t) + trade\_out(l,t) \land \comm{A.11}\\
+\zbreak
+        \t0 \sum_{t: Month | t \in Months } \sum_{p:Product | p \in ps }InputForProduct(p,i)*prod(p,t)   \\
+        \t1 \leq \sum_{i : Input | i \in Inputs } MaxInput~(i,t)  \land \comm{A.13}\\
+        \t0 \sum_{t: Month | t \in Months } \sum_{p: Product | p \in ps } InputForProduct(p,i)*prod~(p,t)   \\
+        \t1   \geq \sum_{i: Input | i \in Inputs } MinInput~(i,t)   \land \comm{A.14}\\
+        \t0 \sum_{t: Month | t \in Months } export~(v,l,t)  \leq MaxExport~(v,l) \land \comm{A.15}\\
+\comm{A.6.3 Constraints because of quota restrictions } \\
+        \t0 quota\_used = \comm{A.17} \\
+        \t1 \{ v:Vessel; s: QuotaStock  |  v \in vs \land  s \in qs @ \\
+        \t2     (v,s) \mapsto \sum_{f: Fishery | f \in fs } (1+QuotaSurcharge~(s,f))* \\
+        \t2 catch~(v,f,s) \}  \land \\
+        \t0 \sum_{v: Vessel | v \in vs } quota\_trans\_to(v,s)- quota\_trans\_from(v,s) =0 \land \comm{A.18} \\
+        \t0 quota\_used(v,s) - quota\_rent\_in(v,s) + quota\_rent\_out(v,s) -   \comm{A.16} \\
+        \t1 quota\_exch\_to(v,s) + quota\_exch\_from(v,s) - \\
+        \t1 quota\_trans\_to(v,s) + quota\_trans\_from(v,s) - \\
+        \t1 quota\_next\_to~(v,s) + quota\_next\_from~(v,s) \leq QuotaLeft~(v,s) \land \\
+        \t0 s = Cod \implies MaxQuotaInto(v,s) = 0 \land \comm{A.19}\\
+        \t0 s \neq Cod \implies MaxQuotaInto(v,s) = 0.05*QuotaAllocated(v,s) \land \\
+        \t1 QuotaValueInto(s)*quota\_exch\_to(v,s) \leq \\
+        \t2     \sum_{s: QuotaStock | s \in qs } MaxQuotaInto~(v,s) \land \\
+        \t0 \sum_{s: QuotaStock | s \in qs } QuotaValueInto (s)*quota\_exch\_to~(v,s) - \comm{A.20}\\
+        \t1 \sum_{s: QuotaStock | s \in qs } QuotaValueFrom(s)* quota\_exch\_from~(v,s)   = 0 \land \\
+        \t0 quota\_next\_from(v,s) \leq (QuotaOver(v,s) / 100)*QuotaAllocated(v,s) \land \comm{A.21}\\
+        \t0 quota\_next\_to~(v,s) \leq (QuotaUnder(v,s) / 100)*QuotaAllocated(v,s) \land \comm{A.22} \\
+\zbreak
+\comm{Bounds} \\
+        \t0 fishing\_days~(v,f,t) \leq MaxFishingDays~(f,t) \land \comm{A.23}\\ 
+        \t0 QuotaAllocated~(v,s) = 0 \implies \\
+        \t1     (quota\_exch\_to~(v,s) = 0 \land  \comm{A.24}\\
+        \t1     quota\_rent\_in~(v,s) = 0 \land \comm{A.25}\\
+        \t1     quota\_trans\_to~(v,s) = 0) \land  \comm{A.26} \\       
+        \t0 QuotaValueInto~s = 0 \implies quota\_exch\_to~(v,s) = 0 \land \comm{A.27}\\
+        \t0 QuotaValueFrom~s = 0 \implies quota\_exch\_from~(v,s) = 0  \comm{A.28}\\
+\zbreak
+        \t0 plan.c = c? \
+        \t0 plan.fishing\_days = fishing\_days \land 
+        \t0 plan.quota\_rent\_out = quota\_rent\_out  \land \\
+        \t0 plan.quota\_rent\_in = quota\_rent\_in \land \\
+        \t0 plan.quota\_trans\_from = quota\_trans\_from \land \\
+        \t0 plan.quota\_trans\_to = quota\_trans\_to \land \\
+        \t0 plan.quota\_next\_from = quota\_next\_from \land \\
+        \t0 plan.quota\_next\_to = quota\_next\_to \land \\
+        \t0 plan.quota\_exch\_from = quota\_exch\_from \land \\
+        \t0 plan.quota\_exch\_to = quota\_exch\_to \land \\
+        \t0 plan.trade\_out = trade\_out \land \\
+        \t0 plan.trade\_in = trade\_in \land \\
+        \t0 plan.prod = prod \land \\
+        \t0 plan.export = export \\
+\end{schema}
+\end{document}

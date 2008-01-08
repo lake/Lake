@@ -1,0 +1,1311 @@
+\errorcontextlines=20
+\documentclass[a4paper]{article}
+\advance\textwidth by 1in
+\advance\textheight by 1in
+\advance\oddsidemargin by -0.5in
+\advance\topmargin by -0.5in
+\usepackage{oz}
+\usepackage{example}
+\usepackage{multicol}
+%
+% just ignore any over- or under-full hboxes
+% this document uses most of the (physical) page and isn't spread
+% out either.  This may make it slightly harder to read first time
+% through, but makes it more suitable for later reference.
+%
+% before we start, let's make a few definitions
+%
+\makeatletter
+%\def\example{\begin{sidebyside}}
+%\def\verbpart{\nextside\small\vspace*{-1ex}\begin{quote}\begin{verbatim}}
+%\def\endexample{\end{quote}\vspace*{-2ex}\end{sidebyside}\vspace*{-3ex}\ignorespaces}
+\def\symbol#1{#1 & \tt\string#1}
+\def\symbols{\@ifnextchar[{\@symbols}{\@symbols[0]}}
+\def\@symbols[#1]{\interzedlinepenalty=\interdisplaylinepenalty\z@env
+        \openup #1\jot
+        \halign\bgroup\zstrut\hbox to 3.8em{$##$\hss}\tabskip=0pt&##\hss\cr
+        \noalign{\vskip-#1\jot}}% equal vspace above and below argue display
+\let\endsymbols=\endzed
+\makeatother
+%
+\begin{document}
+\begin{center}
+{\Large\bf Printing Z and Object-Z \LaTeX\ documents}\\[2.5ex]
+{\em Paul King}\\[1ex]
+Department of Computer Science\\
+University of Queensland\\
+Australia, 4072\\
+king@batserver.cs.uq.oz.au\\[1ex]
+May 29, 1990
+\end{center}
+
+\section{Introduction}
+This note describes a package of \LaTeX\ macros for printing
+Z and Object-Z specifications.  The macros and this note are
+based originally on Mike Spivey's \verb'zed.sty' macros and documentation.
+The package does several related things for you:
+\begin{itemize}
+\item   It loads extra fonts and defines mnemonics
+        for the Z symbols they contain.
+\item   It defines macros for some Z symbols (e.g. $\pinj$) which
+        don't appear in any of our fonts.
+\item   It fixes the way \TeX\ sets letters in mathematical formulas so
+        that multi-character identifiers look better.
+\item   It provides various brands of `boxed mathematics'
+        which appear in Z and Object-Z specifications.
+\end{itemize}
+
+The package is kept in a file {\tt oz.sty}
+in the directory \verb|/usr/local/lib/tex/localinputs|.
+This directory should be mentioned in your \verb|TEXINPUTS| shell variable.
+To use the macros you just begin your \LaTeX\ document with something like:
+\begin{quote}
+\begin{verbatim}
+\documentstyle[11pt,oz]{article}
+\end{verbatim}
+\end{quote}
+\vspace*{-1.5ex}
+
+\section{Schema Boxes}
+
+The example below shows a schema on the left and what you
+need to say to get it on the right.
+
+\begin{example}
+\begin{schema}{BirthdayBook}
+    known: \pset NAME \\
+    birthday: NAME \pfun DATE
+\ST
+    known = \dom birthday
+\end{schema}
+\end{example}
+
+The command \verb|\ST| (read `Such That') is the same as the previously used
+command \verb|\where| which has been kept as an alias for upward compatibility.
+If you want a schema with no name, just a horizontal rule at the top,
+use the \verb|schema*| environment instead.
+You can set various parameters (see Section 7) to change the box style,
+for example:
+
+\begin{example}
+$BirthdayBook \sdef \lsch ... \rsch$
+\end{example}
+
+A generic schema is produced as follows.
+
+\begin{example}
+\begin{genschema}{Pool}{RESOURCE}
+owner : RESOURCE \pfun USER \\
+free : \pset RESOURCE
+\ST
+(\dom owner) \uni free = RESOURCE \\
+(\dom owner) \int free = \emptyset
+\end{genschema}
+\end{example}
+
+\section{Axiomatic definitions}
+
+A `liberal' axiomatic definition is produced as follows.
+
+\begin{example}
+\begin{axdef}
+limit : \nat
+\ST
+limit \leq 65536
+\end{axdef}
+\end{example}
+
+A `generic' axiomatic definition is produced as follows.
+
+\begin{example}
+\begin{gendef}{X,Y}
+first : X \prod Y \tfun X
+\ST
+\all x : X; y : Y \dot first(x,y) = x
+\end{gendef}
+\end{example}
+
+A `unique' axiomatic definition is produced as follows.
+
+\begin{example}
+\begin{uniqdef}
+\pi : \real
+\ST
+\pi = 3.14159265\ldots
+\end{uniqdef}
+\end{example}
+
+\section{Object-Z Class Boxes}
+
+Object-Z allows class types to be defined using a box very similar to
+the schema box previously described.  It allows the previously
+described boxed environments (as well as nested sub-classes) to be
+placed within a class box.  In addition, special names can be used for
+some of the boxed-environments when they appear within a class box.
+The following example illustrates a class definition.
+
+\begin{example}
+\begin{class}{Shape}
+\also
+colour : Colour \\
+\begin{axdef}
+perim : \real
+\ST
+perim > 0
+\end{axdef} \\
+\begin{classcom}
+This class has 2 constants
+$colour$ and $perim$.
+\end{classcom} \\
+\begin{state}
+x, y : \real
+\end{state} \\
+\begin{init}
+x = y = 0
+\end{init} \\
+\begin{op}{Translate}
+\Delta (x,y) \\
+dx?, dy? : \real
+\ST
+x' = x + dx? \\
+y' = y + dy?
+\end{op}
+\end{class}
+\end{example}
+
+The \verb|classcom| environment hasn't been seen before.
+It creates a paragraph of text with the same margins as used
+for schemas and other Z environments.  It uses a special font
+intended for use when placing comments inside classes.
+A similar environment, \verb|zpar|, uses the same margins
+but with the normal roman font.
+
+The \verb|\begin{init}| command is an abbreviation for
+\verb|\begin{schema}{\Init}|.  Similarly \verb|\begin{state}|
+is a more meaningful synonym for \verb|\begin{schema*}|.
+
+You will be given \LaTeX\ warning messages if you try to
+use a \verb|state| environment outside of a class box
+or if you try to place an environment such as \verb|syntax|
+inside a class.  You can ask for additional help in these
+cases using the normal \LaTeX\ \verb|h| or \verb|H| help commands.
+If you proceed with \LaTeX ing, the macros will attempt to
+do the best they can to do what you probably intend, even though
+you are violating the recommended nesting guidelines.
+
+\section{Controlling the Spacing within Equations and Boxes}
+
+Most of the special Z symbols are defined
+in a way that allows \TeX\ to space them out correctly.
+Sometimes, however, you'll need to give \TeX\ a helping hand if
+you want it to get the spacing right.  For example, to get $map\,f$
+you need to type \verb|map\,f|.  The \verb|\,| gives you a thin space:
+if this is omitted, the input \verb|map f| gives
+$map f$, because \TeX\ ignores spaces in math mode.
+
+Sometimes it is useful to indent the left margin to emphasis
+the logical structure of the predicate.
+The command \verb|\t1| does this by making the corresponding
+line in the output have one helping of indentation.
+As things get more nested, you can say \verb|\t2|, \verb|\t3|, and so on.
+But if you should ever get beyond \verb|t9|, you'll need to use braces
+around the argument: \verb|\t{10}|, and you'd better look for some way
+to simplify your specification!
+These little tab marks might look different to normal tabs
+but are never the less convenient. They're short,
+and they don't get longer as the tabbing gets deeper, within reason,
+so they can be tucked in neatly on the left, well away from the maths.
+The size of `helping' you get with \verb|\t| is determined by
+the \verb|\zedtab| parameter (see Section 7).
+
+If you want a more powerful aligning mechanism than tabbing
+then you can use the margin stack as shown in the example below.
+The command \verb|\M| sets the future left margin to the current
+horizontal position and pushes the old value onto a margin stack.
+The command \verb|\O| resets the left margin to its previous value
+(which is popped off the stack).
+
+\begin{example}
+\begin{schema}{Test}
+x, y : \nat
+\ST
+x + 1/x = 0 \imp \M y + 1/y = 0 \\
+y = x \O \\
+\end{schema}
+\end{example}
+
+If a schema or other box contains more than one predicate below the
+line, it often looks better to add a tiny vertical space between
+them, as in this example:
+
+\begin{example}
+\begin{schema}{AddBirthday}
+  \Delta BirthdayBook \\
+  n?: NAME \\
+  d?: DATE
+\ST
+  n? \nem known
+\also
+  birthday'=birthday \uni \{n? \map d?\}
+\end{schema}
+\end{example}
+
+This is done with the command \verb|\also|, which behaves syntactically
+like \verb|\ST|.
+The command \verb|\also| is provided {\em instead\/} of the
+optional argument to \verb|\\|
+which \LaTeX\ provides in other environments.
+If larger vertical spacing is required, the commands
+\verb|\Also| and \verb|\ALSO| may be used (giving 2 and 4 times
+as much space as \verb|\also| respectively).
+
+Normally, the contents of a schema box are kept on a single page.
+For large schemas it may be necessary to split the box across pages.
+You must specify which places are suitable for splitting using one of
+\verb|\zbreak|, \verb|\Zbreak| or \verb|\ZBREAK|.  If no split is
+performed at this point, a vertical space will be added as if the
+user had typed \verb|\also|, \verb|\Also|, or \verb|\ALSO| respectively.
+You can also use the \verb|\znewpage| command to force a page break within
+a box.  (These breaking facilities will hopefully never be needed for schemas,
+but may become necessary for class specifications.)
+
+\section{Other Display Environments}
+
+The \verb|zed| environment can be used to set multi-line formulas without
+an enclosing box: it is useful for given-set declarations, theorems, and the
+miscellaneous bits of mathematics that don't come in a box:
+
+\vspace{-1ex}\begin{example}
+\begin{zed}
+    \all n: \nat \dot \\
+\t1         n+n \mem even.
+\end{zed}
+\end{example}
+
+The formula \verb|\begin{zed} ... \end{zed}| may be abbreviated to
+\verb|\[ ... \]|; the \verb|zed| environment is a generalization of the
+\verb|displaymath| environment of \LaTeX, so this redefinition of
+commands is fairly benign. Notice that the maths is set flush left on the
+same indentation as schemas and their friends.
+Here too you can use \verb|\also| for a little extra space
+between lines.
+
+For algebraic-style proofs, there is the \verb|argue| environment.
+This is like the \verb|zed| environment, but the separation between
+lines is increased a little, and page breaks may occur between lines.
+When the left-hand side is long this style wastes less space
+than the \LaTeX\ \verb|eqnarray| style.
+The intended use is for arguments like this:
+\begin{argue}
+    rev(append(cons(x,s),t)) \\
+\t1     = rev(cons(x,append(s,t))) \\
+\t1     = append(rev(append(s,t)),cons(x,nil)) \\
+\t1     = append(append(rev(t),rev(s)),cons(x,nil))
+                \quad \hbox{by hypothesis} \\
+\t1     = append(rev(t),append(rev(s),cons(x,nil))) \\
+\t1     = append(rev(t),rev(cons(x,s))).
+\end{argue}
+Here is the input:
+\begin{quote}
+\begin{verbatim}
+\begin{argue}
+    rev(append(cons(x,s),t)) \\
+\t1     = rev(cons(x,append(s,t))) \\
+\t1     = append(rev(append(s,t)),cons(x,nil)) \\
+\t1     = append(append(rev(t),rev(s)),cons(x,nil))
+                \quad \hbox{by hypothesis} \\
+\t1     = append(rev(t),append(rev(s),cons(x,nil))) \\
+\t1     = append(rev(t),rev(cons(x,s))).
+\end{argue}
+\end{verbatim}
+\end{quote}
+
+The example below shows an inference rule (the optional argument
+to \verb|\derive| gives a side-condition of the rule):
+
+\vspace{-1ex}\begin{example}
+\begin{infrule}
+    \Gamma \shows P
+\derive[x \nem freevars(\Gamma)]
+    \Gamma \shows \all x \dot P
+\end{infrule}
+\end{example}
+
+The \verb|syntax| environment is used for making displays like this:
+
+\begin{syntax}
+  EXPR & \ddef & IDENT      & identifier \\
+       & \bbar & EXPR\;EXPR & application \\
+       & \bbar & \lambda IDENT \dot EXPR & lambda-abstraction.
+\end{syntax}
+from input like this:
+\begin{quote}
+\begin{verbatim}
+\begin{syntax}
+  EXPR & \ddef & IDENT                   & identifier \\
+       & \bbar & EXPR\;EXPR              & application \\
+       & \bbar & \lambda IDENT \dot EXPR & lambda-abstraction.
+\end{syntax}
+\end{verbatim}
+\end{quote}
+
+This kind of thing is useful when you're describing a language,
+and it can also be used for data-type definitions as shown below.
+The optional final column was omitted below by leaving out the third \verb|&|.
+
+\begin{example}
+\begin{syntax}
+TYPE & \ddef & givenT  \lang NAME \rang \\
+& \bbar & powerT \lang TYPE \rang \\
+& \bbar & tupleT \lang \seq TYPE \rang \\
+& \bbar & schemaT \lang IDENT \ffun TYPE \rang \\
+& \bbar & classT \lang IDENT \ffun ClassAttr \rang
+\end{syntax}
+\end{example}
+
+This can be compared with the layout adopted by the UQ Z editor (version 1).
+
+\begin{example}
+\begin{zed}
+TYPE \ddef \M givenT  \lang NAME \rang \\
+\bbar powerT \lang TYPE \rang \\
+\bbar tupleT \lang \seq TYPE \rang \\
+\bbar schemaT \lang IDENT \ffun TYPE \rang \\
+\bbar classT \lang IDENT \ffun ClassAttr \rang \O
+\end{zed}
+\end{example}
+
+The {\tt sidebyside} environment allows a display as shown in the
+first two columns below to be produced from the text of the third column.
+Note the use of the \verb|\comment| command.
+
+\begin{example}
+\begin{sidebyside}
+\begin{schema}{Schema}
+\comment*{declarations}
+\ST
+a < b \comment{pred-1} \\
+aaaaa < bbbbb \comment{pred-2}
+\end{schema}
+\nextside
+\begin{zpar}
+This is a paragraph which has the same
+margins as the standard schemas do.
+\end{zpar}
+\end{sidebyside}
+\end{example}
+
+In fact, this environment was used throughout this note to
+display the examples beside the required input text.
+Incidentally, the above example shows that \verb|sidebyside|
+environments can be nested; so what the author of this note typed
+to get the above display was:
+
+\begin{quote}
+\begin{verbatim}
+\begin{sidebyside}
+        \begin{sidebyside}
+                ...
+        \nextside
+                ...
+        \end{sidebyside}
+\nextside
+        ...
+\end{sidebyside}
+\end{verbatim}
+\end{quote}
+
+This resulted in the first two columns being equally spaced and
+together taking up as much space as the third column.
+You can have more than 2 columns without nesting by specifying an optional
+parameter to \verb|sidebyside|.  For example, the display below has three
+equally spaced columns obtained using \verb|\begin{sidebyside}[3]|.
+
+ \begin{sidebyside}[3]
+ \begin{schema}{BirthdayBook}
+     known: \pset NAME \\
+     birthday: NAME \pfun DATE
+ \ST
+     known = \dom birthday
+ \end{schema}
+ \nextside
+ \begin{schema}{BirthdayBook}
+     known: \pset NAME \\
+     birthday: NAME \pfun DATE
+ \ST
+     known = \dom birthday
+ \end{schema}
+ \nextside
+ \begin{zpar}
+Don't get carried away with \verb|sidebyside|
+ like this example does.
+ \end{zpar}
+ \end{sidebyside}
+ 
+\section{Style Parameters}
+
+\begin{description}
+\item[\tt\string\zedindent] The (horizontal) indentation for mathematical text.
+        By default, this is the same as \verb|\leftmargini|, the indentation
+        used for list environments.
+\item[\tt\string\zedleftsep] The (horizontal) space between the vertical line on the left
+        of schemas, etc., and the maths inside. The default is 1em.
+\item[\tt\string\zedtab] The unit of indentation used by \verb|\t|. The default
+        is 2em.
+\item[\tt\string\zedbar] The length of the horizontal bar in the middle of a
+        schema. The default is 8em.
+\item[\tt\string\leftschemas] A declaration which makes schema names be
+        set flush left. Use it in the document preamble.
+\item[\tt\string\zedlinethickness] The thickness of the lines that make up
+        schema and class boxes.  You can change the thickness
+        with a command such as \verb|\zedlinethickness=0.1pt|.  This may
+        be useful if you are creating overhead slides.
+        \begin{description}
+        \makeatletter
+        \item[0.1pt] \zedlinethickness=0.1pt
+                ~\hbox to 4cm{\z@hrulefill}
+        \item[0.4pt] \zedlinethickness=0.4pt
+                ~\hbox to 4cm{\z@hrulefill}~~~(The default)
+        \item[\hphantom{0.}1pt] \zedlinethickness=1pt
+                ~\hbox to 4cm{\z@hrulefill}
+        \end{description}
+\item[\tt\string\baselinestretch] The spacing for the text part of your
+        document.  It doesn't change the spacing within Z environments.  It's
+        default value is 1.  A command such as \verb|\def\baselinestretch{2}|
+        will make your text double spaced, but not your Z environments.
+\item[\tt\string\zedbaselinestretch] The spacing for the Z environment
+        part of your document.  It's default value is 1.
+\item[\tt\string\zedsize] The size of the material within the Z
+        part of your document. It doesn't affect the remainder of your document.
+        For example, \verb|\zedsize{\large}| will give you large Z symbols
+        and equations but will not affect the size of the surrounding text.
+\item[\tt\string\zedcornerheight] The height of `corners' that can be placed
+        on the right hand side of the top and bottom lines of schema and class
+        boxes.  The default is 0em (i.e. no corners).
+\end{description}
+
+\section{Symbols}
+
+Multi-letter identifiers have been changed to look
+better than they do with vanilla \LaTeX: instead of
+$\mathit{specifications}$, you get $specifications$.
+The letters haven't been spread apart, and the
+ligature $fi$ has been used.
+
+Almost all of the mathematical symbols of \LaTeX\ can be used;
+some have been redefined---usually to fix the spacing so that it is
+suitable for Z specifications.
+The commands for obtaining additional symbols are listed below.
+Sometimes more than one command may produce a symbol you
+require.  You should use the one that seems to be designed for the
+context you have in mind.  This is because the spacing around (and size of)
+symbols has been chosen for their typical context.
+
+Throughout the lifetime of these macros a number of alternate control
+sequences for any symbol may have existed.  A list of aliases has been
+set up so that old commands may still be used.  It is
+recommended however that you stick to the recommended command
+names for symbols as these names may be supported by other tools.
+Within the table below non-recommended aliases are surrounded by
+brackets, e.g., \verb|(\power)|.
+\begin{multicols}{2}
+\setcounter{secnumdepth}{2}
+\zedindent=0.2\zedindent
+\subsection{Special Z Notation}
+\vspace*{-0.5ex}
+\subsubsection{Numbers}
+\vspace*{-2.5ex}
+\begin{symbols}
+\nat & \verb' \nat' \\
+\natone & \verb' \natone (\nplus)' \\
+\integer & \verb' \integer (\num)' \\
+\real & \verb' \real' \\
+\div~\mod & \verb' \div \mod' \\
+i^n & \verb' i^n i\expon n' \\
+\succ & \verb' \succ' \\
+%\prec & \verb' \prec' \\
+=~\neq & \verb' = \neq' \\
+<~\leq~\leqslant & \verb' < \leq \leqslant' \\
+>~\geq~\geqslant & \verb' > \geq \geqslant' \\
+*\,/\,+ - & \verb' * / + -' \\
+\end{symbols}
+\subsubsection{Logic}
+\vspace*{-2.5ex}
+\begin{symbols}
+\lnot & \verb'\lnot' \\
+\land & \verb'\land (\wedge)' \\
+\lor & \verb'\lor (\vee)' \\
+\all & \verb'\all (\forall)' \\
+\exi & \verb'\exi (\exists)' \\
+\exi_1 & \verb'\exione' \\
+\nexi & \verb'\nexi (\nexists)' \\
+\dot & \verb'@ \dot (\spot)' \\
+%\cond & \verb'\cond' \\
+\imp & \verb'\imp (\implies)' \\
+\iff & \verb'\iff' \\
+\true & \verb'\true' \\
+\false & \verb'\false' \\
+\bool & \verb'\bool' \\
+\end{symbols}
+\subsubsection{Sets}
+\vspace*{-2.5ex}
+\begin{symbols}
+\{~~\cbar~~\} & \verb' \{ \cbar \}' \\
+\emptyset & \verb' \emptyset' \\
+\varemptyset & \verb' \varemptyset' \\
+\mem & \verb' \mem (\in)' \\
+\nmem & \verb' \nem (\nmem \notin)' \\
+\pset & \verb' \pset (\power)' \\
+\fset & \verb' \fset (\finset)' \\
+\psetone~~\fsetone & \verb' \fsetone \psetone' \\
+\uni & \verb' \uni (\union)' \\
+\int & \verb' \int (\inter)' \\
+\psubs & \verb' \psubs (\subset)' \\
+\subs & \verb' \subs (\subseteq)' \\
+\psups & \verb' \psups (\supset)' \\
+\sups & \verb' \sups (\supseteq)' \\
+\prod & \verb' \prod (\cross)' \\
+\min~\max & \verb' \min \max' \\
+\# & \verb' \#' \\
+\duni & \verb' \duni (\dunion)' \\
+\dint & \verb' \dint (\dinter)' \\
+\upto & \verb' \upto' \\
+\end{symbols}
+
+\subsubsection{Relations and Functions}
+\vspace*{-2.5ex}
+\begin{symbols}[0.1]
+\lambda~~~\mu & \verb'\lambda \mu' \\
+\dom & \verb'\dom' \\
+\ran & \verb'\ran' \\
+\dres & \verb'\dres' \\
+\dsub & \verb'\dsub (\ndres)' \\
+\rres & \verb'\rres' \\
+\rsub & \verb'\rsub (\nrres)' \\
+\fovr & \verb'\fovr' \\
+\cmp & \verb'\cmp' \\
+\fcmp & \verb'\fcmp (\comp)' \\
+(\!|~~~|\!) & \verb'\limg \rimg' \\
+\id & \verb'\id' \\
+R\inv & \verb'R^{-1}  R\inv' \\
+R^+ &   \verb'R^+     R\tcl' \\
+R^* &   \verb'R^*     R\rtcl' \\
+R^k &   \verb'R^k     R\iter k' \\
+iter\,0\,R & \verb'iter \, 0 \, R' \\
+\map & \verb'\map' \\
+\rel & \verb'\rel' \\
+\tfun & \verb'\tfun (\fun)' \\
+\tinj & \verb'\tinj (\inj)' \\
+\tsur & \verb'\tsur (\surj)' \\
+\pfun & \verb'\pfun' \\
+\pinj & \verb'\pinj' \\
+\psur & \verb'\psur (\psurj)' \\
+\ffun & \verb'\ffun' \\
+\finj & \verb'\finj' \\
+\bij & \verb'\bij' \\
+\end{symbols}
+\subsubsection{Sequences}
+\vspace*{-2.5ex}
+\begin{symbols}
+\seq & \verb'   \seq' \\
+\seqone & \verb'   \seqone' \\
+\emptyseq & \verb'   \emptyseq' \\
+\lseq~~~\rseq & \verb'   \lseq \rseq' \\
+\head~~\tail & \verb'   \head \tail' \\
+\front~~\last & \verb'   \front \last' \\
+\rev & \verb'   \rev' \\
+\next & \verb'   \next' \\
+\inseq & \verb'   \inseq' \\
+\prefix & \verb'   \prefix' \\
+\suffix & \verb'   \suffix' \\
+\squash & \verb'   \squash' \\
+\cat & \verb'   \cat' \\
+\dcat & \verb'   \dcat' \\
+\dcmp & \verb'   \dcmp' \\
+\dovr & \verb'   \dovr' \\
+\ires & \verb'   \ires' \\
+\sres & \verb'   \sres \filter' \\
+\partitions & \verb'   \partitions' \\
+\disjoint & \verb'   \disjoint' \\
+\end{symbols}
+
+\subsubsection{Schemas}
+\vspace*{-2.5ex}
+\begin{symbols}
+\Delta & \verb'\Delta' \\
+\equiv~~\Xi & \verb'\equiv \Xi' \\
+\pred & \verb'\pred' \\
+\pre & \verb'\pre' \\
+\post & \verb'\post' \\
+\project & \verb'\zproject \project' \\
+\zand & \verb'\zand' \\
+\zor & \verb'\zor' \\
+\zcmp & \verb'\zcmp (\semi)' \\
+\zexi & \verb'\zexi' \\
+\zall & \verb'\zall' \\
+\znot & \verb'\znot' \\
+\zhide & \verb'\zhide (\hide)' \\
+\zfor & \verb'\zfor' \\
+\zimp & \verb'\zimp' \\
+\zeq & \verb'\zeq' \\
+\zovr & \verb'\zovr' \\
+\zpipe & \verb'\zpipe' \\
+\theta & \verb'\theta' \\
+\lsch~~\zbar~~\rsch & \verb'\lsch \zbar \rsch' \\
+.. & \verb'.' \\
+\end{symbols}
+\subsubsection{Bags}
+\vspace*{-2.5ex}
+\begin{symbols}
+\lbag~~~\rbag & \verb'\lbag \rbag' \\
+\bag & \verb'\bag' \\
+\emptybag & \verb'\emptybag' \\
+\items & \verb'\items' \\
+\bagcount & \verb'\bagcount' \\
+\buni & \verb'\buni' \\
+\inbag & \verb'\inbag' \\
+\end{symbols}
+\subsubsection{Definitions and Declarations}
+\vspace*{-2.5ex}
+\begin{symbols}
+::= & \verb'\ddef' \\
+\bbar & \verb'\bbar' \\
+== & \verb'\defs' \also
+\widehat= & \verb'\sdef' \also
+\triangleq & \verb'\varsdef' \\
+,~~\semicolon~~: & \verb', ; :' \\
+\lang~~~\rang & \verb'\lang \rang' \\
+\end{symbols}
+\subsubsection{Miscellaneous}
+\vspace*{-2.5ex}
+\begin{symbols}[0]
+[~~~] & \verb'[ ]' \\
+(~~~) & \verb'( )' \\
+!~~~? & \verb'! ?' \\
+\zlet & \verb'\zlet' \\
+\zwhere & \verb'\zwhere' \\
+\zin & \verb'\zin' \\
+\langle\!|~~~|\!\rangle & \verb'\lblot \rblot' \\
+\intern Bump & \verb'\intern Bump' \\
+\Init & \verb'\Init'\\
+\Exit & \verb'\Exit'
+\end{symbols}
+
+\subsection{Other Special Notation}
+\vspace*{-1ex}
+\subsubsection{Temporal Logic}
+\vspace*{-2.5ex}
+\begin{symbols}
+\always~\uptilnow & \verb'\always \uptilnow' \\
+~&\verb'(\henceforth)'\\
+\atnext~\atlast & \verb'\atnext \atlast' \\
+\eventually~\previously & \verb'\eventually \previously' \\
+\end{symbols}
+\subsubsection{Proofs}
+\vspace*{-2.5ex}
+\begin{symbols}[0.1]
+\TH & \verb'   \TH' \\
+\PR & \verb'   \PR' \\
+\LE & \verb'   \LE' \\
+\ETH~\Qed & \verb'   \qed (\ETH) \Qed' \\
+\QED~\BLACKQED & \verb'   \QED \BLACKQED' \\
+\vdash & \verb'   \shows (\thrm)' \\
+\vDash & \verb'   \vDash' \\
+\refines & \verb'   \refines' \\
+\weakrefine & \verb'   \weakrefine' \\
+\end{symbols}
+\subsubsection{Object Theory}
+\vspace*{-2.5ex}
+\begin{symbols}
+\subclass & \verb'\subclass \isa' \\
+\weaksubclass & \verb'\weaksubclass \islikea' \\
+\supclass & \verb'\supclass' \\
+\weaksupclass & \verb'\weaksupclass' \\
+\hasa & \verb'\hasa \instantiates' \\
+\instancein & \verb'\instancein' \\
+\subtype~~\subtypeeq & \verb'\subtype \subtypeeq' \\
+\suptype~~\suptypeeq & \verb'\suptype \suptypeeq' \\
+\end{symbols}
+\subsubsection{Orders}
+\vspace*{-2.5ex}
+\begin{symbols}
+\mono & \verb'      \mono' \\ % these lines fudged to give more spacing
+\torder & \verb'      \torder' \\
+\porder & \verb'      \porder' \\
+\end{symbols}
+\subsubsection{Word Styles}
+\vspace*{-2.5ex}
+\begin{symbols}[0.4]
+\word{word} & \verb'\word{word}' \\
+\keyword{word} & \verb'\keyword{word}' \\
+\boldword{word} & \verb'\boldword{word}' \\
+\underword{word} & \verb'\underword{word}' \\
+\underkeyword{word} & \verb'\underkeyword{word}' \\
+\underboldword{word} & \verb'\underboldword{word}' \\
+\String{word} & \verb'\String{word}' \\
+\STRING{word} & \verb'\STRING{word}' \\
+a \infix{rel} b & \verb'a \infix{rel} b' \\
+\end{symbols}
+
+\subsection{Special Letter Fonts}
+\vspace*{-1ex}
+\subsubsection{Greek}
+\vspace*{-2.5ex}
+\begin{symbols}
+\alpha & \verb'\alpha' \\
+\beta & \verb'\beta' \\
+\gamma~\Gamma & \verb'\gamma \Gamma' \\
+\delta~\Delta & \verb'\delta \Delta' \\
+\epsilon~\varepsilon & \verb'\epsilon \varepsilon' \\
+\zeta & \verb'\zeta' \\
+\eta & \verb'\eta' \\
+\theta~\vartheta~\Theta & \verb'\theta \vartheta \Theta' \\
+\iota & \verb'\iota' \\
+\kappa~\varkappa & \verb'\kappa \varkappa' \\
+\lambda~\Lambda & \verb'\lambda \Lambda' \\
+\mu & \verb'\mu' \\
+\nu & \verb'\nu' \\
+\xi~\Xi & \verb'\xi \Xi' \\
+\pi~\varpi~\Pi & \verb'\pi \varpi \Pi' \\
+\rho~\varrho & \verb'\rho \varrho' \\
+\sigma~\varsigma~\Sigma & \verb'\sigma \varsigma \Sigma' \\
+\tau & \verb'\tau' \\
+\upsilon~\Upsilon & \verb'\upsilon \Upsilon' \\
+\phi~\varphi~\Phi & \verb'\phi \varphi \Phi' \\
+\chi & \verb'\chi' \\
+\psi~\Psi & \verb'\psi \Psi' \\
+\omega~\Omega & \verb'\omega \Omega' \\
+\end{symbols}
+\subsubsection{Caligraphic}
+\vspace*{-2.5ex}
+\begin{symbols}
+\mathcal{A} & \verb'\mathcal{A}' \\
+\mathcal{B} & \verb'\mathcal{B}' \\
+\mathcal{C} & \verb'\mathcal{C}' \\
+\mathcal{D} & \verb'\mathcal{D}' \\
+\mathcal{E} & \verb'\mathcal{E}' \\
+\mathcal{F} & \verb'\mathcal{F}' \\
+\mathcal{G} & \verb'\mathcal{G}' \\
+\mathcal{H} & \verb'\mathcal{H}' \\
+\mathcal{I} & \verb'\mathcal{I}' \\
+\mathcal{J} & \verb'\mathcal{J}' \\
+\mathcal{K} & \verb'\mathcal{K}' \\
+\mathcal{L} & \verb'\mathcal{L}' \\
+\mathcal{M} & \verb'\mathcal{M}' \\
+\mathcal{N} & \verb'\mathcal{N}' \\
+\mathcal{O} & \verb'\mathcal{O}' \\
+\mathcal{P} & \verb'\mathcal{P}' \\
+\mathcal{Q} & \verb'\mathcal{Q}' \\
+\mathcal{R} & \verb'\mathcal{R}' \\
+\mathcal{S} & \verb'\mathcal{S}' \\
+\mathcal{T} & \verb'\mathcal{T}' \\
+\mathcal{U} & \verb'\mathcal{U}' \\
+\mathcal{V} & \verb'\mathcal{V}' \\
+\mathcal{W} & \verb'\mathcal{W}' \\
+\mathcal{X} & \verb'\mathcal{X}' \\
+\mathcal{Y} & \verb'\mathcal{Y}' \\
+\mathcal{Z} & \verb'\mathcal{Z}' \\
+\end{symbols}
+\subsubsection{BlackBoard Bold}
+\vspace*{-2.5ex}
+\begin{symbols}
+\mathbb A & \verb'\mathbb A' \\
+\mathbb B & \verb'\mathbb B' \\
+\mathbb C & \verb'\mathbb C' \\
+\mathbb D & \verb'\mathbb D' \\
+\mathbb E & \verb'\mathbb E' \\
+\mathbb F & \verb'\mathbb F' \\
+\mathbb G & \verb'\mathbb G' \\
+\mathbb H & \verb'\mathbb H' \\
+\mathbb I & \verb'\mathbb I' \\
+\mathbb J & \verb'\mathbb J' \\
+\mathbb K & \verb'\mathbb K' \\
+\mathbb L & \verb'\mathbb L' \\
+\mathbb M & \verb'\mathbb M' \\
+\mathbb N & \verb'\mathbb N' \\
+\mathbb O & \verb'\mathbb O' \\
+\mathbb P & \verb'\mathbb P' \\
+\mathbb Q & \verb'\mathbb Q' \\
+\mathbb R & \verb'\mathbb R' \\
+\mathbb S & \verb'\mathbb S' \\
+\mathbb T & \verb'\mathbb T' \\
+\mathbb U & \verb'\mathbb U' \\
+\mathbb V & \verb'\mathbb V' \\
+\mathbb W & \verb'\mathbb W' \\
+\mathbb X & \verb'\mathbb X' \\
+\mathbb Y & \verb'\mathbb Y' \\
+\mathbb Z & \verb'\mathbb Z' \\
+\end{symbols}
+\subsubsection{Miscellaneous}
+\vspace*{-2.5ex}
+\begin{symbols}
+\hslash & \verb'\hslash' \\
+\hbar & \verb'\hbar' \\
+\backepsilon & \verb'\backepsilon' \\
+\eth & \verb'\eth' \\
+\beth & \verb'\beth' \\
+\gimel & \verb'\gimel' \\
+\daleth & \verb'\daleth' \\
+\complement & \verb'\complement' \\
+\intercal & \verb'\intercal' \\
+\aleph & \verb'\aleph' \\
+\nabla & \verb'\nabla' \\
+\hbar & \verb'\hbar' \\
+\imath & \verb'\imath' \\
+\jmath & \verb'\jmath' \\
+\ell & \verb'\ell' \\
+\wp & \verb'\wp' \\
+\Re & \verb'\Re' \\
+\Im & \verb'\Im' \\
+\mho & \verb'\mho' \\
+\digamma & \verb'\digamma' \\
+\end{symbols}
+
+\subsection{Shapes}
+\vspace*{-2ex}
+\begin{symbols}
+\Box & \verb'\Box' \\
+\square & \verb'\square' \\
+\blacksquare & \verb'\blacksquare' \\
+\diamond & \verb'\diamond' \\
+\Diamond & \verb'\Diamond' \\
+\lozenge & \verb'\lozenge' \\
+\blacklozenge & \verb'\blacklozenge' \\
+\vartriangleright & \verb'\vartriangleright' \\
+\vartriangleleft & \verb'\vartriangleleft' \\
+\blacktriangledown & \verb'\blacktriangledown' \\
+\blacktriangleright & \verb'\blacktriangleright' \\
+\blacktriangleleft & \verb'\blacktriangleleft' \\
+\vartriangle & \verb'\vartriangle' \\
+\blacktriangle & \verb'\blacktriangle' \\
+\triangledown & \verb'\triangledown' \\
+\triangle & \verb'\triangle' \\
+\triangleleft & \verb'\triangleleft' \\
+\triangleright & \verb'\triangleright' \\
+\bigtriangleup & \verb'\bigtriangleup' \\
+\bigtriangledown & \verb'\bigtriangledown' \\
+\clubsuit & \verb'\clubsuit' \\
+\diamondsuit & \verb'\diamondsuit' \\
+\heartsuit & \verb'\heartsuit' \\
+\spadesuit & \verb'\spadesuit' \\
+\ast & \verb'\ast' \\
+\star & \verb'\star' \\
+\maltese & \verb'\maltese' \\
+\bigstar & \verb'\bigstar' \\
+\bigcirc & \verb'\bigcirc' \\
+\circ & \verb'\circ' \\
+\bullet & \verb'\bullet' \\
+\centerdot & \verb'\centerdot' \\
+\cdot & \verb'\cdot' \\
+\cdots & \verb'\cdots' \\
+\ldots & \verb'\ldots' \\
+\vdots & \verb'\vdots' \\
+\ddots & \verb'\ddots' \\
+\end{symbols}
+\subsubsection{Circled Operations}
+\vspace*{-2.5ex}
+\begin{symbols}
+\circledS & \verb'\circledS' \\
+\circledcirc & \verb'\circledcirc' \\
+\circledast & \verb'\circledast' \\
+\circleddash & \verb'\circleddash' \\
+\circledR & \verb'\circledR' \\
+\copyright & \verb'\copyright' \\
+\fovr & \verb'\fovr' \\
+\ominus & \verb'\ominus' \\
+\otimes & \verb'\otimes' \\
+\oslash & \verb'\oslash' \\
+\odot & \verb'\odot' \\
+\end{symbols}
+
+\subsubsection{Boxed operators}
+\vspace*{-2.5ex}
+\begin{symbols}[0.2]
+\boxdot & \verb'\boxdot' \\
+\boxplus & \verb'\boxplus' \\
+\boxtimes & \verb'\boxtimes' \\
+\boxminus & \verb'\boxminus' \\
+\end{symbols}
+\subsection{Arrow Symbols}
+\vspace*{-1ex}
+\subsubsection{Left Arrows}
+\vspace*{-2.5ex}
+\begin{symbols}[0.7]
+\leftarrow & \verb'\leftarrow   \gets' \\
+\Leftarrow & \verb'\Leftarrow' \\
+\hookleftarrow & \verb'\hookleftarrow' \\
+\leftharpoonup & \verb'\leftharpoonup' \\
+\leftharpoondown & \verb'\leftharpoondown' \\
+\longleftarrow & \verb'\longleftarrow' \\
+\Longleftarrow & \verb'\Longleftarrow' \\
+\twoheadleftarrow & \verb'\twoheadleftarrow' \\
+\leftleftarrows & \verb'\leftleftarrows' \\
+\leftarrowtail & \verb'\leftarrowtail' \\
+\Lleftarrow & \verb'\Lleftarrow' \\
+\nleftarrow & \verb'\nleftarrow' \\
+\nLeftarrow & \verb'\nLeftarrow' \\
+\end{symbols}
+
+\subsubsection{Right Arrows}
+\begin{symbols}[0.7]
+\rightarrow & \verb'\rightarrow \to' \\
+\Rightarrow & \verb'\Rightarrow' \\
+\map & \verb'\map' \\
+\longmapsto & \verb'\longmapsto' \\
+\hookrightarrow & \verb'\hookrightarrow' \\
+\rightharpoonup & \verb'\rightharpoonup' \\
+\rightharpoondown & \verb'\rightharpoondown' \\
+\leadsto & \verb'\leadsto' \\
+\longrightarrow & \verb'\longrightarrow' \\
+\Longrightarrow & \verb'\Longrightarrow' \\
+\twoheadrightarrow & \verb'\twoheadrightarrow' \\
+\rightrightarrows & \verb'\rightrightarrows' \\
+\rightarrowtail & \verb'\rightarrowtail' \\
+\rightsquigarrow & \verb'\rightsquigarrow' \\
+\Rrightarrow & \verb'\Rrightarrow' \\
+\nrightarrow & \verb'\nrightarrow' \\
+\nRightarrow & \verb'\nRightarrow' \\
+\end{symbols}
+
+\subsubsection{Left Right Arrows}
+\begin{symbols}[0.6]
+\leftrightarrow & \verb'\leftrightarrow' \\
+\Leftrightarrow & \verb'\Leftrightarrow' \\
+\rightleftharpoons & \verb'\rightleftharpoons' \\
+\longleftrightarrow & \verb'\longleftrightarrow' \\
+\Longleftrightarrow & \verb'\Longleftrightarrow' \\
+\rightleftharpoons & \verb'\rightleftharpoons' \\
+\leftrightharpoons & \verb'\leftrightharpoons' \\
+\leftrightarrows & \verb'\leftrightarrows' \\
+\rightleftarrows & \verb'\rightleftarrows' \\
+\leftrightsquigarrow & \verb'\leftrightsquigarrow' \\
+\nLeftrightarrow & \verb'\nLeftrightarrow' \\
+\nleftrightarrow & \verb'\nleftrightarrow' \\
+\end{symbols}
+
+\subsubsection{Up Down Arrows}
+\begin{symbols}[1]
+\uparrow & \verb'\uparrow' \\
+\Uparrow & \verb'\Uparrow' \\
+\downarrow & \verb'\downarrow' \\
+\Downarrow & \verb'\Downarrow' \\
+\updownarrow & \verb'\updownarrow' \\
+\Updownarrow & \verb'\Updownarrow' \\
+\upuparrows & \verb'\upuparrows' \\
+\downdownarrows & \verb'\downdownarrows' \\
+\upharpoonright & \verb'\upharpoonright' \\
+\downharpoonright & \verb'\downharpoonright' \\
+\upharpoonleft & \verb'\upharpoonleft' \\
+\downharpoonleft & \verb'\downharpoonleft' \\
+\end{symbols}
+
+\subsubsection{Miscellaneous}
+\begin{symbols}[0.9]
+\nearrow & \verb'\nearrow' \\
+\searrow & \verb'\searrow' \\
+\swarrow & \verb'\swarrow' \\
+\nwarrow & \verb'\nwarrow' \\
+\circlearrowright & \verb'\circlearrowright' \\
+\circlearrowleft & \verb'\circlearrowleft' \\
+\Lsh & \verb'\Lsh' \\
+\Rsh & \verb'\Rsh' \\
+\looparrowleft & \verb'\looparrowleft' \\
+\looparrowright & \verb'\looparrowright' \\
+\curvearrowleft & \verb'\curvearrowleft' \\
+\curvearrowright & \verb'\curvearrowright' \\
+\end{symbols}
+\pagebreak[4]
+
+\subsection{Relations}
+\begin{symbols}[0.8]
+\ll & \verb'\ll' \\
+\gg & \verb'\gg' \\
+\llless & \verb'\lll \llless' \\
+\gggtr & \verb'\ggg \gggtr' \\
+\sqsubset & \verb'\sqsubset' \\
+\sqsupset & \verb'\sqsupset' \\
+\sqsubseteq & \verb'\sqsubseteq' \\
+\sqsupseteq & \verb'\sqsupseteq' \\
+\owns & \verb'\owns' \\
+\vdash & \verb'\vdash' \\
+\Vdash & \verb'\Vdash' \\
+\vDash & \verb'\vDash' \\
+\dashv & \verb'\dashv' \\
+\Vvdash & \verb'\Vvdash' \\
+\models & \verb'\models' \\
+\nvdash & \verb'\nvdash' \\
+\nVdash & \verb'\nVdash' \\
+\nvDash & \verb'\nvDash' \\
+\nVDash & \verb'\nVDash' \\
+\perp & \verb'\perp' \\
+\sim & \verb'\sim' \\
+\simeq & \verb'\simeq' \\
+\eqsim & \verb'\eqsim' \\
+\backsim & \verb'\backsim' \\
+\backsimeq & \verb'\backsimeq' \\
+\thicksim & \verb'\thicksim' \\
+\nsim & \verb'\nsim' \\
+\approx & \verb'\approx' \\
+\napprox & \verb'\napprox' \\
+\thickapprox & \verb'\thickapprox' \\
+\approxeq & \verb'\approxeq' \\
+\asymp & \verb'\asymp' \\
+\cong & \verb'\cong' \\
+\ncong & \verb'\ncong' \\
+\doteq & \verb'\doteq' \\
+\doteqdot & \verb'\Doteq \doteqdot' \\
+\risingdotseq & \verb'\risingdotseq' \\
+\fallingdotseq & \verb'\fallingdotseq' \\
+\lessdot & \verb'\lessdot' \\
+\gtrdot & \verb'\gtrdot' \\
+\eqcirc & \verb'\eqcirc' \\
+\circeq & \verb'\circeq' \\
+\bumpeq & \verb'\bumpeq' \\
+\Bumpeq & \verb'\Bumpeq' \\
+\triangleq & \verb'\triangleq' \\
+\multimap & \verb'\multimap' \\
+\propto & \verb'\propto' \\
+\varpropto & \verb'\varpropto' \\
+\lesssim & \verb'\lesssim' \\
+\gtrsim & \verb'\gtrsim' \\
+\lessapprox & \verb'\lessapprox' \\
+\gtrapprox & \verb'\gtrapprox' \\
+\xprec & \verb'\xprec' \\
+\xsucc & \verb'\xsucc' \\
+\preceq & \verb'\preceq' \\
+\succeq & \verb'\succeq' \\
+\precsim & \verb'\precsim' \\
+\succsim & \verb'\succsim' \\
+\precapprox & \verb'\precapprox' \\
+\succapprox & \verb'\succapprox' \\
+\eqslantless & \verb'\eqslantless' \\
+\eqslantgtr & \verb'\eqslantgtr' \\
+\curlyeqprec & \verb'\curlyeqprec' \\
+\curlyeqsucc & \verb'\curlyeqsucc' \\
+\preccurlyeq & \verb'\preccurlyeq' \\
+\succcurlyeq & \verb'\succcurlyeq' \\
+\leqq & \verb'\leqq' \\
+\geqq & \verb'\geqq' \\
+\leqslant & \verb'\leqslant' \\
+\geqslant & \verb'\geqslant' \\
+\lessgtr & \verb'\lessgtr' \\
+\gtrless & \verb'\gtrless' \\
+\lesseqgtr & \verb'\lesseqgtr' \\
+\Also
+\gtreqless & \verb'\gtreqless' \\
+\Also
+\lesseqqgtr & \verb'\lesseqqgtr' \\
+\Also
+\gtreqqless & \verb'\gtreqqless' \\
+\also
+\lvertneqq & \verb'\lvertneqq' \\
+\gvertneqq & \verb'\gvertneqq' \\
+\nleq & \verb'\nleq' \\
+\ngeq & \verb'\ngeq' \\
+\nless & \verb'\nless' \\
+\ngtr & \verb'\ngtr' \\
+\nprec & \verb'\nprec' \\
+\nsucc & \verb'\nsucc' \\
+\lneqq & \verb'\lneqq' \\
+\gneqq & \verb'\gneqq' \\
+\nleqslant & \verb'\nleqslant' \\
+\ngeqslant & \verb'\ngeqslant' \\
+\lneq & \verb'\lneq' \\
+\gneq & \verb'\gneq' \\
+\npreceq & \verb'\npreceq' \\
+\nsucceq & \verb'\nsucceq' \\
+\precnsim & \verb'\precnsim' \\
+\succnsim & \verb'\succnsim' \\
+\lnsim & \verb'\lnsim' \\
+\gnsim & \verb'\gnsim' \\
+\nleqq & \verb'\nleqq' \\
+\ngeqq & \verb'\ngeqq' \\
+\precneqq & \verb'\precneqq' \\
+\succneqq & \verb'\succneqq' \\
+\precnapprox & \verb'\precnapprox' \\
+\succnapprox & \verb'\succnapprox' \\
+\lnapprox & \verb'\lnapprox' \\
+\gnapprox & \verb'\gnapprox' \\
+\Subset & \verb'\Subset' \\
+\Supset & \verb'\Supset' \\
+\subseteqq & \verb'\subseteqq' \\
+\supseteqq & \verb'\supseteqq' \\
+%\varsubsetneq & \verb'\varsubsetneq' \\
+%\varsupsetneq & \verb'\varsupsetneq' \\
+\nsubseteqq & \verb'\nsubseteqq' \\
+\also
+\nsupseteqq & \verb'\nsupseteqq' \\
+\also
+\subsetneqq & \verb'\subsetneqq' \\
+\also
+\supsetneqq & \verb'\supsetneqq' \\
+%\varsubsetneqq & \verb'\varsubsetneqq' \\
+%\varsupsetneqq & \verb'\varsupsetneqq' \\
+\subsetneq & \verb'\subsetneq' \\
+\supsetneq & \verb'\supsetneq' \\
+\nsubseteq & \verb'\nsubseteq' \\
+\nsupseteq & \verb'\nsupseteq' \\
+\trianglerighteq & \verb'\trianglerighteq' \\
+\trianglelefteq & \verb'\trianglelefteq' \\
+\ntrianglerighteq & \verb'\ntrianglerighteq' \\
+\ntrianglelefteq & \verb'\ntrianglelefteq' \\
+\ntriangleleft & \verb'\ntriangleleft' \\
+\ntriangleright & \verb'\ntriangleright' \\
+\between & \verb'\between' \\
+| & \verb'| \vert \mid' \\
+\| & \verb'\| \Vert \parallel' \\
+\interleave & \verb'\interleave' \\
+\shortmid & \verb'\shortmid' \\
+\shortparallel & \verb'\shortparallel' \\
+\shortinterleave & \verb'\shortinterleave' \\
+\nparallel & \verb'\nparallel' \\
+\nmid & \verb'\nmid' \\
+\nshortmid & \verb'\nshortmid' \\
+\nshortparallel & \verb'\nshortparallel' \\
+\end{symbols}
+
+\subsection{Binary Operations}
+\begin{symbols}[1.4]
+\curlywedge & \verb'\curlywedge' \\
+\curlyvee & \verb'\curlyvee' \\
+\veebar & \verb'\veebar' \\
+\barwedge & \verb'\barwedge' \\
+\doublebarwedge & \verb'\doublebarwedge' \\
+\pm & \verb'\pm' \\
+\mp & \verb'\mp' \\
+\times & \verb'\times' \\
+\ltimes & \verb'\ltimes' \\
+\rtimes & \verb'\rtimes' \\
+\leftthreetimes & \verb'\leftthreetimes' \\
+\rightthreetimes & \verb'\rightthreetimes' \\
+\divideontimes & \verb'\divideontimes' \\
+\divides & \verb'\divides' \\
+\uplus & \verb'\uplus' \\
+\sqcap & \verb'\sqcap' \\
+\sqcup & \verb'\sqcup' \\
+\Cup & \verb'\Cup \doublecup' \\
+\Cap & \verb'\Cap \doublecap' \\
+\backslash & \verb'\backslash' \\
+\setminus & \verb'\setminus' \\
+\smallsetminus & \verb'\smallsetminus' \\
+\wr & \verb'\wr' \\
+\lhd & \verb'\lhd' \\
+\rhd & \verb'\rhd' \\
+\unlhd & \verb'\unlhd' \\
+\unrhd & \verb'\unrhd' \\
+\restriction & \verb'\restriction' \\
+\amalg & \verb'\amalg' \\
+\top & \verb'\top' \\
+\bot & \verb'\bot' \\
+\smallsmile & \verb'\smallsmile' \\
+\smallfrown & \verb'\smallfrown' \\
+\smile & \verb'\smile' \\
+\frown & \verb'\frown' \\
+\pitchfork & \verb'\pitchfork' \\
+\dotplus & \verb'\dotplus' \\
+\Join & \verb'\Join' \\
+\bowtie & \verb'\bowtie' \\
+\end{symbols}
+
+\subsection{Miscellaneous Symbols}
+\begin{symbols}
+\dagger & \verb'\dagger' \\
+\ddagger & \verb'\ddagger' \\
+\sectionsymbol & \verb'\sectionsymbol' \\
+\P & \verb'\P' \\
+\angle & \verb'\angle' \\
+\measuredangle & \verb'\measuredangle' \\
+\sphericalangle & \verb'\sphericalangle' \\
+\prime & \verb'\prime' \\
+\backprime & \verb'\backprime' \\
+\surd & \verb'\surd' \\
+\smallint & \verb'\smallint' \\
+\flat & \verb'\flat' \\
+\natural & \verb'\natural' \\
+\sharp & \verb'\sharp' \\
+\partial & \verb'\partial' \\
+\infty & \verb'\infty' \\
+\yen & \verb'\yen' \\
+\therefore & \verb'\therefore' \\
+\because & \verb'\because' \\
+\checkmark & \verb'\checkmark' \\
+\end{symbols}
+
+\subsection{Variable-sized Symbols}
+These symbols come in two sizes which
+do not vary with the point size of your
+font.  The big size can be obtained
+by preceding the symbol command with
+the command \verb'\displaystyle'.
+\begin{symbols}[1.3]
+\sum \displaystyle \sum & \verb'\sum' \\
+\product \displaystyle \product & \verb'\product' \\
+\coprod \displaystyle \coprod & \verb'\coprod' \\
+\integral \displaystyle \integral & \verb'\integral' \\
+\oint \displaystyle \oint & \verb'\oint' \\
+\bigcap \displaystyle \bigcap & \verb'\bigcap' \\
+\bigcup \displaystyle \bigcup & \verb'\bigcup' \\
+\bigsqcup \displaystyle \bigsqcup & \verb'\bigsqcup' \\
+\bigvee \displaystyle \bigvee & \verb'\bigvee' \\
+\bigwedge \displaystyle \bigwedge & \verb'\bigwedge' \\
+\bigodot \displaystyle \bigodot & \verb'\bigodot' \\
+\bigotimes \displaystyle \bigotimes & \verb'\bigotimes' \\
+\bigoplus \displaystyle \bigoplus & \verb'\bigoplus' \\
+\biguplus \displaystyle \biguplus & \verb'\biguplus' \\
+\end{symbols}
+
+\subsection{Delimiters}
+\vspace*{-1ex}
+These symbols can be made large to surround large formula.
+E.g., $$\left\lfloor\displaystyle\sum_{i=1}^n x^i\right\rfloor$$
+was generated using
+
+\begin{verbatim}
+\left\lfloor...\right\rfloor
+\end{verbatim}
+\vspace*{-2ex}
+\begin{symbols}[0.8]
+(~~~) & \verb'( )' \\
+\{~~~\} & \verb'\{ \}' \\
+\lfloor~~~\rfloor & \verb'\lfloor \rfloor' \\
+\lceil~~~\rceil & \verb'\lceil \rceil' \\
+\langle~~~\rangle & \verb'\langle \rangle' \\
+\ulcorner~~~\urcorner & \verb'\ulcorner \urcorner' \\
+\llcorner~~~\lrcorner & \verb'\llcorner \lrcorner' \\
+\uparrow & \verb'\uparrow' \\
+\downarrow & \verb'\downarrow' \\
+\updownarrow & \verb'\updownarrow' \\
+\Uparrow & \verb'\Uparrow' \\
+\Downarrow & \verb'\Downarrow' \\
+\Updownarrow & \verb'\Updownarrow' \\
+\end{symbols}
+
+\subsection{Math Accents}
+\vspace*{-1ex}
+\begin{symbols}[0.2]
+\hat{a} & \verb'\hat{a}' \\
+\widehat{a} & \verb'\widehat{a}' \\
+\widehat{aa} & \verb'\widehat{aa}' \\
+\widehat{aaa} & \verb'\widehat{aaa}' \\
+\tilde{a} & \verb'\tilde{a}' \\
+\widetilde{a} & \verb'\widetilde{a}' \\
+\widetilde{aa} & \verb'\widetilde{aa}' \\
+\widetilde{aaa} & \verb'\widetilde{aaa}' \\
+\check{a} & \verb'\check{a}' \\
+\breve{a} & \verb'\breve{a}' \\
+\acute{a} & \verb'\acute{a}' \\
+\grave{a} & \verb'\grave{a}' \\
+\bar{a} & \verb'\bar{a}' \\
+\vec{a} & \verb'\vec{a}' \\
+\dotaccent{a} & \verb'\dotaccent{a}' \\
+\ddot{a} & \verb'\ddot{a}' \\
+\end{symbols}
+
+\subsection{Size Commands}
+\vspace*{-1ex}
+\begin{symbols}
+\mu~\zsmall\mu~\zSmall\mu &\verb'\mu \zsmall\mu \zSmall\mu'\\
+\zbig\mu~\zBig\mu~\zBIG\mu &\verb'\zbig\mu \zBig\mu \zBIG\mu'\\
+\end{symbols}
+\end{multicols}
+\end{document}

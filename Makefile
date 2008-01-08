@@ -63,7 +63,8 @@ GNUPLOT_JPG = $(GNUPLOT_SJPG:gjpg=jpg)
 GNUPLOT_SRC = $(GNUPLOT_STEX) $(GNUPLOT_SPNG) $(GNUPLOT_STJPG)
 GNUPLOT_OUTPUT = $(GNUPLOT_TEX) $(GNUPLOT_PNG) $(GNUPLOT_JPG)
 
-DIA_SRC = $(wildcard Figures/*.dia)
+#DIA_SRC = $(wildcard Figures/*.dia) #no subdirs
+DIA_SRC = $(shell find ./Figures -name \*.dia)
 DIA_OUTPUT = $(DIA_SRC:dia=$(IMAGE_TYPE))
 
 FIGURES = $(XFIG_PDFTEX_T) $(DOTPDF) $(NEATOPDF) $(GNUPLOT_OUTPUT) $(DIA_OUTPUT)
