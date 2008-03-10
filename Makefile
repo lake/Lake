@@ -43,7 +43,7 @@ XFIG_FILES = $(shell find ./Figures -name \*.fig)
 XFIG_PDFTEX_T = $(XFIG_FILES:fig=pdftex_t)
 XFIG_TEMPS = $(wildcard Figures/*.bak) $(XFIG_FILES:fig=pdf) $(XFIG_PDFTEX_T)
 
-DOT=$(wildcard Figures/*.dot)
+DOT=$(shell find ./Figures -name \*.dot)
 #DOTEPS=$(DOT:dot=eps)
 DOTPDF=$(DOT:dot=pdf)
 
