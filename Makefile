@@ -87,7 +87,7 @@ view: ${PAPER}
 
 .xpdf-reload: $(PAPER)
 	@touch $@
-	@xpdf -remote $(PAPER) -raise $(PAPER) &
+	@xpdf -remote $(PAPER) -reload -raise &
 
 %.pdf: %.aux %.bbl
 	@if [ ! -e $(PAPER) ] ; then\
