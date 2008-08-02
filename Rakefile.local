@@ -1,0 +1,13 @@
+load 'latex/Rakefile'
+
+# Uncomment any of the below options to make local build changes
+
+# Specify a path for latex's package lookup.  Be sure to end the path with '::'
+# to ensure the default path is also included
+#ENV['TEXINPUTS'] = 'latex:latex/packages/ucthesis::'
+
+# Specify a path for bibtex
+#ENV['BIBINPUTS'] = 'Bib'
+
+#ENV['BSTINPUTS'] = 'latex:latex/packages/ucthesis'
+

@@ -1,5 +1,18 @@
 #!/usr/bin/env ruby
-system 'cp latex/Makefile.template Makefile'
-system 'ln -s latex/Makefile Makefile.global'
+if template = ARGV.shift
+	if File.directory? "latex/templates/#{template}/"
+		system "cp -t . latex/templates/#{template}/*"
+	else
+		puts "No such template found -- #{template}"
+		exit 1
+	end
+end
+
+system 'cp latex/Rakefile.local Rakefile'
+system 'cp latex/vimproject .vimproject'
 system 'ln -s latex/gitignore .gitignore'
-system "mkdir Figures"
+Dir.glob('latex/init-files/.[a-z]*').each do |path|
+	system "ln -s #{path}"
+end
+system "mkdir -p Figures"
+

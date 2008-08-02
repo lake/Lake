@@ -1,4 +1,6 @@
 \usepackage[pdftex]{graphicx,color}
+\usepackage[bookmarks, colorlinks, citecolor=green, urlcolor=blue,
+			filecolor=blue, linkcolor=blue]{hyperref}
 \usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -7,7 +9,6 @@
 \usepackage{url}
 \usepackage[noend]{algorithmic} % may not be installed
 \usepackage{algorithm}
-%\usepackage{algorithm2e}
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{setspace} % for double, 1.5, single spacing etc.
@@ -18,12 +19,13 @@
 \usepackage{verbatim}
 \usepackage{float} % defines newfloat used below
 
+
 % required for combined latex/pdf xfig figures
 \DeclareGraphicsRule{.pdftex}{pdf}{.pdftex}{} 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN MACROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% todo: add support for labels to todo, if possible.
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Macros																{{{1
 \newcounter{todo}\setcounter{todo}{0}
 \newcommand{\todo}[1]{{\em {\bf TODO \addtocounter{todo}{1}\thetodo:} #1}} 
 
@@ -35,7 +37,9 @@
 \newfloat{Program}{thp}{lop}
 \newfloat{Procedure}{thp}{lop}
 
-%% THEOREM, DEFS %%
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Theorems, etc.														{{{2
 \newenvironment{proof-idea}{\noindent{\bf Proof Idea}\hspace*{1em}}{\bigskip}
 
 \theoremstyle{plain}
@@ -51,6 +55,8 @@
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}[section]
 \newtheorem{conj}{Conjecture}
+%}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 % Defines SubFloat for wrapping verbatim environments in subfloats.
 \makeatletter
@@ -70,7 +76,16 @@
      \subfloat[\sf@one][\sf@two]{\box\sf@box}%
    \fi}
 \makeatother
+%}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-%% shared aliased commands  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Aliases																{{{1
 \newcommand{\infinity}{\infty}
+%}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+% vim:foldmethod=marker
