@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
-`cp latex/Makefile.template Makefile`
-`ln -s latex/Makefile Makefile.global`
-`ln -s latex/gitignore .gitignore`
+system 'cp latex/Makefile.template Makefile'
+system 'ln -s latex/Makefile Makefile.global'
+system 'ln -s latex/gitignore .gitignore'
+system "mkdir Figures"
