@@ -38,36 +38,39 @@ TEX_INCLUDES = $(wildcard latex/*.tex)
 TEX_SRC = $(shell find . -name \*.tex)
 BIB_FILES = $(wildcard *.bib) $(wildcard Bib/*.bib)
 
-#XFIG_FILES = $(wildcard Figures/*.fig) #no subdirs
-XFIG_FILES = $(shell find ./Figures -name \*.fig) 
-XFIG_PDFTEX_T = $(XFIG_FILES:fig=pdftex_t)
-XFIG_TEMPS = $(wildcard Figures/*.bak) $(XFIG_FILES:fig=pdf) $(XFIG_PDFTEX_T)
+FIGURES =
+ifneq ($(shell ls Figures 2> /dev/null),)
+    XFIG_FILES = $(wildcard Figures/*.fig) #no subdirs
+    XFIG_FILES = $(shell find ./Figures -name \*.fig) 
+    XFIG_PDFTEX_T = $(XFIG_FILES:fig=pdftex_t)
+    XFIG_TEMPS = $(wildcard Figures/*.bak) $(XFIG_FILES:fig=pdf) $(XFIG_PDFTEX_T)
 
-DOT=$(shell find ./Figures -name \*.dot)
-#DOTEPS=$(DOT:dot=eps)
-DOTPDF=$(DOT:dot=pdf)
+    DOT=$(shell find ./Figures -name \*.dot)
+    #DOTEPS=$(DOT:dot=eps)
+    DOTPDF=$(DOT:dot=pdf)
 
-NEATO=$(wildcard Figures/*.neato)
-#NEATOEPS=$(NEATO:neato=eps)
-NEATOPDF=$(NEATO:neato=pdf)
+    NEATO=$(wildcard Figures/*.neato)
+    #NEATOEPS=$(NEATO:neato=eps)
+    NEATOPDF=$(NEATO:neato=pdf)
 
-GNUPLOT_STEX = $(shell find ./Figures -name \*.gtex)
-GNUPLOT_SPNG = $(shell find ./Figures -name \*.gpng)
-GNUPLOT_SJPG = $(shell find ./Figures -name \*.gjpg)
-GNUPLOT_TEX = $(GNUPLOT_STEX:gtex=tex)
-GNUPLOT_PNG = $(GNUPLOT_SPNG:gpng=png)
-GNUPLOT_JPG = $(GNUPLOT_SJPG:gjpg=jpg)
-#GNUPLOT_FIG = $(GNUPLOT_SRC:gnuplot=fig)
-#GNUPLOTEPS=$(GNUPLOT:gnuplot=eps)
-#GNUPLOTPDF=$(GNUPLOT:gnuplot=pdf)
-GNUPLOT_SRC = $(GNUPLOT_STEX) $(GNUPLOT_SPNG) $(GNUPLOT_STJPG)
-GNUPLOT_OUTPUT = $(GNUPLOT_TEX) $(GNUPLOT_PNG) $(GNUPLOT_JPG)
+    GNUPLOT_STEX = $(shell find ./Figures -name \*.gtex)
+    GNUPLOT_SPNG = $(shell find ./Figures -name \*.gpng)
+    GNUPLOT_SJPG = $(shell find ./Figures -name \*.gjpg)
+    GNUPLOT_TEX = $(GNUPLOT_STEX:gtex=tex)
+    GNUPLOT_PNG = $(GNUPLOT_SPNG:gpng=png)
+    GNUPLOT_JPG = $(GNUPLOT_SJPG:gjpg=jpg)
+    #GNUPLOT_FIG = $(GNUPLOT_SRC:gnuplot=fig)
+    #GNUPLOTEPS=$(GNUPLOT:gnuplot=eps)
+    #GNUPLOTPDF=$(GNUPLOT:gnuplot=pdf)
+    GNUPLOT_SRC = $(GNUPLOT_STEX) $(GNUPLOT_SPNG) $(GNUPLOT_STJPG)
+    GNUPLOT_OUTPUT = $(GNUPLOT_TEX) $(GNUPLOT_PNG) $(GNUPLOT_JPG)
 
-#DIA_SRC = $(wildcard Figures/*.dia) #no subdirs
-DIA_SRC = $(shell find ./Figures -name \*.dia)
-DIA_OUTPUT = $(DIA_SRC:dia=$(IMAGE_TYPE))
+    #DIA_SRC = $(wildcard Figures/*.dia) #no subdirs
+    DIA_SRC = $(shell find ./Figures -name \*.dia)
+    DIA_OUTPUT = $(DIA_SRC:dia=$(IMAGE_TYPE))
 
-FIGURES = $(XFIG_PDFTEX_T) $(DOTPDF) $(NEATOPDF) $(GNUPLOT_OUTPUT) $(DIA_OUTPUT)
+    FIGURES = $(XFIG_PDFTEX_T) $(DOTPDF) $(NEATOPDF) $(GNUPLOT_OUTPUT) $(DIA_OUTPUT)
+endif
 
 export latex_count=3
 
@@ -75,19 +78,25 @@ export latex_count=3
 ifneq ($(notdir $(PDF_VIEWER)),xpdf)
 all: $(PAPER)
 #all:
-#	@echo source $(GNUPLOT_SRC)
-#	@echo output $(GNUPLOT_OUTPUT)
+#	@echo LS = $(LS)
+#	@echo D = $(D)
+#	@echo NOFIGDIR = $(NOFIGDIR)
 else
 all: $(PAPER) .xpdf-reload
 endif
 
 .PHONY: view
 view: ${PAPER}
-	${PDF_VIEWER} ${PAPER}
+	${PDF_VIEWER} -remote $(PAPER) $(PAPER) &
+
 
 .xpdf-reload: $(PAPER)
 	@touch $@
-	@xpdf -remote $(PAPER) -reload -raise &
+	@if [ -n "`ps -ef | grep '[x]pdf.*$(PAPER)'`" ] ; then\
+		xpdf -remote $(PAPER) -reload -raise & \
+	else \
+		xpdf -remote $(PAPER) -raise $(PAPER) & \
+	fi
 
 %.pdf: %.aux %.bbl
 	@if [ ! -e $(PAPER) ] ; then\
@@ -119,12 +128,14 @@ view: ${PAPER}
 %.eps: %.neato
 	neato -Gepsilon=.000000001 $< -Tps > $@
 
+ifneq ($(BIB_FILES),)
 .PRECIOUS: %.bbl
 %.bbl: %.tex %.aux $(BIB_FILES)
 ifneq ($(strip $(BIB_FILES)),)
 	bibtex -min-crossrefs=100 $(basename $<)
 endif
 	@echo "" # manual NOP
+endif
 
 # gnuplot's latex terminal
 .PRECIOUS: %.tex
