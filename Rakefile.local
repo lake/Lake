@@ -2,12 +2,17 @@ load 'latex/Rakefile'
 
 # Uncomment any of the below options to make local build changes
 
-# Specify a path for latex's package lookup.  Be sure to end the path with '::'
-# to ensure the default path is also included
-#ENV['TEXINPUTS'] = 'latex:latex/packages/ucthesis::'
+# If your master latex source file's name is not "paper.tex", uncomment the
+# following line and set $paper to that name.
+# $paper = 'your_master_latex_file'
 
-# Specify a path for bibtex
-#ENV['BIBINPUTS'] = 'Bib'
+# Specify a path for latex's package lookup.  Be sure that the path end with
+# '::' to ensure the default path is also searched.  Here we assume that
+# ENV['TEXINPUTS'] ends with ::.
+#ENV['TEXINPUTS'] = 'latex:latex/packages/ucthesis::' + ENV['TEXINPUTS']
 
-#ENV['BSTINPUTS'] = 'latex:latex/packages/ucthesis'
+# Specify a path for bibtex style files
+# As with ENV['TEXINPUTS'] above, we assume that ENV['BSTINPUTS'] ends with ::
+# so that bibtex searches the global directories for bibtex style files.
+#ENV['BSTINPUTS'] = 'latex:latex/packages/ucthesis:' + ENV['BSTINPUTS']
 

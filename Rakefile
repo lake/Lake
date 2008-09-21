@@ -1,6 +1,7 @@
 require 'fileutils'
 
 
+BIB_FILES = FileList['*.bib', 'Bib/**/*.bib']
 TEX_FILES = FileList['*.tex']
 FIG_FILES = FileList['Figures/**/*.fig']
 DIA_FILES = FileList['Figures/**/*.dia']
@@ -21,9 +22,9 @@ MAX_LATEX_ITERATION = 10
 
 
 
-$paper = 'paper'
+$paper ||= 'paper'
 
-$pdf = "#{$paper}.pdf"
+BBL_FILE  = FileList[$paper + ".bbl"]
 
 
 task :default => :view
@@ -34,23 +35,39 @@ task :default => :view
 desc <<-EOS
 	Builds the pdf output
 EOS
-task :pdf  => 'paper.pdf'
-file 'paper.pdf' => TEX_FILES + FIGURES do
+task :pdf  => "#{$paper}.pdf"
+file "#{$paper}.pdf" => TEX_FILES + BBL_FILE + FIGURES do
 	1.upto MAX_LATEX_ITERATION do 
 		# Quit if latex reports an error
-		exit 1 unless sh "pdflatex paper.tex"
+		exit 1 unless sh "pdflatex #{$paper}.tex"
 
-		# We can stop  when LaTeX is certain it has all the cross-references
-		# right
+		# We can stop when LaTeX is certain it has resolved all citation
+		# references.
 		break if 
 			`egrep -s 'Rerun (LaTeX|to get cross-references right)' *.log`.empty?
 	end
-
-	if $paper != 'paper' and File.exists? 'paper.pdf'
-		FileUtils.mv 'paper.pdf', "#{$pdf}"
-	end
 end
 
+desc <<-EOS
+	Creates #{$paper}.bbl if a bib file exists
+EOS
+file "#{$paper}.bbl" => BIB_FILES do |t|
+	unless BIB_FILES.nil?
+		bib_inputs =
+			BIB_FILES.map{|f| File.dirname(f)} + ENV['BIBINPUTS'].split(':')
+
+		# remove dupes, preserving order
+		bib_inputs = bib_inputs & bib_inputs
+
+		ENV['BIBINPUTS'] = bib_inputs.join(':')
+
+		sh "pdflatex #{$paper}.tex" unless File.exists?($paper + ".aux")
+
+		# -min-crossrefs=100 essentially turns off cross referencing.
+		# Not sure why one wouldn't just take the default of 2.
+		sh "bibtex -min-crossrefs=100 #{File.basename(t.name, '.bbl')}"
+	end
+end
 
 desc <<-EOS
 	Builds all of the figures
@@ -86,9 +103,9 @@ end
 # Tasks to view the paper
 
 task :view => :pdf do
-	if  `ps -ef | grep "xpdf -remote paper" | grep -v "grep"`.strip.empty?
+	if `pgrep -f "^xpdf -remote #{$paper}"`.strip.empty?
 		# not already viewing, open a new xpdf
-		sh "xpdf -remote #{$paper} #{$pdf} &"
+		sh "xpdf -remote #{$paper} #{$paper}.pdf &"
 	else
 		# already viewing, reload instead
 		sh "xpdf -remote #{$paper} -reload -raise"
