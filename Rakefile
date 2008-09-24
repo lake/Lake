@@ -51,10 +51,11 @@ end
 desc <<-EOS
 	Creates #{$paper}.bbl if a bib file exists
 EOS
-file "#{$paper}.bbl" => BIB_FILES do |t|
+file "#{$paper}.bbl" => BIB_FILES + FIGURES do |t|
 	unless BIB_FILES.nil?
 		bib_inputs =
-			BIB_FILES.map{|f| File.dirname(f)} + ENV['BIBINPUTS'].split(':')
+			BIB_FILES.map{|f| File.dirname(f)} + 
+				(ENV['BIBINPUTS'] ||'').split(':')
 
 		# remove dupes, preserving order
 		bib_inputs = bib_inputs & bib_inputs

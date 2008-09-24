@@ -13,3 +13,4 @@
 *.bak
 .xpdf-reload
 /*.out
+.*.gnuplot-output
