@@ -21,8 +21,9 @@ DIA_FILES = FileList['Figures/**/*.dia']
 
 PDFTEX_T_FILES = FIG_FILES.map{|f| f.gsub /\.\w*$/, '.pdftex_t'}
 NEATO_FILES = FileList['Figures/**/*.neato']
-SECONDARY_PDF_FILES = NEATO_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'}
-PNG_FILES = DIA_FILES.map{|f| f.gsub /\.\w*$/, '.png'}
+SECONDARY_PDF_FILES =
+	NEATO_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'} \
+	+ DIA_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'}
 
 GNUPLOT_FILES = FileList['Figures/**/*.gplot'].map do |f| 
 	dir, file = dir_and_file_name( f)
@@ -31,11 +32,11 @@ end
 GNUPLOT_DATA_FILES = FileList['Figures/**/*.gdata']
 
 
-FIGURES = PDFTEX_T_FILES + SECONDARY_PDF_FILES + PNG_FILES + GNUPLOT_FILES
+FIGURES = PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES
 
 # Don't trash figures that are checked in directly (i.e. that we don't have the
 # source for)
-PREGENERATED_RESOURCES = FileList['Figures/**/*.png'] - PNG_FILES
+PREGENERATED_RESOURCES = FileList['Figures/**/*.png']
 
 
 MAX_LATEX_ITERATION = 10
@@ -102,6 +103,10 @@ rule '.pdftex_t' => ['.fig'] do |t|
 	sh "fig2dev -Lpdftex_t -p#{pdf_name} #{t.source} > #{t.name}"
 end
 
+rule '.pdf' => ['.eps'] do |t|
+	sh "epstopdf #{t.source}"
+end
+
 rule '.eps' => ['.neato'] do |t|
 	sh "neato -Gepsilon=.000000001 #{t.source} -Tps > #{t.name}"
 end
@@ -110,13 +115,8 @@ rule '.eps' => ['.dot'] do |t|
 	sh "dot #{t.source} -Tps > #{t.name}"
 end
 
-
-rule '.pdf' => ['.eps'] do |t|
-	sh "epstopdf #{t.source}"
-end
-
-rule '.png' => ['.dia'] do |t|
-	sh "dia -t png #{t.source}"
+rule '.eps' => ['.dia'] do |t|
+	sh "dia -t eps #{t.source}"
 end
 
 # Figures/.foo.gnuplot-output => Figures/foo.gplot
