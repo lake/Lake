@@ -1,4 +1,4 @@
-\usepackage[pdftex]{graphicx,color}
+\usepackage{graphicx,color}
 \usepackage[bookmarks, colorlinks, citecolor=green, urlcolor=blue,
 			filecolor=blue, linkcolor=blue]{hyperref}
 \usepackage{subfig}
@@ -33,8 +33,15 @@
 \newcounter{todo}\setcounter{todo}{0}
 \newcommand{\todo}[1]{{\em {\bf TODO \addtocounter{todo}{1}\thetodo:} #1}} 
 
+% English
 \newcommand{\deletia}{\ldots [deletia] \ldots}
-\newcommand{\etal}{\emph{et al.}\xspace}
+\newcommand{\etal}{\hbox{\emph{et al.}}\xspace}
+\newcommand{\eg}{\hbox{\emph{e.g.}}\xspace}
+\newcommand{\ie}{\hbox{\emph{i.e.}}\xspace}
+\newcommand{\cf}{\hbox{\emph{cf.}}\xspace}
+\newcommand{\st}{\hbox{\emph{s.t.}}\xspace}
+\newcommand{\wrt}{\hbox{\emph{w.r.t.}}\xspace}
+
 
 \newfloat{Protocol}{thp}{lop}
 \DeclareMathOperator{\cbar}{||} %denotes concurrency in protocol floats.
