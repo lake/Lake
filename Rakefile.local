@@ -1,6 +1,9 @@
-load 'latex/Rakefile'
-
 # Uncomment any of the below options to make local build changes
+
+# Specify a path to a script that generates pdfs from rdata files.  It must
+# accept one command line argument, which must be the path to the rdata file.
+# R_CREATE_GRAPHS = "path/to/script"
+load 'latex/Rakefile'
 
 # If your master latex source file's name is not "paper.tex", uncomment the
 # following line and set $paper to that name.

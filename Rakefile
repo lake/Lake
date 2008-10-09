@@ -1,5 +1,7 @@
 require 'fileutils'
 
+__DIR__ = File.dirname( __FILE__)
+
 ########################################################################
 # Ancillary methods that unfortunately have to clutter the top of the file
 # because they're used to set the constants
@@ -9,6 +11,12 @@ def dir_and_file_name( path)
 	file = path[dir.size+1..-1]
 
 	[dir, file]
+end
+
+def change_extension(path, extension, leading_dot=false)
+	dir, file = dir_and_file_name( path)
+	file.gsub! /^\./, '' unless leading_dot
+	"#{dir}/#{'.' if leading_dot}#{file.gsub(/\.[\w-]*$/,'')}.#{extension}"
 end
 ########################################################################
 
@@ -26,13 +34,20 @@ SECONDARY_PDF_FILES =
 	+ DIA_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'}
 
 GNUPLOT_FILES = FileList['Figures/**/*.gplot'].map do |f| 
-	dir, file = dir_and_file_name( f)
-	"#{dir}/.#{file.gsub(/\.\w*$/,'')}.gnuplot-output"
+	change_extension( f, 'gnuplot-output', true)
 end
 GNUPLOT_DATA_FILES = FileList['Figures/**/*.gdata']
 
+# Local rakefiles must define R_CREATE_GRAPHS, the path to a script that
+# generates pdfs from rdata files, in order for the rdata rules to take effect.
+R_CREATE_GRAPHS = nil unless self.class.const_defined? :R_CREATE_GRAPHS
+R_DATA_FILES = FileList['Figures/**/*.rdata']
+R_FILES = R_DATA_FILES.map do |f| 
+	change_extension( f, 'r-output', true)
+end
 
-FIGURES = PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES
+
+FIGURES = PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES
 
 # Don't trash figures that are checked in directly (i.e. that we don't have the
 # source for)
@@ -121,17 +136,24 @@ end
 
 # Figures/.foo.gnuplot-output => Figures/foo.gplot
 rule '.gnuplot-output' => proc{ |f|
-	dir, file = dir_and_file_name( f)
-	prefix = "#{dir}/#{file.chomp('.gnuplot-output')[1..-1]}"
-	["#{prefix}.gplot"] + GNUPLOT_DATA_FILES
+	[ change_extension(f, 'gplot')] + GNUPLOT_DATA_FILES
 } do |t|
 	dir, file = dir_and_file_name( t.name)
 	extension = gnuplot_target_extension( t.source)
 	real_target_file = 
 		"#{dir}/#{file.chomp('.gnuplot-output')[1..-1]}.#{extension}"
 
-	sh "gnuplot < #{t.source} > #{t.name}"
-	sh "mv #{t.name} #{real_target_file} && touch #{t.name}"
+	sh "gnuplot < #{t.source} > #{real_target_file}"
+	FileUtils.touch t.name
+end
+
+rule '.r-output' => proc{|f|
+	[ change_extension(f, 'rdata'), R_CREATE_GRAPHS].compact
+} do |t|
+	dir = File.dirname(t.name)
+	repo_root = File.expand_path( File.join( __DIR__, '..'))
+	sh "cd #{dir}; #{repo_root}/#{R_CREATE_GRAPHS} #{repo_root}/#{t.source}"
+	FileUtils.touch t.name
 end
 
 
@@ -150,13 +172,15 @@ end
 
 
 ########################################################################
-# Tasks modify the working directory
+# Tasks that modify the working directory
 
 CLEAN_PATTERN = %w(*.4ct *.4tc *.dvi *.idv *.lg *.lop *.lol
 				*.toc *.out *.lof *.lot *.blg *.bbl *.lop *.loa
 				*.tmp *.xref *.log *.aux).map {|pat| "{.,html}/#{pat}"}
 CLEANER_PATTERN = %w(*.pdf *.css *.html).map {|pat| "{.,html}/#{pat}"}
-CLEANEST_PATTERN = %w(*.eps *.pdftex_t *.pdf 
+# don't confuse .RData with the *.rdata files.  The former is detritus produced
+# by the R binary
+CLEANEST_PATTERN = %w(*.eps *.pdftex_t *.pdf *.Rout .RData
 					*.png).map {|pat| "Figures/**/#{pat}"}
 
 desc <<-EOS
@@ -181,6 +205,10 @@ task :cleanest => :cleaner do |t|
 		reject{ |file| PREGENERATED_RESOURCES.include? file}.
 		each{ |file| FileUtils.rm file}
 end
+
+
+########################################################################
+# Ancillary methods
 
 # Implements the array usage of Dir::glob for older rubys (e.g. 1.8.5)
 def glob(pattern_array)
