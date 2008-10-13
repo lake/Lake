@@ -7,6 +7,11 @@ require File.join(__DIR__, 'util')
 
 
 BIB_FILES = FileList['*.bib', 'Bib/**/*.bib']
+# a & a removes dupes, while preserving order
+BIB_INPUTS = (a = BIB_FILES.map{|f| File.dirname(f)} + 
+		(ENV['BIBINPUTS'] ||'').split(':'); a & a)
+ENV['BIBINPUTS'] = BIB_INPUTS.join(':') unless BIB_INPUTS.empty?
+
 TEX_FILES = FileList['*.tex']
 FIG_FILES = FileList['Figures/**/*.fig']
 DIA_FILES = FileList['Figures/**/*.dia']
@@ -47,7 +52,7 @@ CLEAN.include(glob(%w(
 CLOBBER.include(
 	glob(
 		%w(*.pdf) + 
-		%w(*.eps *.Rout .RData *.png).map{|pat| "Figures/**/#{pat}"}
+		%w(*.pdf *.eps *.Rout .RData *.png).map{|pat| "Figures/**/#{pat}"}
 	) + FIGURES - PREGENERATED_RESOURCES
 )
 
@@ -55,7 +60,6 @@ CLOBBER.include(
 MAX_LATEX_ITERATION = 10
 
 $paper ||= 'paper'
-BBL_FILE  = FileList[$paper + ".bbl"]
 
 
 task :default => :view
@@ -65,42 +69,40 @@ task :default => :view
 
 desc "
 	Builds the pdf output.  If the pdf is manually removed (i.e. not through the
-	cleaner task) it may be necessary to call cleaner before running this task.
+	clean task), it may be necessary to call cleaner before running this task.
 ".compact!
 task :pdf  => "#{$paper}.pdf"
-file "#{$paper}.pdf" => TEX_FILES + BBL_FILE + FIGURES do
-	1.upto MAX_LATEX_ITERATION do 
-		# Quit if latex reports an error
-		exit 1 unless sh "pdflatex #{$paper}.tex"
+file "#{$paper}.pdf" => TEX_FILES + FIGURES do
 
-		# We can stop when LaTeX is certain it has resolved all citation
-		# references.
-		break if 
-			`egrep -s 'Rerun (LaTeX|to get cross-references right)' *.log`.empty?
-	end
-end
+	# Quit if latex reports an error
+	exit 1 unless sh "pdflatex #{$paper}.tex"
 
-desc <<-EOS
-	Creates #{$paper}.bbl if a bib file exists
-EOS
-file "#{$paper}.bbl" => BIB_FILES + FIGURES do |t|
-	unless BIB_FILES.nil?
-		bib_inputs =
-			BIB_FILES.map{|f| File.dirname(f)} + 
-				(ENV['BIBINPUTS'] ||'').split(':')
-
-		# remove dupes, preserving order
-		bib_inputs = bib_inputs & bib_inputs
-
-		ENV['BIBINPUTS'] = bib_inputs.join(':')
-
-		sh "pdflatex #{$paper}.tex" unless File.exists?($paper + ".aux")
+	unless BIB_INPUTS.nil?
 
 		# -min-crossrefs=100 essentially turns off cross referencing.
 		# Not sure why one wouldn't just take the default of 2.
-		sh "bibtex -min-crossrefs=100 #{File.basename(t.name, '.bbl')}"
+		sh "bibtex -terse -min-crossrefs=100 #{$paper}"
+	end
+
+	1.upto MAX_LATEX_ITERATION do 
+
+		# Early escape when we know we can't resolve all citation references
+		# because of missing citations.
+		unless `egrep -s "I didn't find a database entry for " *.blg`.empty?
+			break puts("Missing citations.  See warnings in pdflatex output.")
+		end
+
+		# We can stop when LaTeX is certain it has resolved all references.
+		cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
+		cit_regex = "LaTeX Warning: Citation .* on page .* undefined"
+		regex = "((#{cross_ref_regex})|(#{cit_regex}))"
+		break if `egrep -s '#{regex}' *.log`.empty?
+
+		puts "Re-running latex to resolve references."
+		exit 1 unless sh "pdflatex #{$paper}.tex > /dev/null"
 	end
 end
+
 
 desc <<-EOS
 	Builds all of the figures
