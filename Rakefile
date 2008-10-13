@@ -2,24 +2,7 @@ require 'fileutils'
 
 __DIR__ = File.dirname( __FILE__)
 
-########################################################################
-# Ancillary methods that unfortunately have to clutter the top of the file
-# because they're used to set the constants
-
-def dir_and_file_name( path)
-	dir = File.dirname( path)
-	file = path[dir.size+1..-1]
-
-	[dir, file]
-end
-
-def change_extension(path, extension, leading_dot=false)
-	dir, file = dir_and_file_name( path)
-	file.gsub! /^\./, '' unless leading_dot
-	"#{dir}/#{'.' if leading_dot}#{file.gsub(/\.[\w-]*$/,'')}.#{extension}"
-end
-########################################################################
-
+require File.join(__DIR__, 'util')
 
 
 BIB_FILES = FileList['*.bib', 'Bib/**/*.bib']
@@ -33,17 +16,17 @@ SECONDARY_PDF_FILES =
 	NEATO_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'} \
 	+ DIA_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'}
 
-GNUPLOT_FILES = FileList['Figures/**/*.gplot'].map do |f| 
-	change_extension( f, 'gnuplot-output', true)
-end
 GNUPLOT_DATA_FILES = FileList['Figures/**/*.gdata']
+GNUPLOT_FILES = FileList['Figures/**/*.gplot'].map do |f| 
+	replace_extension(dot(f), 'gnuplot-output')
+end
 
 # Local rakefiles must define R_CREATE_GRAPHS, the path to a script that
 # generates pdfs from rdata files, in order for the rdata rules to take effect.
 R_CREATE_GRAPHS = nil unless self.class.const_defined? :R_CREATE_GRAPHS
 R_DATA_FILES = FileList['Figures/**/*.rdata']
 R_FILES = R_DATA_FILES.map do |f| 
-	change_extension( f, 'r-output', true)
+	replace_extension(dot(f), 'r-output')
 end
 
 
@@ -68,9 +51,10 @@ task :default => :view
 ########################################################################
 # Tasks to build the paper in various formats
 
-desc <<-EOS
-	Builds the pdf output
-EOS
+desc "
+	Builds the pdf output.  If the pdf is manually removed (i.e. not through the
+	cleaner task) it may be necessary to call cleaner before running this task.
+".compact!
 task :pdf  => "#{$paper}.pdf"
 file "#{$paper}.pdf" => TEX_FILES + BBL_FILE + FIGURES do
 	1.upto MAX_LATEX_ITERATION do 
@@ -136,19 +120,16 @@ end
 
 # Figures/.foo.gnuplot-output => Figures/foo.gplot
 rule '.gnuplot-output' => proc{ |f|
-	[ change_extension(f, 'gplot')] + GNUPLOT_DATA_FILES
+	[ replace_extension(undot(f), 'gplot')] + GNUPLOT_DATA_FILES
 } do |t|
-	dir, file = dir_and_file_name( t.name)
 	extension = gnuplot_target_extension( t.source)
-	real_target_file = 
-		"#{dir}/#{file.chomp('.gnuplot-output')[1..-1]}.#{extension}"
-
+	real_target_file = replace_extension(t.name, extension)
 	sh "gnuplot < #{t.source} > #{real_target_file}"
 	FileUtils.touch t.name
 end
 
 rule '.r-output' => proc{|f|
-	[ change_extension(f, 'rdata'), R_CREATE_GRAPHS].compact
+	[ replace_extension(undot(f), 'rdata'), R_CREATE_GRAPHS].compact
 } do |t|
 	dir = File.dirname(t.name)
 	repo_root = File.expand_path( File.join( __DIR__, '..'))
@@ -205,37 +186,3 @@ task :cleanest => :cleaner do |t|
 		reject{ |file| PREGENERATED_RESOURCES.include? file}.
 		each{ |file| FileUtils.rm file}
 end
-
-
-########################################################################
-# Ancillary methods
-
-# Implements the array usage of Dir::glob for older rubys (e.g. 1.8.5)
-def glob(pattern_array)
-	files = pattern_array.map{|s| Dir.glob(s)}.flatten
-	files & files
-end
-
-
-# Reads a .gplot file and returns the expected file extension for the file type
-# (e.g. tex, png).  Raises an Exception if the expected file type could not be
-# determined.
-def gnuplot_target_extension( gplot_path)
-	File.open( gplot_path) do |file|
-		while line = file.gets
-			next unless line =~ /set terminal (.*)$/
-
-			case $1.strip
-			when 'latex'
-				return 'tex'
-			when /(png|jpg|gif)/
-				return $1
-			else
-				raise "Unknown terminal type #{$1} in gplot file #{gplot_path}"
-			end
-		end
-	end
-	raise "Unable to determine extension for gplot file #{gplot_path}.  " +
-		"No line that looked like 'set terminal FOO' could be found"
-end
-
