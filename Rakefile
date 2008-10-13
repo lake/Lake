@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'rake/clean'
 
 __DIR__ = File.dirname( __FILE__)
 
@@ -37,12 +38,23 @@ FIGURES = PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES
 PREGENERATED_RESOURCES = FileList['Figures/**/*.png']
 
 
+CLEAN.include(glob(%w(
+	*.4ct *.4tc *.dvi *.idv *.lg *.lop *.lol *.toc *.out *.lof *.lot *.blg *.bbl
+	*.lop *.loa *.tmp *.xref *.log *.aux
+)))
+# Don't confuse .RData with the *.rdata files.  The former is detritus produced
+# by the R binary.  
+CLOBBER.include(
+	glob(
+		%w(*.pdf) + 
+		%w(*.eps *.Rout .RData *.png).map{|pat| "Figures/**/#{pat}"}
+	) + FIGURES - PREGENERATED_RESOURCES
+)
+
+
 MAX_LATEX_ITERATION = 10
 
-
-
 $paper ||= 'paper'
-
 BBL_FILE  = FileList[$paper + ".bbl"]
 
 
@@ -151,38 +163,3 @@ task :view => :pdf do
 	end
 end
 
-
-########################################################################
-# Tasks that modify the working directory
-
-CLEAN_PATTERN = %w(*.4ct *.4tc *.dvi *.idv *.lg *.lop *.lol
-				*.toc *.out *.lof *.lot *.blg *.bbl *.lop *.loa
-				*.tmp *.xref *.log *.aux).map {|pat| "{.,html}/#{pat}"}
-CLEANER_PATTERN = %w(*.pdf *.css *.html).map {|pat| "{.,html}/#{pat}"}
-# don't confuse .RData with the *.rdata files.  The former is detritus produced
-# by the R binary
-CLEANEST_PATTERN = %w(*.eps *.pdftex_t *.pdf *.Rout .RData
-					*.png).map {|pat| "Figures/**/#{pat}"}
-
-desc <<-EOS
-	Clean LaTeX ancillary files
-EOS
-task :clean do
-	glob( CLEAN_PATTERN).each{|file| FileUtils.rm file}
-end
-
-desc <<-EOS
-	Clean output files (implies clean)
-EOS
-task :cleaner => :clean do
-	glob( CLEANER_PATTERN).each{|file| FileUtils.rm file}
-end
-
-desc <<-EOS
-	Clean all generated files, including Figures (implies cleaner)
-EOS
-task :cleanest => :cleaner do |t|
-	glob( CLEANEST_PATTERN).
-		reject{ |file| PREGENERATED_RESOURCES.include? file}.
-		each{ |file| FileUtils.rm file}
-end
