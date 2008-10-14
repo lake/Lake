@@ -3,6 +3,11 @@
 # Specify a path to a script that generates pdfs from rdata files.  It must
 # accept one command line argument, which must be the path to the rdata file.
 # R_CREATE_GRAPHS = "path/to/script"
+
+# Specify any pregenerated resources that should not be removed by clobber.
+# Checked in pdfs and other figures should be matched by valid glob patterns.
+# PREGENERATED_RESOURCES = FileList['{dir1,dir2}/**/*.{pdf,png}']
+
 load 'latex/Rakefile'
 
 # If your master latex source file's name is not "paper.tex", uncomment the

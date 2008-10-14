@@ -13,24 +13,24 @@ BIB_INPUTS = (a = BIB_FILES.map{|f| File.dirname(f)} +
 ENV['BIBINPUTS'] = BIB_INPUTS.join(':') unless BIB_INPUTS.empty?
 
 TEX_FILES = FileList['*.tex']
-FIG_FILES = FileList['Figures/**/*.fig']
-DIA_FILES = FileList['Figures/**/*.dia']
+FIG_FILES = FileList['**/*.fig']
+DIA_FILES = FileList['**/*.dia']
 
 PDFTEX_T_FILES = FIG_FILES.map{|f| f.gsub /\.\w*$/, '.pdftex_t'}
-NEATO_FILES = FileList['Figures/**/*.neato']
+NEATO_FILES = FileList['**/*.neato']
 SECONDARY_PDF_FILES =
 	NEATO_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'} \
 	+ DIA_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'}
 
-GNUPLOT_DATA_FILES = FileList['Figures/**/*.gdata']
-GNUPLOT_FILES = FileList['Figures/**/*.gplot'].map do |f| 
+GNUPLOT_DATA_FILES = FileList['**/*.gdata']
+GNUPLOT_FILES = FileList['**/*.gplot'].map do |f| 
 	replace_extension(dot(f), 'gnuplot-output')
 end
 
 # Local rakefiles must define R_CREATE_GRAPHS, the path to a script that
 # generates pdfs from rdata files, in order for the rdata rules to take effect.
 R_CREATE_GRAPHS = nil unless self.class.const_defined? :R_CREATE_GRAPHS
-R_DATA_FILES = FileList['Figures/**/*.rdata']
+R_DATA_FILES = FileList['**/*.rdata']
 R_FILES = R_DATA_FILES.map do |f| 
 	replace_extension(dot(f), 'r-output')
 end
@@ -40,7 +40,9 @@ FIGURES = PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES
 
 # Don't trash figures that are checked in directly (i.e. that we don't have the
 # source for)
-PREGENERATED_RESOURCES = FileList['Figures/**/*.png']
+PREGENERATED_RESOURCES = [] unless self.class.const_defined? :PREGENERATED_RESOURCES
+# We don't generate any pngs at the moment, we we know they must be pregenerated
+PREGENERATED_RESOURCES.include FileList['**/*.png']
 
 
 CLEAN.include(glob(%w(
@@ -52,8 +54,8 @@ CLEAN.include(glob(%w(
 CLOBBER.include(
 	glob(
 		%w(*.pdf) + 
-		%w(*.pdf *.eps *.Rout .RData *.png).map{|pat| "Figures/**/#{pat}"}
-	) + FIGURES - PREGENERATED_RESOURCES
+		%w(*.pdf *.eps *.Rout .RData *.png).map{|pat| "**/#{pat}"}
+	) - glob('latex/**/*') + FIGURES - PREGENERATED_RESOURCES
 )
 
 
