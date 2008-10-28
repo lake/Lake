@@ -35,13 +35,17 @@ R_FILES = R_DATA_FILES.map do |f|
 	replace_extension(dot(f), 'r-output')
 end
 
+# Ignore figures in excluded directories.
+EXCLUDED_FIGURES = nil unless self.class.const_defined? :EXCLUDED_FIGURES
 
-FIGURES = PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES
+FIGURES = (PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES).
+	reject { |f| f =~ EXCLUDED_FIGURES }
 
 # Don't trash figures that are checked in directly (i.e. that we don't have the
 # source for)
-PREGENERATED_RESOURCES = [] unless self.class.const_defined? :PREGENERATED_RESOURCES
-# We don't generate any pngs at the moment, we we know they must be pregenerated
+PREGENERATED_RESOURCES = 
+	FileList[] unless self.class.const_defined? :PREGENERATED_RESOURCES
+# We don't generate any pngs at the moment, we know they must be pregenerated
 PREGENERATED_RESOURCES.include FileList['**/*.png']
 
 
@@ -55,10 +59,11 @@ CLOBBER.include(
 	glob(
 		%w(*.pdf) + 
 		%w(*.pdf *.eps *.Rout .RData *.png).map{|pat| "**/#{pat}"}
-	) - glob('latex/**/*') + FIGURES - PREGENERATED_RESOURCES
+	).reject{|f| f =~ EXCLUDED_FIGURES} - 
+		glob('latex/**/*') + 
+		FIGURES - 
+		PREGENERATED_RESOURCES
 )
-
-
 MAX_LATEX_ITERATION = 10
 
 $paper ||= 'paper'

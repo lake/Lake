@@ -4,6 +4,10 @@
 # accept one command line argument, which must be the path to the rdata file.
 # R_CREATE_GRAPHS = "path/to/script"
 
+# Specify files with figure extensions that the build system should ignore.  In
+# the example pattern, we just ignore all files in dir1 and dir2.
+# EXCLUDED_FIGURES = /.*\/?(dir1|dir2)\/.*/
+
 # Specify any pregenerated resources that should not be removed by clobber.
 # Checked in pdfs and other figures should be matched by valid glob patterns.
 # PREGENERATED_RESOURCES = FileList['{dir1,dir2}/**/*.{pdf,png}']
