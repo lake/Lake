@@ -13,6 +13,10 @@ BIB_INPUTS = (a = BIB_FILES.map{|f| File.dirname(f)} +
 ENV['BIBINPUTS'] = BIB_INPUTS.join(':') unless BIB_INPUTS.empty?
 
 TEX_FILES = FileList['*.tex']
+MASTER_TEX_FILE_ROOTS = TEX_FILES.map do |f|
+	f.chomp('.tex') unless `grep '^[:space:]*\\\\begin{document}' #{f}`.empty?
+end.compact!
+
 FIG_FILES = FileList['**/*.fig']
 DIA_FILES = FileList['**/*.dia']
 
@@ -66,8 +70,6 @@ CLOBBER.include(
 )
 MAX_LATEX_ITERATION = 10
 
-$paper ||= 'paper'
-
 
 task :default => :view
 
@@ -78,35 +80,35 @@ desc "
 	Builds the pdf output.  If the pdf is manually removed (i.e. not through the
 	clean task), it may be necessary to call cleaner before running this task.
 ".compact!
-task :pdf  => "#{$paper}.pdf"
-file "#{$paper}.pdf" => TEX_FILES + FIGURES do
+task :pdf  => MASTER_TEX_FILE_ROOTS.map{|master| master + '.pdf'}
+MASTER_TEX_FILE_ROOTS.each do |master|
+	file master + '.pdf' => TEX_FILES + FIGURES do
 
-	# Quit if latex reports an error
-	exit 1 unless sh "pdflatex #{$paper}.tex"
+		# Quit if latex reports an error
+		exit 1 unless sh "pdflatex #{master}"
 
-	unless BIB_INPUTS.nil?
-
-		# -min-crossrefs=100 essentially turns off cross referencing.
-		# Not sure why one wouldn't just take the default of 2.
-		sh "bibtex -terse -min-crossrefs=100 #{$paper}"
-	end
-
-	1.upto MAX_LATEX_ITERATION do 
-
-		# Early escape when we know we can't resolve all citation references
-		# because of missing citations.
-		unless `egrep -s "I didn't find a database entry for " *.blg`.empty?
-			break puts("Missing citations.  See warnings in pdflatex output.")
+		unless BIB_INPUTS.nil?
+			# -min-crossrefs=100 essentially turns off cross referencing.
+			# Not sure why one wouldn't just take the default of 2.
+			sh "bibtex -terse -min-crossrefs=100 #{master}"
 		end
 
-		# We can stop when LaTeX is certain it has resolved all references.
-		cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
-		cit_regex = "LaTeX Warning: Citation .* on page .* undefined"
-		regex = "((#{cross_ref_regex})|(#{cit_regex}))"
-		break if `egrep -s '#{regex}' *.log`.empty?
+		1.upto MAX_LATEX_ITERATION do 
+			# Early escape when we know we can't resolve all citation references
+			# because of missing citations.
+			unless `egrep -s "I didn't find a database entry for " *.blg`.empty?
+				break puts("Missing citations.  See warnings in pdflatex output.")
+			end
 
-		puts "Re-running latex to resolve references."
-		exit 1 unless sh "pdflatex #{$paper}.tex > /dev/null"
+			# We can stop when LaTeX is certain it has resolved all references.
+			cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
+			cit_regex = "LaTeX Warning: Citation .* on page .* undefined"
+			regex = "((#{cross_ref_regex})|(#{cit_regex}))"
+			break if `egrep -s '#{regex}' *.log`.empty?
+
+			puts "Re-running latex to resolve references."
+			exit 1 unless sh "pdflatex #{master} > /dev/null"
+		end
 	end
 end
 
@@ -163,12 +165,13 @@ end
 # Tasks to view the paper
 
 task :view => :pdf do
-	if `pgrep -f "^xpdf -remote #{$paper}"`.strip.empty?
+	pdf_to_view = MASTER_TEX_FILE_ROOTS.first + ".pdf"
+	if `pgrep -f "^xpdf -remote #{pdf_to_view}"`.strip.empty?
 		# not already viewing, open a new xpdf
-		sh "xpdf -remote #{$paper} #{$paper}.pdf &"
+		sh "xpdf -remote #{pdf_to_view} #{pdf_to_view} &"
 	else
 		# already viewing, reload instead
-		sh "xpdf -remote #{$paper} -reload -raise"
+		sh "xpdf -remote #{pdf_to_view} -reload -raise"
 	end
 end
 
