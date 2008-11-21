@@ -6,16 +6,22 @@ __DIR__ = File.dirname( __FILE__)
 require File.join(__DIR__, 'util')
 
 
-BIB_FILES = FileList['*.bib', 'Bib/**/*.bib']
-# a & a removes dupes, while preserving order
-BIB_INPUTS = (a = BIB_FILES.map{|f| File.dirname(f)} + 
-		(ENV['BIBINPUTS'] ||'').split(':'); a & a)
-ENV['BIBINPUTS'] = BIB_INPUTS.join(':') unless BIB_INPUTS.empty?
-
 TEX_FILES = FileList['*.tex']
 MASTER_TEX_FILE_ROOTS = TEX_FILES.map do |f|
 	f.chomp('.tex') unless `grep '^[:space:]*\\\\begin{document}' #{f}`.empty?
-end.compact!
+end.compact
+
+BIB_INPUTS = nil
+if TEX_FILES.any? do |f|
+			not `grep '^[:space:]*\\\\bibliography{.*}' #{f}`.empty?
+		end
+
+	BIB_FILES = FileList['*.bib', 'Bib/**/*.bib']
+	# a & a removes dupes, while preserving order
+	BIB_INPUTS = (a = BIB_FILES.map{|f| File.dirname(f)} +
+			(ENV['BIBINPUTS'] ||'').split(':'); a & a)
+	ENV['BIBINPUTS'] = BIB_INPUTS.join(':') unless BIB_INPUTS.empty?
+end
 
 FIG_FILES = FileList['**/*.fig']
 DIA_FILES = FileList['**/*.dia']
@@ -87,13 +93,14 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 		# Quit if latex reports an error
 		exit 1 unless sh "pdflatex #{master}"
 
-		unless BIB_INPUTS.nil?
+		unless (BIB_INPUTS or '').empty?
 			# -min-crossrefs=100 essentially turns off cross referencing.
 			# Not sure why one wouldn't just take the default of 2.
 			sh "bibtex -terse -min-crossrefs=100 #{master}"
 		end
 
 		1.upto MAX_LATEX_ITERATION do 
+
 			# Early escape when we know we can't resolve all citation references
 			# because of missing citations.
 			unless `egrep -s "I didn't find a database entry for " *.blg`.empty?
