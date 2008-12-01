@@ -1,6 +1,4 @@
 \usepackage{graphicx,color}
-\usepackage[bookmarks, colorlinks, citecolor=green, urlcolor=blue,
-			filecolor=blue, linkcolor=blue]{hyperref}
 \usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -23,6 +21,10 @@
 \usepackage{ucs}
 \usepackage[utf8x]{inputenc}
 
+% hyperref redefines a number of macros, so it should be last.  Empirically,
+% doing so eliminates compiler warnings.
+\usepackage[bookmarks, colorlinks, citecolor=green, urlcolor=blue,
+			filecolor=blue, linkcolor=blue]{hyperref}
 
 % required for combined latex/pdf xfig figures
 \DeclareGraphicsRule{.pdftex}{pdf}{.pdftex}{} 
