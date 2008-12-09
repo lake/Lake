@@ -11,7 +11,6 @@ MASTER_TEX_FILE_ROOTS = TEX_FILES.map do |f|
 	f.chomp('.tex') unless `grep '^[:space:]*\\\\begin{document}' #{f}`.empty?
 end.compact
 
-BIB_INPUTS = nil
 if TEX_FILES.any? do |f|
 			not `grep '^[:space:]*\\\\bibliography{.*}' #{f}`.empty?
 		end
@@ -21,6 +20,8 @@ if TEX_FILES.any? do |f|
 	BIB_INPUTS = (a = BIB_FILES.map{|f| File.dirname(f)} +
 			(ENV['BIBINPUTS'] ||'').split(':'); a & a)
 	ENV['BIBINPUTS'] = BIB_INPUTS.join(':') unless BIB_INPUTS.empty?
+else
+	BIB_INPUTS = nil
 end
 
 FIG_FILES = FileList['**/*.fig']
