@@ -100,12 +100,25 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			sh "bibtex -terse -min-crossrefs=100 #{master}"
 		end
 
+		prev_missing_cites = []
 		1.upto MAX_LATEX_ITERATION do 
 
 			# Early escape when we know we can't resolve all citation references
 			# because of missing citations.
-			unless `egrep -s "I didn't find a database entry for " *.blg`.empty?
-				break puts("Missing citations.  See warnings in pdflatex output.")
+			missing_cites = (
+				`egrep -s "I didn't find a database entry for " *.blg`.
+					collect {|l| l.split(' ').last }
+			)
+			unless missing_cites.empty?
+				if missing_cites == prev_missing_cites \
+						&& !prev_missing_cites.empty?
+
+					break puts("
+						Missing citations.  See warnings in pdflatex output.
+					".gsub(/^\t*/, '').strip)	# drop formatting detritus
+				else
+					prev_missing_cites = missing_cites
+				end
 			end
 
 			# We can stop when LaTeX is certain it has resolved all references.
