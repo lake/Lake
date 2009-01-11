@@ -79,7 +79,7 @@ CLOBBER.include(
 	glob(
 		CLOBBER_EXTS.map{|ext| "**/*.#{ext}"}
 	).reject{|f| f =~ EXCLUDED_FIGURES} - 
-		glob('latex/**/*') + 
+		glob('lake/**/*') +
 		FIGURES - 
 		PREGENERATED_RESOURCES
 )
