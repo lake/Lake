@@ -4,3 +4,6 @@
 /diagrams/*.png
 *.swp
 *~
+/.gvim-init.vim
+/.vimproject
+/.project-aliases
