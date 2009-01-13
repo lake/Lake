@@ -1,5 +1,10 @@
 require 'fileutils'
 
+def error ( message) 
+	puts message
+	exit 1
+end
+
 def dir_and_file_name( path)
 	dir = File.dirname( path)
 	file = path[dir.size+1..-1]
