@@ -1,6 +1,10 @@
 require 'fileutils'
 require 'rake'
 
+def in_test?
+	ENV.has_key? 'test'
+end
+
 def error ( message) 
 	puts message
 	exit 1

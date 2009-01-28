@@ -1,0 +1,5 @@
+---
+ rake:
+    :produced_files:
+        - paper.pdf
+

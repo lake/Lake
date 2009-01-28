@@ -1,0 +1,17 @@
+require 'rubygems'
+require 'spec'
+require 'spec/rake/spectask'
+
+Spec::Rake::SpecTask.new do |t|
+	t.spec_opts = ['--color --format specdoc']
+	t.spec_files = FileList['*_spec.rb']
+end
+
+namespace :spec do
+	desc <<-EOS
+		Runs specs with backtraces shown
+	EOS
+	Spec::Rake::SpecTask.new(:trace) do |t|
+		t.spec_opts = ['--color --backtrace --format specdoc']
+	end
+end

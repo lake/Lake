@@ -1,0 +1,12 @@
+
+Specs must be run from lake/spec.  Adding the spec tasks to lake would add them
+to the local rakes of actual papers, which is probably undesirable.
+
+To add a directory-induced spec, see lake/spec/auto/simple-build as an example.
+Basically, setup a subtree (sans lake/) somewhere in lake/spec/auto.  Then, in the
+root of that subtree, add a .test.yaml file that specifies what tasks to run,
+and what the expectations of each run is, namely
+
+	1. What files should be produced.
+	2. What output should be produced.
+	3. What the exit code should be.
