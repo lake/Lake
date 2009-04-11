@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'rake/clean'
+require 'rake'
 
 __DIR__ = File.dirname( __FILE__)
 
@@ -30,24 +31,20 @@ end
 FIG_FILES = FileList['**/*.fig']
 DIA_FILES = FileList['**/*.dia']
 
-PDFTEX_T_FILES = FIG_FILES.map{|f| f.gsub /\.\w*$/, '.pdftex_t'}
+PDFTEX_T_FILES = FIG_FILES.map{|f| f.ext '.pdftex_t'}
 NEATO_FILES = FileList['**/*.neato']
 SECONDARY_PDF_FILES =
-	NEATO_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'} \
-	+ DIA_FILES.map{|f| f.gsub /\.\w*$/, '.pdf'}
+	NEATO_FILES.map{|f| f.ext 'pdf'} \
+	+ DIA_FILES.map{|f| f.ext 'pdf'}
 
 GNUPLOT_DATA_FILES = FileList['**/*.gdata']
-GNUPLOT_FILES = FileList['**/*.gplot'].map do |f| 
-	replace_extension(dot(f), 'gnuplot-output')
-end
+GNUPLOT_FILES = FileList['**/*.gplot'].map{|f| dot(f).ext 'gnuplot-output'}
 
 # Local rakefiles must define R_CREATE_GRAPHS, the path to a script that
 # generates pdfs from rdata files, in order for the rdata rules to take effect.
 R_CREATE_GRAPHS = nil unless self.class.const_defined? :R_CREATE_GRAPHS
 R_DATA_FILES = FileList['**/*.rdata']
-R_FILES = R_DATA_FILES.map do |f| 
-	replace_extension(dot(f), 'r-output')
-end
+R_FILES = R_DATA_FILES.map{|f| dot(f).ext 'r-output'}
 
 # Ignore figures in excluded directories.
 EXCLUDED_FIGURES = nil unless self.class.const_defined? :EXCLUDED_FIGURES
@@ -165,16 +162,16 @@ end
 
 # Figures/.foo.gnuplot-output => Figures/foo.gplot
 rule '.gnuplot-output' => proc{ |f|
-	[ replace_extension(undot(f), 'gplot')] + GNUPLOT_DATA_FILES
+	[undot(f).ext('gplot')] + GNUPLOT_DATA_FILES
 } do |t|
-	extension = gnuplot_target_extension( t.source)
-	real_target_file = replace_extension(t.name, extension)
+	extension = gnuplot_target_extension(t.source)
+	real_target_file = t.name.ext extension
 	sh "gnuplot < #{t.source} > #{real_target_file}"
 	FileUtils.touch t.name
 end
 
 rule '.r-output' => proc{|f|
-	[ replace_extension(undot(f), 'rdata'), R_CREATE_GRAPHS].compact
+	[ undot(f).ext('rdata'), R_CREATE_GRAPHS].compact
 } do |t|
 	dir = File.dirname(t.name)
 	repo_root = File.expand_path( File.join( __DIR__, '..'))
