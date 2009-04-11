@@ -87,7 +87,7 @@ desc "
 ".compact!
 task :pdf  => MASTER_TEX_FILE_ROOTS.map{|master| master + '.pdf'}
 MASTER_TEX_FILE_ROOTS.each do |master|
-	file master + '.pdf' => TEX_FILES + FIGURES + BIB_FILES do
+	file master + '.pdf' => TEX_FILES + FIGURES + PREGENERATED_RESOURCES + BIB_FILES do
 
 		# Quit if latex reports an error
 		exit 1 unless sh "pdflatex #{master}"
