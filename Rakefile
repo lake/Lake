@@ -85,7 +85,9 @@ desc "
 	clean task), it may be necessary to call cleaner before running this task.
 ".compact!
 task :pdf  => MASTER_TEX_FILE_ROOTS.map{|master| master + '.pdf'}
+
 MASTER_TEX_FILE_ROOTS.each do |master|
+	task master => master + '.pdf' # Don't make me type '.pdf'.
 	file master + '.pdf' => TEX_FILES + FIGURES + PREGENERATED_RESOURCES + BIB_FILES do
 
 		# Quit if latex reports an error
