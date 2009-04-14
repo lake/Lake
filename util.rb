@@ -68,6 +68,47 @@ module StringUtils
 end
 String.class_eval{ include StringUtils}
 
+# This parses an aux file and returns its list of bib files and citations.
+def parse_aux_file aux_file
+	bibs, cites = [], [] 
+	File.readlines(aux_file).each do |line|
+		cites << line[/\{(.*)\}/, 1] if line =~ /^\\citation/
+		bibs += line[/^\\bibdata\{(.*)\}/, 1].split(",").map do |b|
+			b.strip.ext "bib"
+		end if line =~ /^\\bibdata/
+	end
+	return [bibs, cites]
+end
+
+# Determine master's exact dependencies from its fls and aux files.
+def get_deps_bibs_cites master
+
+	# The variable deps will include packages, tex files, figures, anything
+	# that is read by latex to build the pdf.
+	deps, bibs, cites = [master.ext("tex")], [], []
+
+	# Parse master.fls if it exists.
+	if File.exists? master.ext("fls")
+		# Latex both inputs and outputs aux files, so if master.pdf depended on
+		# master.aux, then each build would output a new master.aux, which
+		# would, in turn, trigger a new build, ad infinitum.  To prevent this,
+		# we separate latex' output files from its input files. 
+		outputs = `grep OUTPUT #{master.ext("fls")}`.split("\n").map do |line|
+			line.split(" ")[1]
+		end
+		deps += `grep INPUT #{master.ext("fls")}`.split("\n").map do |line| 
+			line.split(" ")[1]
+		end.reject{|f| outputs.include? f}
+	end
+
+	# If master.aux, exists parse it to determine its bib dependencies.
+	if File.exists? master.ext("aux")
+		bibs, cites = parse_aux_file master.ext("aux")
+	end
+
+	return [deps, bibs, cites].map{|x| x.uniq}
+end
+
 # The following code block defines a default pdf viewer.  The viewer method
 # may be overridden in a local Rakefile, created by copying Rakefile.local.
 

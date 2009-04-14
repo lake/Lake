@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'rake/clean'
 require 'rake'
+require 'set'
 
 __DIR__ = File.dirname( __FILE__)
 
@@ -13,19 +14,6 @@ end.compact
 error '
 	No master (la)tex documents found:  no tex file contains \begin{document}.
 '.strip.gsub(/^\t/,"") if MASTER_TEX_FILE_ROOTS.empty?
-
-if TEX_FILES.any? do |f|
-			not `grep '^[:space:]*\\\\bibliography{.*}' #{f}`.empty?
-		end
-
-	BIB_FILES = FileList['*.bib', 'Bib/**/*.bib']
-	# a & a removes dupes, while preserving order
-	BIB_INPUTS = (a = BIB_FILES.map{|f| File.dirname(f)} +
-			(ENV['BIBINPUTS'] ||'').split(':'); a & a)
-	ENV['BIBINPUTS'] = BIB_INPUTS.join(':') unless BIB_INPUTS.empty?
-else
-	BIB_INPUTS = nil
-end
 
 FIG_FILES = FileList['**/*.fig']
 DIA_FILES = FileList['**/*.dia']
@@ -94,15 +82,36 @@ task :pdf  => MASTER_TEX_FILE_ROOTS.map{|master| master + '.pdf'}
 MASTER_TEX_FILE_ROOTS.each do |master|
 	task master => master + '.pdf' # Don't make me type '.pdf'.
 
-	file master + '.pdf' => TEX_FILES + FIGURES + PREGENERATED_RESOURCES + BIB_FILES do
+	# Touch the master if the aux files and fls files don't exist.  This will 
+	# trigger a rebuild, which is probably needed, and generate these files.
+	touch master.ext("tex") \
+		unless File.exists? master.ext("fls") and File.exists? master.ext("aux")
+	# The deps variable includes figures, sty, cls, and package file and 
+	# anything read by latex when building the pdf.
+	deps, bibs, cites = get_deps_bibs_cites master.ext("tex")
+	file master.ext('.pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
 		# Quit if latex reports an error
-		exit 1 unless sh "pdflatex #{master}"
+		exit 1 unless sh "pdflatex -recorder #{master}"
 
-		unless (BIB_INPUTS or '').empty?
-			# -min-crossrefs=100 essentially turns off cross referencing.
-			# Not sure why one wouldn't just take the default of 2.
+		# Once pdflatex has run, we can get set of bib_files and bib_cites for 
+		# this file from the aux file, if it exists. 
+		new_bibs, new_cites = parse_aux_bibs_cites master.ext("aux")
+
+		# Run bibtex if the set of bibs or cites has changed or if any bib file
+		# has changed since the last bbl was built.
+		run_bibtex = Set.new(new_cites) != Set.new(cites) \
+			or Set.new(new_bibs) != Set.new(bibs)
+		run_bibtex |= (file master.ext("bbl") => new_bibs).needed?
+
+		# Run bibtex, if a bib file OR the set of cites has changed.
+		if run_bibtex
+			# -min-crossrefs=100 essentially turns off cross referencing.  Not
+			# sure why one wouldn't just take the default of 2.
 			sh "bibtex -terse -min-crossrefs=100 #{master}"
+			# Always run pdflatex at least once after a bibtex since 
+			# we ran it for a reason.
+			sh "pdflatex -recorder #{master}"
 		end
 
 		prev_missing_cites = []
@@ -133,7 +142,7 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			break if `egrep -s '#{regex}' *.log`.empty?
 
 			puts "Re-running latex to resolve references."
-			exit 1 unless sh "pdflatex #{master} > /dev/null"
+			exit 1 unless sh "pdflatex -recorder #{master} > /dev/null"
 		end
 	end
 end
