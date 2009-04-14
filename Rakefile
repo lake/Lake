@@ -57,11 +57,10 @@ FIGURES = (PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES).
 
 # Don't trash figures that are checked in directly (i.e. that we don't have the
 # source for)
-PREGENERATED_RESOURCES = 
-	FileList[] unless self.class.const_defined? :PREGENERATED_RESOURCES
-# We don't generate any pngs at the moment, we know they must be pregenerated
-PREGENERATED_RESOURCES.include FileList['**/*.png']
-
+CLOBBER_EXTS = %w(pdf eps ps png Rout RData)
+PREGENERATED_RESOURCES = FileList[
+	`git ls-files`.split.select {|f| CLOBBER_EXTS.include? f[/\.(.*?)$/, 1]} 
+]
 
 CLEAN.include(glob(%w(
 	*.4ct *.4tc *.dvi *.idv *.lg *.lop *.lol *.toc *.out *.lof *.lot *.blg *.bbl
@@ -71,8 +70,7 @@ CLEAN.include(glob(%w(
 # by the R binary.  
 CLOBBER.include(
 	glob(
-		%w(*.pdf) + 
-		%w(*.pdf *.eps *.Rout .RData *.png).map{|pat| "**/#{pat}"}
+		CLOBBER_EXTS.map{|ext| "**/*.#{ext}"}
 	).reject{|f| f =~ EXCLUDED_FIGURES} - 
 		glob('latex/**/*') + 
 		FIGURES - 
