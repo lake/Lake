@@ -5,7 +5,6 @@ __DIR__ = File.dirname( __FILE__)
 
 require File.join(__DIR__, 'util')
 
-
 TEX_FILES = FileList['*.tex']
 MASTER_TEX_FILE_ROOTS = TEX_FILES.map do |f|
 	f.chomp('.tex') unless `grep '^[:space:]*\\\\begin{document}' #{f}`.empty?
@@ -186,16 +185,7 @@ end
 
 
 ########################################################################
-# Tasks to view the paper
-
+# Task to view the paper
 task :view => :pdf do
-	pdf_to_view = MASTER_TEX_FILE_ROOTS.first + ".pdf"
-	if `pgrep -f "^xpdf -remote #{pdf_to_view}"`.strip.empty?
-		# not already viewing, open a new xpdf
-		sh "xpdf -remote #{pdf_to_view} #{pdf_to_view} &"
-	else
-		# already viewing, reload instead
-		sh "xpdf -remote #{pdf_to_view} -reload -raise"
-	end
+	viewer MASTER_TEX_FILE_ROOTS.first.ext("pdf")
 end
-

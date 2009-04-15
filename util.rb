@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'rake'
 
 def error ( message) 
 	puts message
@@ -66,3 +67,40 @@ module StringUtils
 	end
 end
 String.class_eval{ include StringUtils}
+
+# The following code block defines a default pdf viewer.  The viewer method
+# may be overridden in a local Rakefile, created by copying Rakefile.local.
+
+# If xpdf is on the path, use it.
+if not `which xpdf`.strip.empty?
+	def viewer pdf
+		if `pgrep -f "^xpdf -remote #{pdf}"`.strip.empty?
+		# not already viewing, open a new xpdf
+			sh "xpdf -remote #{pdf} #{pdf} &"
+		else
+		# already viewing, reload instead
+			sh "xpdf -remote #{pdf} -reload -raise"
+		end
+	end
+
+# If skim is on the system, use it. /Applications is standard like /usr/bin.
+elsif File.exists? "/Applications/Skim.app"
+	def viewer pdf
+		sh "#{File.dirname(File.expand_path(__FILE__))}/skimview #{pdf}" 
+	end
+
+# If this is OS X, then open with the "open" command.
+elsif `uname` == "Darwin" # "Darwin" == OS X
+	def viewer pdf
+		sh "open #{pdf}"
+	end
+
+# If none of these were set then let the user know they should define one.
+else 
+	def viewer(pdf) 
+		puts  "Unable to view #{pdf}:  No pdf viewer found."
+		print "Define the viewer method in your local Rakefile, "
+		puts  "which you copy from Rakefile.local."
+	end
+
+end
