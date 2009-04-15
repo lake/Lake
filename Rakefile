@@ -82,12 +82,18 @@ task :default => :view
 
 desc "
 	Builds the pdf output.  If the pdf is manually removed (i.e. not through the
-	clean task), it may be necessary to call cleaner before running this task.
+	clean task), it may be necessary to call clobber before running this task.
 ".compact!
 task :pdf  => MASTER_TEX_FILE_ROOTS.map{|master| master + '.pdf'}
 
+# Rake does not currently support filering the dependency list of a rule to a
+# subset of the files that share an extension.  Not all tex files are created
+# equal; some tex files are "master" tex files that contain \begin{document} and
+# input other tex files.  Here, we create a (task, file) pair for each master
+# tex file in the project.
 MASTER_TEX_FILE_ROOTS.each do |master|
 	task master => master + '.pdf' # Don't make me type '.pdf'.
+
 	file master + '.pdf' => TEX_FILES + FIGURES + PREGENERATED_RESOURCES + BIB_FILES do
 
 		# Quit if latex reports an error
