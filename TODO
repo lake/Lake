@@ -41,6 +41,9 @@ Fix citations bug (and do so with regression tests!):
 
 Make bib files dependencies of pdf
 
+Make lake SCM agnostic.  Allow it to work in svn, git, mercurial, etc.  And use
+	a design that allows adding new SCMs easily.
+
 Excessive bibtexing:
 	The field proposal on which I worked with Zhendong and Prem had master tex
 	files with no bibliography, on which lake nonetheless ran bibtex, and
