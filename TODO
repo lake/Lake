@@ -1,0 +1,86 @@
+Test harness
+
+
+Write README
+
+	authors
+
+	installation instructions
+
+	description & features
+
+
+scrub templates (any else?)
+
+	git filter-branch --tree-filter /tmp/fix-one-tree.rb HEAD
+	git filter-branch --tree-filter 'if [ -d templates/pluq ]; then mv templates/pluq templates/work; fi'
+
+
+Better UI
+	lake command
+		- checks out git repo in ~/.lake/repo
+		- makes submodules that symlink to this local repo
+			This will solve the Prem problem.
+		- creates from templates better
+
+
+Fix citations bug (and do so with regression tests!):
+
+    If you add a citation to a tex file and to a bib file, but you're using
+    includeonly to build only a subset of a project, the citations will never be
+    resolved and you'll uselessly re-run latex max_iterations.
+
+	General approach:
+
+		Slightly less unseriously, we might be able to tackle this by checksumming
+		*.aux after each loop and quitting early if it never changes.  This means
+		that you only run pdflatex one extra time instead of max iterations.
+
+	Checksumming *.aux does seem to work, although checksumming the pdf does not
+	(presumably because of timestamps).
+
+Make bib files dependencies of pdf
+
+Excessive bibtexing:
+	The field proposal on which I worked with Zhendong and Prem had master tex
+	files with no bibliography, on which lake nonetheless ran bibtex, and
+	stopped with an error.
+
+In the field proposal written with Zhendong and Prem, another bib bug cropped
+up.  To reproduce, remove the exclusions and try to build all masters in the
+project.
+
+Add support for a configuration file to reduce the tedium of copying identical
+local Rakefiles into each project.
+
+Earl's todo emails:
+	Get rid of the Bib assumption and just discover bib files, then add support
+	for exclusions.
+
+	Lake should detect whether MASTER_TEX_FILES is nil and gracefully fail.
+	This happens with my dissertation because paper.master is the actual checked
+	in version of paper.tex.
+
+	2.  Add a Bibtex subsection to the Usage section.
+
+	3.  Drop the rake view rule in the README, which means that we need to
+	implement the new rake build and view behavior.  I advocate this because I
+	don't think we should plan to change the fundamental way to use lake shortly
+	after release.  On the multiple tex master front, I believe the behavior
+	should be to view/reload all pdfs listed, where epsilon = all pdfs.
+
+	4.  Complete list of suffixes that Lake recognizes somewhere in the Usage
+	section, not sure where.
+
+
+Better support for multiple pdfs (was masterexclusions)
+	given a project with two master tex files foo and bar,
+
+	rake		# builds all (here foo and bar) and views the first in 
+				# lexicographic order (bar)
+	rake bar	# builds and views bar
+	rake bar.pdf	# builds bar
+	rake pdf	# build first pdf (in this case bar)
+	rake pdfs	# build all pdfs
+
+
