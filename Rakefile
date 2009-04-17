@@ -91,8 +91,8 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 	deps, bibs, cites = get_deps_bibs_cites master.ext("tex")
 	file master.ext('.pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
-		# Quit if latex reports an error
-		exit 1 unless sh "pdflatex -recorder #{master}"
+		# Run latex.  This will quit if there is an error.
+		sh "pdflatex -recorder #{master}"
 
 		# Once pdflatex has run, we can get set of bib_files and bib_cites for 
 		# this file from the aux file, if it exists. 
@@ -142,7 +142,7 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			break if `egrep -s '#{regex}' *.log`.empty?
 
 			puts "Re-running latex to resolve references."
-			exit 1 unless sh "pdflatex -recorder #{master} > /dev/null"
+			sh "pdflatex -recorder #{master} > /dev/null"
 		end
 	end
 end
