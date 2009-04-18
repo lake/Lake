@@ -96,7 +96,7 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 
 		# Once pdflatex has run, we can get set of bib_files and bib_cites for 
 		# this file from the aux file, if it exists. 
-		new_bibs, new_cites = parse_aux_bibs_cites master.ext("aux")
+		new_bibs, new_cites = parse_aux_file master.ext("aux")
 
 		# Run bibtex if the set of bibs or cites has changed or if any bib file
 		# has changed since the last bbl was built.
