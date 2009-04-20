@@ -11,6 +11,9 @@
 /*.lol
 /*.toc
 /*.fls
+/*.nav
+/*.snm
+/*.vrb
 *.bak
 .xpdf-reload
 /*.out
