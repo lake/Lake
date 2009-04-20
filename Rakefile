@@ -86,17 +86,17 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 	# trigger a rebuild, which is probably needed, and generate these files.
 	touch master.ext("tex") \
 		unless File.exists? master.ext("fls") and File.exists? master.ext("aux")
-	# The deps variable includes figures, sty, cls, and package file and 
-	# anything read by latex when building the pdf.
+	# The deps variable includes figures, sty, cls, and package files: anything
+	# latex reads when building the pdf.
 	deps, bibs, cites = get_deps_bibs_cites master.ext("tex")
 	file master.ext('.pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
-		# Run latex.  This will quit if there is an error.
+		# Run latex.  This quits if there is an error.
 		sh "pdflatex -recorder #{master}"
 
 		# Once pdflatex has run, we can get set of bib_files and bib_cites for 
 		# this file from the aux file, if it exists. 
-		new_bibs, new_cites = parse_aux_file master.ext("aux")
+		new_bibs, new_cites = traverse_aux_file_tree [master.ext("aux")]
 
 		# Run bibtex if the set of bibs or cites has changed or if any bib file
 		# has changed since the last bbl was built.

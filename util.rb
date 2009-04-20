@@ -68,16 +68,35 @@ module StringUtils
 end
 String.class_eval{ include StringUtils}
 
-# This parses an aux file and returns its list of bib files and citations.
+# This method parses an aux file and returns its list of bib files, citations,
+# and included tex files.
 def parse_aux_file aux_file
-	bibs, cites = [], [] 
+	bibs, cites, includes = [], [], []
 	File.readlines(aux_file).each do |line|
-		cites << line[/\{(.*)\}/, 1] if line =~ /^\\citation/
 		bibs += line[/^\\bibdata\{(.*)\}/, 1].split(",").map do |b|
 			b.strip.ext "bib"
 		end if line =~ /^\\bibdata/
+		cites << line[/\{(.*)\}/, 1] if line =~ /^\\citation/
+		includes << line[/\{(.*)\}/, 1] if line =~ /^\\@input/
 	end
-	return [bibs, cites]
+	return [bibs, cites, includes]
+end
+
+# This method traverses a tree of aux files, and parses each.  Its
+# implementation makes two assumptions:  1) there is only one bibdata per master
+# tex file; that is, only one \bibliography;  and master tex files that share a
+# directory do not share an aux file that contains bibdata.
+def traverse_aux_file_tree includes
+
+	return [[], []] if includes.empty?
+
+	bibs, cites, new_includes = parse_aux_file includes[0]
+
+	includes += new_includes unless new_includes.nil?
+
+	new_bibs, new_cites = traverse_aux_file_tree includes[1..-1]
+
+	return [bibs + new_bibs, cites + new_cites]
 end
 
 # Determine master's exact dependencies from its fls and aux files.
@@ -103,7 +122,7 @@ def get_deps_bibs_cites master
 
 	# If master.aux, exists parse it to determine its bib dependencies.
 	if File.exists? master.ext("aux")
-		bibs, cites = parse_aux_file master.ext("aux")
+		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
 	end
 
 	return [deps, bibs, cites].map{|x| x.uniq}
