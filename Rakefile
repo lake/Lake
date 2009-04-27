@@ -102,7 +102,9 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 		# has changed since the last bbl was built.
 		run_bibtex = Set.new(new_cites) != Set.new(cites) \
 			or Set.new(new_bibs) != Set.new(bibs)
-		run_bibtex |= (file master.ext("bbl") => new_bibs).needed?
+		run_bibtex |= (
+			(file master.ext("bbl") => new_bibs).needed?
+		) unless new_bibs.empty?
 
 		# Run bibtex, if a bib file OR the set of cites has changed.
 		if run_bibtex
