@@ -1,0 +1,13 @@
+
+First latex run generates the \citation and \bibdata in the aux files.
+These each occur only in the aux file of the corresponding .tex
+
+First bibtex run reads aux files and created .bbl file containing the
+\bibitem's for each citation.
+
+First latex run after bibtex reads .bbl file and writes \bibcite commands
+to aux file that contains \bibdata.  And puts the bibliography into pdf.
+
+Second latex run after bibtex uses \bibcite commands to resolve citation numbers
+in the pdf.
+
