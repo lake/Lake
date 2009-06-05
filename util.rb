@@ -78,7 +78,7 @@ def parse_aux_file aux_file
 		end if line =~ /^\\bibdata/
 		cites << line[/\{(.*)\}/, 1] if line =~ /^\\citation/
 		includes << line[/\{(.*)\}/, 1] if line =~ /^\\@input/
-	end
+	end if File.exists?(aux_file)
 	return [bibs, cites, includes]
 end
 
