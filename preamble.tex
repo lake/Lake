@@ -16,10 +16,14 @@
 \usepackage{ifthen}
 \usepackage{verbatim}
 \usepackage{float} % defines newfloat used below
+\usepackage{microtype}
 
 % These two let you use multibyte utf-8 characters, e.g. 03bb - λ 
 \usepackage{ucs}
 \usepackage[utf8x]{inputenc}
+
+% call this with optional  [turnoff] to turn off notes and todos
+\usepackage{todos}
 
 % hyperref redefines a number of macros, so it should be last.  Empirically,
 % doing so eliminates compiler warnings.
@@ -32,8 +36,6 @@
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % Macros																{{{1
-\newcounter{todo}\setcounter{todo}{0}
-\newcommand{\todo}[1]{{\em {\bf TODO \addtocounter{todo}{1}\thetodo:} #1}} 
 
 % English
 \newcommand{\cf}{\hbox{\emph{cf.}}\xspace}
@@ -65,7 +67,6 @@
 
 \theoremstyle{remark}
 \newtheorem*{rem}{Remark}
-\newtheorem*{note}{Note}
 
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}[section]

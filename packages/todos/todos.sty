@@ -1,0 +1,128 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{notes}
+
+\RequirePackage{ifthen,color}
+
+\newif\ifTurnedOff
+
+
+\DeclareOption{turnoff}{\TurnedOfftrue}
+\DeclareOption{turnon}{\TurnedOfffalse}
+\DeclareOption*{\PackageError{notes}{Unknown option '\CurrentOption'.}}
+\ExecuteOptions{turnon}
+\ProcessOptions\relax
+
+
+\ifTurnedOff
+
+\newcommand \listoftodos{}
+\newcommand{\note}[2][]{}
+\newcommand{\todo}[2][]{}
+\newcommand{\findref}[1]{}
+
+
+\else
+
+\definecolor{Orange}{rgb}{0.91,0.36,0}
+\definecolor{Purple}{rgb}{0.44,0.23,0.45}
+\definecolor{Green}{rgb}{0.24,0.48,0}
+\definecolor{Blue}{rgb}{0.09,0.30,0.5}
+\definecolor{Red}{rgb}{0.61,0.03,0.03}
+\definecolor{Brown}{rgb}{0.59,0.40,0.21}
+
+\definecolor{Gray}{rgb}{0.4,0.4,0.4}
+
+\def\ifundefinedcs#1{\expandafter%
+\ifx\csname#1\endcsname\relax}
+
+
+\newcommand \getNCol[1] {%
+\ifthenelse{#1 = 1}{\color{Blue}}{}%
+\ifthenelse{#1 = 2}{\color{Green}}{}%
+\ifthenelse{#1 = 3}{\color{Red}}{}%
+\ifthenelse{#1 = 4}{\color{Purple}}{}%
+\ifthenelse{#1 = 5}{\color{Orange}}{}%
+\ifthenelse{#1 = 6}{\color{Brown}}{}%
+}
+
+%this keeps track of how many colors have been assigned to names
+\newcounter{ColorCounter}
+\setcounter{ColorCounter}{1}
+
+
+% This defines a command based on the passed in arg.  If Chris is passed in,
+% then this defines \ChrisColor as a particular color.  We have to do the
+% ton of if's because of the way latex expands macros and we want to know the
+% value of ColorCounter when the command is encountered and we don't want
+% to define a new command that references the value of ColorCounter because
+% it will change
+\newcommand \DefineNameCol[1] {%
+\ifundefinedcs{#1Color}%
+\ifthenelse{\value{ColorCounter} = 1}{%
+\expandafter\newcommand \csname#1Color\endcsname{\getNCol{1}}}{}%
+\ifthenelse{\value{ColorCounter} = 2}{%
+\expandafter\newcommand \csname#1Color\endcsname{\getNCol{2}}}{}%
+\ifthenelse{\value{ColorCounter} = 3}{%
+\expandafter\newcommand \csname#1Color\endcsname{\getNCol{3}}}{}%
+\ifthenelse{\value{ColorCounter} = 4}{%
+\expandafter\newcommand \csname#1Color\endcsname{\getNCol{4}}}{}%
+\ifthenelse{\value{ColorCounter} = 5}{%
+\expandafter\newcommand \csname#1Color\endcsname{\getNCol{5}}}{}%
+\ifthenelse{\value{ColorCounter} = 6}{%
+\expandafter\newcommand \csname#1Color\endcsname{\getNCol{6}}}{}%
+%increment the color counter, but wrap around from 6 to 1 because we only have 6 colors
+\ifthenelse{\value{ColorCounter}=6}{\setcounter{ColorCounter}{1}}{\addtocounter{ColorCounter}{1}}%
+\fi%
+}
+
+% When called with the string Chris, this converts it to \ChrisColor
+\newcommand \GetNameCol[1] {%
+\csname#1Color\endcsname%
+}
+
+
+%drat... comment was already taken, so we use note instead
+\newcommand{\note}[2][\relax]{%
+\noindent%
+\ifx #1\relax%
+{\em\small\color{Gray}{\bf note:} #2}%
+\else%
+\DefineNameCol{#1}%
+{\em\small\GetNameCol{#1}{\bf #1:} #2}%
+\fi%
+}
+
+
+%my hack on a todo macro that.  The optional parameter is the name of the
+%person assigned to:
+%\todo{rewrite this} or \todo[Chris]{improve rockband skills}
+%when starting on a newline,
+
+%code for the list of todos
+\makeatletter
+\newcommand \listoftodos{\section*{Todo list} \@starttoc{todo}}
+\newcommand\l@todo[2]
+{\par\noindent{}#1 (\textit{Page #2}) \par}
+\makeatother
+
+%code for inserting the todo and adding it to the list
+\newcounter{TodoCounter}[section]
+\newcommand{\todo}[2][]{%
+\stepcounter{TodoCounter}%
+\ifx #1 #1
+{\em\color{red}\textbf{Todo \arabic{section}-\arabic{TodoCounter}:} #2}%
+\addcontentsline{todo}{todo}{\textbf{\arabic{section}-\arabic{TodoCounter}:} #2}%
+\else%
+{\em\color{red}\textbf{Todo \arabic{section}-\arabic{TodoCounter} (for #1):} #2}%
+\addcontentsline{todo}{todo}{\textbf{\arabic{section}-\arabic{TodoCounter} #1:} \protect{#2}}%
+\fi%
+}
+
+\newcommand{\findref}[1]{%
+\stepcounter{TodoCounter}%
+\noindent%
+{\em\small\color{red}({\bf Todo \arabic{section}-\arabic{TodoCounter} Find Ref: } #1)}%
+\addcontentsline{todo}{todo}{\textbf{\arabic{section}-\arabic{TodoCounter} Find Reference:} \protect{#1}}%
+}
+
+\fi
