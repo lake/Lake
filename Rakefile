@@ -48,7 +48,7 @@ PREGENERATED_RESOURCES = FileList[
 
 CLEAN.include(glob(%w(
 	*.4ct *.4tc *.dvi *.idv *.lg *.lop *.lol *.toc *.out *.lof *.lot *.blg *.bbl
-	*.lop *.loa *.tmp *.xref *.log *.aux
+	*.lop *.loa *.tmp *.xref *.log *.aux *.vrb *.snm *.nav *.fls
 )))
 # Don't confuse .RData with the *.rdata files.  The former is detritus produced
 # by the R binary.  
