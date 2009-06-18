@@ -7,6 +7,12 @@ __DIR__ = File.dirname( __FILE__)
 
 require File.join(__DIR__, 'util')
 
+if ENV['TEXINPUTS'].nil? or  ENV['TEXINPUTS'].empty?
+    ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/::"
+else
+    ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/:" + ENV['TEXINPUTS']
+end
+
 TEX_FILES = FileList['*.tex']
 MASTER_TEX_FILE_ROOTS = TEX_FILES.map do |f|
 	f.chomp('.tex') unless `grep '^[:space:]*\\\\begin{document}' #{f}`.empty?
