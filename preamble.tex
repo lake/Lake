@@ -5,8 +5,6 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{url}
-\usepackage[noend]{algorithmic} % may not be installed
-\usepackage{algorithm}
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{setspace} % for double, 1.5, single spacing etc.
@@ -29,6 +27,9 @@
 % doing so eliminates compiler warnings.
 \usepackage[bookmarks, colorlinks, citecolor=green, urlcolor=blue,
 			filecolor=blue, linkcolor=blue]{hyperref}
+% According to the hyperref readme, algorithm must follow hyperref
+\usepackage[noend]{algorithmic} % may not be installed
+\usepackage{algorithm}
 
 % required for combined latex/pdf xfig figures
 \DeclareGraphicsRule{.pdftex}{pdf}{.pdftex}{} 
