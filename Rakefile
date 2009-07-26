@@ -189,7 +189,7 @@ rule '.gnuplot-output' => proc{ |f|
 	[undot(f).ext('gplot')] + GNUPLOT_DATA_FILES
 } do |t|
 	extension = gnuplot_target_extension(t.source)
-	real_target_file = t.name.ext extension
+	real_target_file = undot(t.name).ext extension
 	sh "gnuplot < #{t.source} > #{real_target_file}"
 	FileUtils.touch t.name
 end
