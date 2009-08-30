@@ -1,0 +1,106 @@
+\usepackage{graphicx,color}
+\usepackage{subfig}
+\usepackage{url} % do I need this with hyperref?
+\usepackage{multicol}
+\usepackage{multirow}
+%\usepackage{setspace} % for double, 1.5, single spacing etc.
+% setspace messes up the line numbering of algorithmic
+\usepackage{aeguill}
+\usepackage{xspace}
+\usepackage{listings}
+\usepackage{ifthen}
+\usepackage{verbatim}
+\usepackage{float} % defines newfloat used below
+\usepackage{microtype}
+
+% These two let you use multibyte utf-8 characters, e.g. 03bb - λ 
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+% call this with optional  [turnoff] to turn off notes and todos
+\usepackage{todos}
+
+% hyperref redefines a number of macros, so it should be last.  Empirically,
+% doing so eliminates compiler warnings.
+\usepackage[%
+	bookmarks, colorlinks, citecolor=green, urlcolor=blue,
+	filecolor=blue, linkcolor=blue, pdfpagelabels=false%
+]{hyperref}
+\usepackage{algorithmic} % may not be installed
+\usepackage{algorithm}
+
+% required for combined latex/pdf xfig figures
+\DeclareGraphicsRule{.pdftex}{pdf}{.pdftex}{} 
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Macros																{{{1
+
+% English
+\newcommand{\cf}{\hbox{\emph{cf.}}\xspace}
+\newcommand{\deletia}{\ldots [deletia] \ldots}
+\newcommand{\etal}{\hbox{\emph{et al.}}\xspace}
+\newcommand{\eg}{\hbox{\emph{e.g.}}\xspace}
+\newcommand{\ie}{\hbox{\emph{i.e.}}\xspace}
+\newcommand{\scil}{\hbox{\emph{sc.}}\xspace} %scilicet: it is permitted to know
+\newcommand{\st}{\hbox{\emph{s.t.}}\xspace}
+\newcommand{\wrt}{\hbox{\emph{w.r.t.}}\xspace}
+\newcommand{\viz}{\hbox{\emph{viz.}}\xspace} %videlicet: it is permitted to see
+
+
+\newfloat{Protocol}{thp}{lop}
+\DeclareMathOperator{\cbar}{||} %denotes concurrency in protocol floats.
+\newfloat{Program}{thp}{lop}
+\newfloat{Procedure}{thp}{lop}
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Theorems, etc.														{{{2
+%\newenvironment{proof-idea}{\noindent{\bf Proof Idea}\hspace*{1em}}{\bigskip}
+%
+%\theoremstyle{plain}
+%\newtheorem{thm}{Theorem}[section]
+%\newtheorem{lem}[thm]{Lemma}
+%\newtheorem{prop}[thm]{Proposition}
+%\newtheorem{cor}[thm]{Corollary}
+%
+%\theoremstyle{remark}
+%\newtheorem*{rem}{Remark}
+%
+%\theoremstyle{definition}
+%\newtheorem{defn}{Definition}[section]
+%\newtheorem{conj}{Conjecture}
+%}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+% Defines SubFloat for wrapping verbatim environments in subfloats.
+\makeatletter
+\newbox\sf@box
+\newenvironment{SubFloat}[2][]%
+  {\def\sf@one{#1}%
+   \def\sf@two{#2}%
+   \setbox\sf@box\hbox
+     \bgroup}%
+  { \egroup
+   \ifx\@empty\sf@two\@empty\relax
+     \def\sf@two{\@empty}
+   \fi
+   \ifx\@empty\sf@one\@empty\relax
+     \subfloat[\sf@two]{\box\sf@box}%
+   \else
+     \subfloat[\sf@one][\sf@two]{\box\sf@box}%
+   \fi}
+\makeatother
+%}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Aliases																{{{1
+\newcommand{\infinity}{\infty}
+%}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+% vim:foldmethod=marker
