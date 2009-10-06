@@ -3,11 +3,12 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{amsthm}
+%\usepackage{amsthm} %incompatible with sig-alternate
 \usepackage{url} % do I need this with hyperref?
 \usepackage{multicol}
 \usepackage{multirow}
-\usepackage{setspace} % for double, 1.5, single spacing etc.
+%\usepackage{setspace} % for double, 1.5, single spacing etc.
+% setspace messes up the line numbering of algorithmic
 \usepackage{aeguill}
 \usepackage{xspace}
 \usepackage{listings}
@@ -15,7 +16,6 @@
 \usepackage{verbatim}
 \usepackage{float} % defines newfloat used below
 \usepackage{microtype}
-\usepackage{mathptmx}
 
 % These two let you use multibyte utf-8 characters, e.g. 03bb - λ 
 \usepackage{ucs}
@@ -26,10 +26,11 @@
 
 % hyperref redefines a number of macros, so it should be last.  Empirically,
 % doing so eliminates compiler warnings.
-\usepackage[bookmarks, colorlinks, citecolor=green, urlcolor=blue,
-			filecolor=blue, linkcolor=blue]{hyperref}
-% According to the hyperref readme, algorithm must follow hyperref
-\usepackage[noend]{algorithmic} % may not be installed
+\usepackage[%
+	bookmarks, colorlinks, citecolor=green, urlcolor=blue,
+	filecolor=blue, linkcolor=blue, pdfpagelabels=false%
+]{hyperref}
+\usepackage{algorithmic} % may not be installed
 \usepackage{algorithm}
 
 % required for combined latex/pdf xfig figures
@@ -48,7 +49,6 @@
 \newcommand{\scil}{\hbox{\emph{sc.}}\xspace} %scilicet: it is permitted to know
 \newcommand{\st}{\hbox{\emph{s.t.}}\xspace}
 \newcommand{\wrt}{\hbox{\emph{w.r.t.}}\xspace}
-\newcommand{\etc}{\hbox{\emph{etc.}}\xspace}
 \newcommand{\viz}{\hbox{\emph{viz.}}\xspace} %videlicet: it is permitted to see
 
 
@@ -62,16 +62,16 @@
 % Theorems, etc.														{{{2
 \newenvironment{proof-idea}{\noindent{\bf Proof Idea}\hspace*{1em}}{\bigskip}
 
-\theoremstyle{plain}
+%\theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
 
-\theoremstyle{remark}
-\newtheorem*{rem}{Remark}
+%\theoremstyle{remark}
+%\newtheorem*{rem}{Remark}
 
-\theoremstyle{definition}
+%\theoremstyle{definition}
 \newtheorem{defn}{Definition}[section]
 \newtheorem{conj}{Conjecture}
 %}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
