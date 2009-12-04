@@ -49,7 +49,9 @@ FIGURES = (PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES).
 # source for)
 CLOBBER_EXTS = %w(pdf eps ps png Rout RData)
 PREGENERATED_RESOURCES = FileList[
-	`git ls-files`.split.select {|f| CLOBBER_EXTS.include? f[/\.(.*?)$/, 1]} 
+	`git ls-files`.split("\n").select do |f| 
+		CLOBBER_EXTS.include? f[/\.(.*?)$/, 1]
+	end
 ]
 
 CLEAN.include(glob(%w(
