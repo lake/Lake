@@ -7,6 +7,12 @@ __DIR__ = File.dirname( __FILE__)
 
 require File.join(__DIR__, 'util')
 
+if ENV['TEXINPUTS'].nil? or  ENV['TEXINPUTS'].empty?
+    ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/::"
+else
+    ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/:" + ENV['TEXINPUTS']
+end
+
 TEX_FILES = FileList['*.tex']
 MASTER_TEX_FILE_ROOTS = TEX_FILES.map do |f|
 	f.chomp('.tex') unless `grep '^[:space:]*\\\\begin{document}' #{f}`.empty?
@@ -48,7 +54,7 @@ PREGENERATED_RESOURCES = FileList[
 
 CLEAN.include(glob(%w(
 	*.4ct *.4tc *.dvi *.idv *.lg *.lop *.lol *.toc *.out *.lof *.lot *.blg *.bbl
-	*.lop *.loa *.tmp *.xref *.log *.aux
+	*.lop *.loa *.tmp *.xref *.log *.aux *.vrb *.snm *.nav *.fls
 )))
 # Don't confuse .RData with the *.rdata files.  The former is detritus produced
 # by the R binary.  
@@ -183,7 +189,7 @@ rule '.gnuplot-output' => proc{ |f|
 	[undot(f).ext('gplot')] + GNUPLOT_DATA_FILES
 } do |t|
 	extension = gnuplot_target_extension(t.source)
-	real_target_file = t.name.ext extension
+	real_target_file = undot(t.name).ext extension
 	sh "gnuplot < #{t.source} > #{real_target_file}"
 	FileUtils.touch t.name
 end

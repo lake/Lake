@@ -18,3 +18,4 @@
 .xpdf-reload
 /*.out
 .*.gnuplot-output
+Rakefile
