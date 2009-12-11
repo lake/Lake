@@ -1,3 +1,24 @@
+1.  Centralize all lake repos to hera.
+
+2.  Problem with fls-based dependency and intentionally removed files
+   a.  Make fls before *every* potential build.  Run pdflatex
+  -draftmode -interaction batchmode -recorder.
+   b.  If it fails, just try to build to report the error to the user
+
+3.  Always use -interaction batchmode and look to the log for errors
+
+4.  Graphics:  1) better error messages, as when transfig or what not
+is not installed and 2) try to continue as much as possible.
+
+5.  The create-a-repo script.  This is what should check whether or
+not lake's package dependencies are met.  Possibly even selecting
+different Rakefile that don't have rules for stuff not supported on a
+particular platform.
+
+6.  Extract all fixes from gitlantic.
+
+
+
 Test harness
 
 
