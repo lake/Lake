@@ -25,9 +25,11 @@ FIG_FILES = FileList['**/*.fig']
 DIA_FILES = FileList['**/*.dia']
 
 PDFTEX_T_FILES = FIG_FILES.map{|f| f.ext '.pdftex_t'}
+DOT_FILES = FileList['**/*.dot']
 NEATO_FILES = FileList['**/*.neato']
 SECONDARY_PDF_FILES =
-	NEATO_FILES.map{|f| f.ext 'pdf'} \
+	DOT_FILES.map{|f| f.ext 'pdf'} \
+	+ NEATO_FILES.map{|f| f.ext 'pdf'} \
 	+ DIA_FILES.map{|f| f.ext 'pdf'}
 
 GNUPLOT_DATA_FILES = FileList['**/*.gdata']
