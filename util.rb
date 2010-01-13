@@ -86,17 +86,39 @@ end
 # implementation makes two assumptions:  1) there is only one bibdata per master
 # tex file; that is, only one \bibliography;  and master tex files that share a
 # directory do not share an aux file that contains bibdata.
-def traverse_aux_file_tree includes
+#
+# This returns a list of bibs, and cites
+# we use sets internally but return lists because rake doesn't like sets
+def traverse_aux_file_tree(includes, bibs = [], cites = [])
 
-	return [[], []] if includes.empty?
+	return [bibs, cites] if includes.empty?
 
-	bibs, cites, new_includes = parse_aux_file includes[0]
+    includes.each do |include|
+        new_bibs, new_cites, new_includes = parse_aux_file include
+        bibs |= new_bibs
+        cites |= new_cites
+        traverse_aux_file_tree(new_includes, bibs, cites)
+    end
 
-	includes += new_includes unless new_includes.nil?
+	return [bibs, cites]
+end
 
-	new_bibs, new_cites = traverse_aux_file_tree includes[1..-1]
+# get a list of all of the bib keys in a list of bib files
+def get_bib_keys bibs
+    keys = []
+    bibs.each do |bib|
+        File.read(bib).scan(/@\s*\w+\s*\{\s*([^,\s]+)\s*,/) { |x| keys << x[0] }
+    end
+    return keys.uniq
+end
 
-	return [bibs + new_bibs, cites + new_cites]
+# get a list of all bib entries in a list of .bbl files
+def get_bbl_keys bbls
+    keys = []
+    bbls.each do |bbl|
+        File.read(bbl).scan(/\\bibitem\{([^}]+)\}/) { |x| keys << x[0] }
+    end
+    return keys.uniq
 end
 
 # Determine master's exact dependencies from its fls and aux files.
