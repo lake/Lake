@@ -8,9 +8,9 @@ __DIR__ = File.dirname( __FILE__)
 require File.join(__DIR__, 'util')
 
 if ENV['TEXINPUTS'].nil? or  ENV['TEXINPUTS'].empty?
-    ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/::"
+	ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/::"
 else
-    ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/:" + ENV['TEXINPUTS']
+	ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/:" + ENV['TEXINPUTS']
 end
 
 TEX_FILES = FileList['*.tex']
@@ -94,13 +94,26 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 	# trigger a rebuild, which is probably needed, and generate these files.
 	touch master.ext("tex") \
 		unless File.exists? master.ext("fls") and File.exists? master.ext("aux")
+
+	# here are latex options we use at different times.  We should always
+	# use at least everything except for draftmode.  Perhaps this should go 
+	# somewhere else
+	# -draftmode : don't write a pdf or load graphics files, (but check
+	#              that they exist)
+	# -interaction batchdmode : don't output tons of crap and don't go into
+	#   interaction mode if there is an error
+	# -recorder : record which files were read and written during a the build
+	# -file-line-error : on error, give both the file and the line number
+	latex_opts = "-interaction batchmode -recorder -file-line-error" 
+
+
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
 	deps, bibs, cites = get_deps_bibs_cites master.ext("tex")
 	file master.ext('.pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
 		# Run latex.  This quits if there is an error.
-		sh "pdflatex -recorder #{master}"
+		sh "pdflatex #{latex_opts} #{master}"
 
 		# Once pdflatex has run, we can get set of bib_files and bib_cites for 
 		# this file from the aux file, if it exists. 
@@ -121,7 +134,7 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			sh "bibtex -terse -min-crossrefs=100 #{master}"
 			# Always run pdflatex at least once after a bibtex since 
 			# we ran it for a reason.
-			sh "pdflatex -recorder #{master}"
+			sh "pdflatex #{latex_opts} #{master}"
 		end
 
 		prev_missing_cites = []
@@ -152,7 +165,7 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			break if `egrep -s '#{regex}' *.log`.empty?
 
 			puts "Re-running latex to resolve references."
-			sh "pdflatex -recorder #{master} > /dev/null"
+			sh "pdflatex #{latex_opts} #{master}"
 		end
 	end
 end
