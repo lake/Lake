@@ -90,29 +90,41 @@ task :pdf  => MASTER_TEX_FILE_ROOTS.map{|master| master + '.pdf'}
 MASTER_TEX_FILE_ROOTS.each do |master|
 	task master => master + '.pdf' # Don't make me type '.pdf'.
 
-	# Touch the master if the aux files and fls files don't exist.  This will 
-	# trigger a rebuild, which is probably needed, and generate these files.
-	touch master.ext("tex") \
-		unless File.exists? master.ext("fls") and File.exists? master.ext("aux")
-
 	# here are latex options we use at different times.  We should always
 	# use at least everything except for draftmode.  Perhaps this should go 
 	# somewhere else
 	# -draftmode : don't write a pdf or load graphics files, (but check
-	#              that they exist)
+	#              that they exist)  This still generates an aux and fls file
 	# -interaction batchdmode : don't output tons of crap and don't go into
 	#   interaction mode if there is an error
 	# -recorder : record which files were read and written during a the build
 	# -file-line-error : on error, give both the file and the line number
 	latex_opts = "-interaction batchmode -recorder -file-line-error" 
 
+	# always do a dry-run so that we don't suffer from the problems
+	# of a stale fls or aux file.  This should run extremely fast (doesn't
+	# write a pdf or load graphics, but checks that they are there)
+	err_file = master.ext "err"
+	# delete any possible error file and create an error file if this run
+	# isn't successful to indicate later on that there was an error
+	rm_f err_file
+	sh "pdflatex -draftmode #{latex_opts} #{master} || touch #{err_file}"
+	
 
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
 	deps, bibs, cites = get_deps_bibs_cites master.ext("tex")
 	file master.ext('.pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
-		# Run latex.  This quits if there is an error.
+		# once we get here, latex has been run once already.  If there
+		# is a master.err then that call failed, so output the log and bail
+		if File.exists? master.ext("err")
+			print File.read(master.ext("log"))
+			return false
+		end
+
+		# If we're in this task, then one of the dependencies is newer,
+		# so run latex
 		sh "pdflatex #{latex_opts} #{master}"
 
 		# Once pdflatex has run, we can get set of bib_files and bib_cites for 
