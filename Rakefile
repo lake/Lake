@@ -128,16 +128,27 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 		sh "pdflatex #{latex_opts} #{master}"
 
 		# Once pdflatex has run, we can get set of bib_files and bib_cites for 
-		# this file from the aux file, if it exists. 
-		new_bibs, new_cites = traverse_aux_file_tree [master.ext("aux")]
+		# this file from the aux file, if it exists. We want to treat the
+		# cites as a set for future operations
+		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
+
+		# We want this to essentially be stateless. Run bibtex iff:
+		#   a) any .bib file used by master is newer than master.bbl (or 
+		#      there is a .bib and master.bbl doesn't exist)
+		#   b) there is a cite in master.aux that is not in master.bbl but 
+		#      *is* in a bib file included by master.aux
+
+		bib_keys = get_bib_keys bibs
+		bbl_keys = get_bbl_keys [master.ext("bbl")]
+	
+		# Run if cite added to a tex file.
+		run_bibtex = !((cites - bbl_keys) & bib_keys).empty?
 
 		# Run bibtex if the set of bibs or cites has changed or if any bib file
 		# has changed since the last bbl was built.
-		run_bibtex = Set.new(new_cites) != Set.new(cites) \
-			or Set.new(new_bibs) != Set.new(bibs)
 		run_bibtex |= (
-			(file master.ext("bbl") => new_bibs).needed?
-		) unless new_bibs.empty?
+			(file master.ext("bbl") => bibs).needed?
+		) unless bibs.empty?
 
 		# Run bibtex, if a bib file OR the set of cites has changed.
 		if run_bibtex
@@ -154,6 +165,7 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 
 			# Early escape when we know we can't resolve all citation references
 			# because of missing citations.
+			missing_cites = cites - get_bbl_keys([master.ext("bbl")])
 			missing_cites = (
 				`egrep -s "I didn't find a database entry for " *.blg`.
 					collect {|l| l.split(' ').last }
@@ -161,10 +173,11 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			unless missing_cites.empty?
 				if missing_cites == prev_missing_cites \
 						&& !prev_missing_cites.empty?
-
-					break puts("
-						Missing citations.  See warnings in pdflatex output.
-					".gsub(/^\t*/, '').strip)	# drop formatting detritus
+					puts(
+					 	"Missing the following citations. See warnings in pdflatex output.\n" +
+						missing_cites.to_a.join(", ")
+					)
+					break
 				else
 					prev_missing_cites = missing_cites
 				end
