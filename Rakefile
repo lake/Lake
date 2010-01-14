@@ -24,7 +24,7 @@ error '
 FIG_FILES = FileList['**/*.fig']
 DIA_FILES = FileList['**/*.dia']
 
-PDFTEX_T_FILES = FIG_FILES.map{|f| f.ext '.pdftex_t'}
+PDFTEX_FILES = FIG_FILES.map{|f| f.ext '.tex'}
 DOT_FILES = FileList['**/*.dot']
 NEATO_FILES = FileList['**/*.neato']
 SECONDARY_PDF_FILES =
@@ -204,7 +204,7 @@ EOS
 task :figures => FIGURES
 
 
-rule '.pdftex_t' => ['.fig'] do |t|
+rule '.tex' => ['.fig'] do |t|
 	pdf_name = t.name.gsub /\.\w*$/, '.pdf'
 	sh "fig2dev -Lpdftex -p0 #{t.source} > #{pdf_name}"
 	sh "fig2dev -Lpdftex_t -p#{pdf_name} #{t.source} > #{t.name}"
