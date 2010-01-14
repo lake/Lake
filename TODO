@@ -3,12 +3,16 @@
 * Add rake as submodule from github
 
 * Add lake command that runs rake by default and creates new paper projects
-   with switch for different types and adds commits hooks for the lake
-   submodule to push changes to wips on the central server
+    with switch for different types and adds commits hooks for the lake
+    submodule to push changes to wips on the central server
 		- checks out git repo in ~/.lake/repo
 		- makes submodules that symlink to this local repo
 			This will solve the Prem problem.
 		- creates from templates better
+        - creates a complete .gitignore
+    When called and there is no Rakefile in the top level
+    directory, use the standard Rakefile.local in lake.
+    
 
 *  Graphics:  1) better error messages, as when transfig or what not
 is not installed and 2) try to continue as much as possible.
