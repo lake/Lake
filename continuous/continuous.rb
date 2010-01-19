@@ -57,8 +57,15 @@ def main
 		$DONE = true 
 	}
 
+	# start the notifier
 	notifyOut = IO.popen("#{$NOTIFIER} #{dirs.join ' '}")
 	puts "continuous build and #{$NOTIFIER} are now running"
+
+	# always do a rake to begin with because the user probably started
+	# a continuous build because they changed something.
+	system("rake")
+
+	# now loop until receiving SIGINT
 	while !$DONE
 		fds = IO.select([notifyOut], [], [], timeout=1)
 		# if we get here as a result of the timeout then fds will
@@ -75,7 +82,7 @@ def main
 			# changed
 			if changed.any? { |x| x =~ /\.(bib|tex)$/ }
 				puts "Detected changes in: #{changed.join ' '}"
-				puts "rebuilding now"
+				puts "rebuilding..."
 				system("rake")
 			end
 		end
