@@ -1,0 +1,18 @@
+require 'rake/clean'
+CLEAN.include('notifier')
+task :default => [:notifier]
+
+platform = `uname`
+if platform =~ /linux/i
+	source = "inotify_notifier.c"
+elsif platform =~ /darwin|bsd/i
+	source = "kq_notifier.c"
+else
+	1/0
+end
+
+file "notifier" => [source] do
+	sh "gcc #{source} -o notifier"
+end
+
+		
