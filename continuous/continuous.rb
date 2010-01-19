@@ -40,7 +40,7 @@ end
 # fflush stdout or you may think there is a bug in this code
 
 $NOTIFIER = File.join(File.dirname(__FILE__), "notifier")
-
+$DONE=false
 
 def main
 	if !File.exists? $NOTIFIER
@@ -51,17 +51,28 @@ def main
 	dirs = ["."]
 	dirMonitor = DirMonitor.new(dirs[0])
 
+	# Set a signal handler to catch SIGINT and exit gracefully
+	# So that any process that called this doesn't think it failed
+	Signal.trap("INT") { puts "continuous build recieved SIGINT, exitting..."
+		$DONE = true 
+	}
+
 	notifyOut = IO.popen("#{$NOTIFIER} #{dirs.join ' '}")
-	puts "#{$NOTIFIER} is now running"
-	while true
-		fds = IO.select([notifyOut], [], [])
+	puts "continuous build and #{$NOTIFIER} are now running"
+	while !$DONE
+		fds = IO.select([notifyOut], [], [], timeout=1)
+		# if we get here as a result of the timeout then fds will
+		# be nil
 		if fds
 			fds[0].each { |fd|
 				s = fd.readline.strip
-				#probably should do something here
+				# We don't even care about the contents,
+				# just that the notifier outputted a line
 			}
+			# see what actually changed
 			changed = dirMonitor.whatChanged?
-			puts "changed " + changed.inspect if !changed.empty?
+			# for now, take a naive approach and build if any .bib or .tex
+			# changed
 			if changed.any? { |x| x =~ /\.(bib|tex)$/ }
 				puts "Detected changes in: #{changed.join ' '}"
 				puts "rebuilding now"
