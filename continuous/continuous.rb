@@ -39,13 +39,15 @@ end
 # std out if it is not to a tty.  Thus, make sure you
 # fflush stdout or you may think there is a bug in this code
 
-# BSDs (including OS X) support kqueue, so use kq in that case
-$NOTIFIER = File.join(File.dirname(__FILE__), "kq_notifier")
+$NOTIFIER = File.join(File.dirname(__FILE__), "notifier")
 
-# Linux uses inotify so use that if needed
-$NOTIFIER = File.join(File.dirname(__FILE__), "inotify_notifier")
 
 def main
+	if !File.exists $NOTIFIER
+		$stderr.puts "The binary lake/continous/notifier has not been built"
+		$stderr.puts "Please build it by executing rake in lake/continuous"
+		exit 0
+	end
 	dirs = ["."]
 	dirMonitor = DirMonitor.new(dirs[0])
 
