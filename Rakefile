@@ -88,6 +88,18 @@ MAX_LATEX_ITERATION = 10	# Prevents latex looping on reference resolution.
 
 task :default => :view
 
+# Continuously watch the paper director tree and kick
+# off a build whenever a relevant file is updated.
+# This calls continuous which in turn calls rake when needed
+task :continuous do
+	# run rake notifier to build the correct
+	# notifier for this platform
+	sh "cd lake/continuous && rake notifier"
+	# kick off the continuous builder, which
+	# in turn calls rake whenever a paper source
+	# file is modified
+	ruby "lake/continuous/continuous.rb"
+end
 
 def create_master_task(master)
 
