@@ -44,7 +44,7 @@ R_FILES = R_DATA_FILES.map{|f| dot(f).ext 'r-output'}
 # Ignore figures in excluded directories.
 EXCLUDED_FIGURES = nil unless self.class.const_defined? :EXCLUDED_FIGURES
 
-FIGURES = (PDFTEX_T_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES).
+FIGURES = (PDFTEX_FILES + SECONDARY_PDF_FILES + GNUPLOT_FILES + R_FILES).
 	reject { |f| f =~ EXCLUDED_FIGURES }
 
 # Don't trash figures that are checked in directly (i.e. that we don't have the
