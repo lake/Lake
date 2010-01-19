@@ -7,6 +7,16 @@ __DIR__ = File.dirname( __FILE__)
 
 require File.join(__DIR__, 'util')
 
+# We use all of these latex options, except
+# -draftmode : don't write a pdf or load graphics files, but check that
+#			   they exist.
+# which we use to refresh fls and aux files prior to a rendering build.
+$LATEX_OPTS = '
+	-interaction batchmode  # be quiet and avoid interaction mode on error
+	-recorder				# record files read and written during a build
+	-file-line-error		# output both file and line number on error
+'.gsub(/\s+(#.*\n)?\s*/," ").strip
+
 if ENV['TEXINPUTS'].nil? or  ENV['TEXINPUTS'].empty?
 	ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/::"
 else
@@ -92,54 +102,37 @@ task :pdf  => MASTER_TEX_FILE_ROOTS.map{|master| master + '.pdf'}
 MASTER_TEX_FILE_ROOTS.each do |master|
 	task master => master + '.pdf' # Don't make me type '.pdf'.
 
-	# here are latex options we use at different times.  We should always
-	# use at least everything except for draftmode.  Perhaps this should go 
-	# somewhere else
-	# -draftmode : don't write a pdf or load graphics files, (but check
-	#              that they exist)  This still generates an aux and fls file
-	# -interaction batchdmode : don't output tons of crap and don't go into
-	#   interaction mode if there is an error
-	# -recorder : record which files were read and written during a the build
-	# -file-line-error : on error, give both the file and the line number
-	latex_opts = "-interaction batchmode -recorder -file-line-error" 
-
-	# always do a dry-run so that we don't suffer from the problems
-	# of a stale fls or aux file.  This should run extremely fast (doesn't
-	# write a pdf or load graphics, but checks that they are there)
+	# Always regenerate the fls and aux files.  We may not care about this
+	# failure, as when we wish to clean the project, so we merely record
+	# the error here.
 	err_file = master.ext "err"
-	# delete any possible error file and create an error file if this run
-	# isn't successful to indicate later on that there was an error
 	rm_f err_file
-	sh "pdflatex -draftmode #{latex_opts} #{master} || touch #{err_file}"
-	
+	sh "pdflatex -draftmode #{$LATEX_OPTS} #{master} || touch #{err_file}"
 
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
 	deps, bibs, cites = get_deps_bibs_cites master.ext("tex")
 	file master.ext('.pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
-		# once we get here, latex has been run once already.  If there
-		# is a master.err then that call failed, so output the log and bail
+		# If an error occurred above regenerating the fls and aux file, we now
+		# know that that error matters, so output the log and bail.
 		if File.exists? master.ext("err")
 			print File.read(master.ext("log"))
 			return false
 		end
 
-		# If we're in this task, then one of the dependencies is newer,
-		# so run latex
-		sh "pdflatex #{latex_opts} #{master}"
+		# One of the dependencies is newer, so run latex.
+		sh "pdflatex #{$LATEX_OPTS} #{master}"
 
-		# Once pdflatex has run, we can get set of bib_files and bib_cites for 
-		# this file from the aux file, if it exists. We want to treat the
-		# cites as a set for future operations
+		# Now that pdflatex has run, we extract the set of bib_files and 
+		# bib_cites from the aux file, if it exists. 
 		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
 
-		# We want this to essentially be stateless. Run bibtex iff:
+		# We want running bibtex to essentially be stateless. We run bibtex iff:
 		#   a) any .bib file used by master is newer than master.bbl (or 
 		#      there is a .bib and master.bbl doesn't exist)
 		#   b) there is a cite in master.aux that is not in master.bbl but 
 		#      *is* in a bib file included by master.aux
-
 		bib_keys = get_bib_keys bibs
 		bbl_keys = get_bbl_keys [master.ext("bbl")]
 	
@@ -159,7 +152,7 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			sh "bibtex -terse -min-crossrefs=100 #{master}"
 			# Always run pdflatex at least once after a bibtex since 
 			# we ran it for a reason.
-			sh "pdflatex #{latex_opts} #{master}"
+			sh "pdflatex #{$LATEX_OPTS} #{master}"
 		end
 
 		prev_missing_cites = []
@@ -175,10 +168,9 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			unless missing_cites.empty?
 				if missing_cites == prev_missing_cites \
 						&& !prev_missing_cites.empty?
-					puts(
-					 	"Missing the following citations. See warnings in pdflatex output.\n" +
-						missing_cites.to_a.join(", ")
-					)
+					msg = "Missing the following citations. "
+					msg += "See warnings in pdflatex output.\n" 
+					puts(msg + missing_cites.to_a.join(", "))
 					break
 				else
 					prev_missing_cites = missing_cites
@@ -192,7 +184,7 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 			break if `egrep -s '#{regex}' *.log`.empty?
 
 			puts "Re-running latex to resolve references."
-			sh "pdflatex #{latex_opts} #{master}"
+			sh "pdflatex #{$LATEX_OPTS} #{master}"
 		end
 	end
 end
