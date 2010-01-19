@@ -7,17 +7,11 @@
 #include <signal.h>
 #include <unistd.h>
 
-/* we want the signal handler to do nothing at all
- * since the kqueue system will handle it */
-void sigint(int sig)
-{
-}
-
-
 int main(int argc, char** argv) {
    int f, f2, kq, nev;
 
-   signal(SIGINT, sigint);
+   /* ignore SIGINT since kevent will catch and handle it */
+   signal(SIGINT, SIG_IGN);
 
    /* declare array of file descriptors */
    int *fds = (int *) malloc(argc-1 * sizeof(int));

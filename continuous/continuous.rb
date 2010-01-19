@@ -43,7 +43,7 @@ $NOTIFIER = File.join(File.dirname(__FILE__), "notifier")
 
 
 def main
-	if !File.exists $NOTIFIER
+	if !File.exists? $NOTIFIER
 		$stderr.puts "The binary lake/continous/notifier has not been built"
 		$stderr.puts "Please build it by executing rake in lake/continuous"
 		exit 0
