@@ -8,7 +8,7 @@ if platform =~ /linux/i
 elsif platform =~ /darwin|bsd/i
 	source = "kq_notifier.c"
 else
-	1/0
+	raise "No notifier available for platform: #{platform}"
 end
 
 file "notifier" => [source] do
