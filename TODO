@@ -1,5 +1,9 @@
 * Synchronize seguo, hera, and cerberus via commit hooks
 
+* Add an R task to lake to so that users can easily create dependencies
+  on R scripts in their own Rakefile.local.  Also include a commented
+  out example of the use of such a task in Rakefile.local.
+
 * Add rake as submodule from github
 
 * Add lake command that runs rake by default and creates new paper projects
