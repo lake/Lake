@@ -6,6 +6,7 @@ require 'set'
 __DIR__ = File.dirname( __FILE__)
 
 require File.join(__DIR__, 'util')
+require File.join(__DIR__, 'latex_errors')
 
 # We use all of these latex options, except
 # -draftmode : don't write a pdf or load graphics files, but check that
@@ -117,8 +118,9 @@ MASTER_TEX_FILE_ROOTS.each do |master|
 		# If an error occurred above regenerating the fls and aux file, we now
 		# know that that error matters, so output the log and bail.
 		if File.exists? master.ext("err")
-			print File.read(master.ext("log"))
-			return false
+			errors = parse_log(File.read(master.ext("log")))
+			puts errors.join("\n\n")
+			exit 1
 		end
 
 		# One of the dependencies is newer, so run latex.
