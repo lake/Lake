@@ -1,21 +1,20 @@
-# Each latex error pairs a regex that describes a latex error with a window of
+# A list of common latex errors and their causes, from which the list 
+# latex_errors_abbrev draws, can be found at:
+#   http://www.cs.utexas.edu/~witchel/errorclasses.html
+#
+# Instances of many of these errors may be found in the testing module.
+
+# This list error pairs a regex that describes a latex error with a window of
 # lines following the error, either in terms of a delimiting regex or a count of
 # lines.
-# A list of common errors and their causes (which this list is partially based
-# on) can be found at:
-#   http://www.cs.utexas.edu/~witchel/errorclasses.html
-
 latex_errors_abbrv = [
-	# matches when an argument to a latex function has extra }'s.  
-	# Spews lots of text (11 lines) see extra_brace.log in testing module.
+	# An argument to a latex function has extra }'s.  
 	[/^.*:[0-9]+: Argument of.*has an extra \}/, /it will go away/],
-	# Occurs when missing a \begin{table} statement
-	# see hyphenation.log
+	# Missing a \begin{table} statement
 	[/Too many \}'s/, 5],
-	# Example: Package Option Conflict
+	# Package Option Conflict
 	[/: Missing number, treated as zero/, /TeXbook/],
 	# Improper parameter to \hyphenation
-	# see hyphenation.log
 	[/^.*:[0-9]+:.*Improper.*flushed/, 7],
 	# Previous errors so bad that pdflatex won't produce anything
 	[/^.*==>\sfatal.*/i, 2],
@@ -24,8 +23,10 @@ latex_errors_abbrv = [
 ]
 
 $latex_errors = latex_errors_abbrv.map do |entry|
-	{:regex => entry[0], 
-		entry[1].class == Fixnum ? :lines : :delimiter => entry[1]}
+	{
+		:regex => entry[0], 
+		(entry[1].is_a?( Fixnum ) ? :lines : :delimiter ) => entry[1],
+	}
 end
 
 def parse_log text
