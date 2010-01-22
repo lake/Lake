@@ -8,6 +8,8 @@ __DIR__ = File.dirname( __FILE__)
 require File.join(__DIR__, 'util')
 require File.join(__DIR__, 'latex_errors')
 
+verbose(false) # Quiet the chatty shell commands.
+
 # We use all of these latex options, except
 # -draftmode : don't write a pdf or load graphics files, but check that
 #			   they exist.
@@ -90,9 +92,8 @@ task :default => :view
 def create_master_task(master)
 
 	# Always regenerate the fls and aux files.
-	system "pdflatex -draftmode #{$LATEX_OPTS} #{master}"
-	errors = parse_log(File.read(master.ext("log")))
-	puts errors.join("\n\n") and exit 1 unless $?.success?
+	system "pdflatex -draftmode #{$LATEX_OPTS} #{master} > /dev/null"
+	puts File.read(master.ext("log")).join("\n\n") and exit 1 unless $?.success?
 
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
@@ -106,7 +107,8 @@ def create_master_task(master)
 	file master.ext('pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
 		# At least one of the dependencies is newer, so run latex.
-		sh "pdflatex #{$LATEX_OPTS} #{master}"
+		puts "Running pdflatex..."
+		sh "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
 
 		# Now that pdflatex has run, we extract the set of bib_files and 
 		# bib_cites from the aux file, if it exists. 
