@@ -103,91 +103,107 @@ task :pdf  => MASTER_TEX_FILE_ROOTS.map{|master| master + '.pdf'}
 MASTER_TEX_FILE_ROOTS.each do |master|
 	task master => master + '.pdf' # Don't make me type '.pdf'.
 
-	# Always regenerate the fls and aux files.  We may not care about this
-	# failure, as when we wish to clean the project, so we merely record
-	# the error here.
-	err_file = master.ext "err"
-	rm_f err_file
-	sh "pdflatex -draftmode #{$LATEX_OPTS} #{master} || touch #{err_file}"
+	# Put all of this stuff in a task so that it isn't run every single time.
+	# We're going to recreate the master.pdf task inside *this* master.pdf
+	# task.
+	task master.ext(".pdf") do
+		# Always regenerate the fls and aux files.  We may not care about this
+		# failure, as when we wish to clean the project, so we merely record
+		# the error here.
+		err_file = master.ext "err"
+		rm_f err_file
+		sh "pdflatex -draftmode #{$LATEX_OPTS} #{master} || touch #{err_file}"
 
-	# The deps variable includes figures, sty, cls, and package files: anything
-	# latex reads when building the pdf.
-	deps, bibs, cites = get_deps_bibs_cites master.ext("tex")
-	file master.ext('.pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
+		# The deps variable includes figures, sty, cls, and package files: anything
+		# latex reads when building the pdf.
+		deps, bibs, cites = get_deps_bibs_cites master.ext("tex")
 
-		# If an error occurred above regenerating the fls and aux file, we now
-		# know that that error matters, so output the log and bail.
-		if File.exists? master.ext("err")
-			errors = parse_log(File.read(master.ext("log")))
-			puts errors.join("\n\n")
-			exit 1
-		end
+		# We want to clear the master.pdf task (which we are in) because
+		# we are going to recreate it right here based on the dependencies
+		# we just collected.  Then we'll see if it needs to be invoked after
+		# it is defined
+		Rake::Task[master.ext("pdf")].clear
 
-		# One of the dependencies is newer, so run latex.
-		sh "pdflatex #{$LATEX_OPTS} #{master}"
+		file master.ext('pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
-		# Now that pdflatex has run, we extract the set of bib_files and 
-		# bib_cites from the aux file, if it exists. 
-		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
-
-		# We want running bibtex to essentially be stateless. We run bibtex iff:
-		#   a) any .bib file used by master is newer than master.bbl (or 
-		#      there is a .bib and master.bbl doesn't exist)
-		#   b) there is a cite in master.aux that is not in master.bbl but 
-		#      *is* in a bib file included by master.aux
-		bib_keys = get_bib_keys bibs
-		bbl_keys = get_bbl_keys [master.ext("bbl")]
-	
-		# Run if cite added to a tex file.
-		run_bibtex = !((cites - bbl_keys) & bib_keys).empty?
-
-		# Run bibtex if the set of bibs or cites has changed or if any bib file
-		# has changed since the last bbl was built.
-		run_bibtex |= (
-			(file master.ext("bbl") => bibs).needed?
-		) unless bibs.empty?
-
-		# Run bibtex, if a bib file OR the set of cites has changed.
-		if run_bibtex
-			# -min-crossrefs=100 essentially turns off cross referencing.  Not
-			# sure why one wouldn't just take the default of 2.
-			sh "bibtex -terse -min-crossrefs=100 #{master}"
-			# Always run pdflatex at least once after a bibtex since 
-			# we ran it for a reason.
-			sh "pdflatex #{$LATEX_OPTS} #{master}"
-		end
-
-		prev_missing_cites = []
-		1.upto MAX_LATEX_ITERATION do 
-
-			# Early escape when we know we can't resolve all citation references
-			# because of missing citations.
-			missing_cites = cites - get_bbl_keys([master.ext("bbl")])
-			missing_cites = (
-				`egrep -s "I didn't find a database entry for " *.blg`.
-					collect {|l| l.split(' ').last }
-			)
-			unless missing_cites.empty?
-				if missing_cites == prev_missing_cites \
-						&& !prev_missing_cites.empty?
-					msg = "Missing the following citations. "
-					msg += "See warnings in pdflatex output.\n" 
-					puts(msg + missing_cites.to_a.join(", "))
-					break
-				else
-					prev_missing_cites = missing_cites
-				end
+			# If an error occurred above regenerating the fls and aux file, we now
+			# know that that error matters, so output the log and bail.
+			if File.exists? master.ext("err")
+				errors = parse_log(File.read(master.ext("log")))
+				puts errors.join("\n\n")
+				exit 1
 			end
 
-			# We can stop when LaTeX is certain it has resolved all references.
-			cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
-			cit_regex = "LaTeX Warning: Citation .* on page .* undefined"
-			regex = "((#{cross_ref_regex})|(#{cit_regex}))"
-			break if `egrep -s '#{regex}' *.log`.empty?
-
-			puts "Re-running latex to resolve references."
+			# One of the dependencies is newer, so run latex.
 			sh "pdflatex #{$LATEX_OPTS} #{master}"
+
+			# Now that pdflatex has run, we extract the set of bib_files and 
+			# bib_cites from the aux file, if it exists. 
+			bibs, cites = traverse_aux_file_tree [master.ext("aux")]
+
+			# We want running bibtex to essentially be stateless. We run bibtex iff:
+			#   a) any .bib file used by master is newer than master.bbl (or 
+			#      there is a .bib and master.bbl doesn't exist)
+			#   b) there is a cite in master.aux that is not in master.bbl but 
+			#      *is* in a bib file included by master.aux
+			bib_keys = get_bib_keys bibs
+			bbl_keys = get_bbl_keys [master.ext("bbl")]
+		
+			# Run if cite added to a tex file.
+			run_bibtex = !((cites - bbl_keys) & bib_keys).empty?
+
+			# Run bibtex if the set of bibs or cites has changed or if any bib file
+			# has changed since the last bbl was built.
+			run_bibtex |= (
+				(file master.ext("bbl") => bibs).needed?
+			) unless bibs.empty?
+
+			# Run bibtex, if a bib file OR the set of cites has changed.
+			if run_bibtex
+				# -min-crossrefs=100 essentially turns off cross referencing.  Not
+				# sure why one wouldn't just take the default of 2.
+				sh "bibtex -terse -min-crossrefs=100 #{master}"
+				# Always run pdflatex at least once after a bibtex since 
+				# we ran it for a reason.
+				sh "pdflatex #{$LATEX_OPTS} #{master}"
+			end
+
+			prev_missing_cites = []
+			1.upto MAX_LATEX_ITERATION do 
+
+				# Early escape when we know we can't resolve all citation references
+				# because of missing citations.
+				missing_cites = cites - get_bbl_keys([master.ext("bbl")])
+				missing_cites = (
+					`egrep -s "I didn't find a database entry for " *.blg`.
+						collect {|l| l.split(' ').last }
+				)
+				unless missing_cites.empty?
+					if missing_cites == prev_missing_cites \
+							&& !prev_missing_cites.empty?
+						msg = "Missing the following citations. "
+						msg += "See warnings in pdflatex output.\n" 
+						puts(msg + missing_cites.to_a.join(", "))
+						break
+					else
+						prev_missing_cites = missing_cites
+					end
+				end
+
+				# We can stop when LaTeX is certain it has resolved all references.
+				cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
+				cit_regex = "LaTeX Warning: Citation .* on page .* undefined"
+				regex = "((#{cross_ref_regex})|(#{cit_regex}))"
+				break if `egrep -s '#{regex}' *.log`.empty?
+
+				puts "Re-running latex to resolve references."
+				sh "pdflatex #{$LATEX_OPTS} #{master}"
+			end
 		end
+		# Now that we've finished defining the new master.pdf task,
+		# see if we need to run it and do so if appropriate
+		master_task = Rake::Task[master.ext("pdf")]
+		master_task.invoke if master_task.needed? 
 	end
 end
 
