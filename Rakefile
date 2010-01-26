@@ -93,7 +93,10 @@ def create_master_task(master)
 
 	# Always regenerate the fls and aux files.
 	system "pdflatex -draftmode #{$LATEX_OPTS} #{master} > /dev/null"
-	puts File.read(master.ext("log")).join("\n\n") and exit 1 unless $?.success?
+	if not $?.success?
+		errors = parse_log( File.read( master.ext( "log" )))
+		puts errors.join( "\n\n" ) and exit 1
+	end
 
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
