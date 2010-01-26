@@ -134,6 +134,9 @@ def create_master_task(master)
 			(file master.ext("bbl") => bibs).needed?
 		) unless bibs.empty?
 
+		# If there are no cites in the paper, then don't run bibtex.
+		run_bibtex &= !cites.empty?
+
 		# Run bibtex, if a bib file OR the set of cites has changed.
 		if run_bibtex
 			# -min-crossrefs=100 essentially turns off cross referencing.  Not
