@@ -173,7 +173,7 @@ def create_master_task(master)
 			cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
 			cit_regex = "LaTeX Warning: Citation .* on page .* undefined"
 			regex = "((#{cross_ref_regex})|(#{cit_regex}))"
-			break if `egrep -s '#{regex}' *.log`.empty?
+			break if `egrep -s '#{regex}' #{master.ext("log")}`.empty?
 
 			puts "Re-running latex to resolve references."
 			sh "pdflatex #{$LATEX_OPTS} #{master}"
