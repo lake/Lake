@@ -91,7 +91,8 @@ task :default => :view
 
 def create_master_task(master)
 
-	# Always regenerate the fls and aux files.
+	# Always generate the fls and aux files so that get_deps_bibs_cites 
+	# does not return stale data.
 	system "pdflatex -draftmode #{$LATEX_OPTS} #{master} > /dev/null"
 	if not $?.success?
 		errors = parse_log( File.read( master.ext( "log" )))
@@ -108,10 +109,6 @@ def create_master_task(master)
 	Rake.application.instance_variable_get('@tasks').delete(master.ext("pdf"))
 
 	file master.ext('pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
-
-		# At least one of the dependencies is newer, so run latex.
-		puts "Running pdflatex..."
-		sh "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
 
 		# Now that pdflatex has run, we extract the set of bib_files and 
 		# bib_cites from the aux file, if it exists. 
@@ -138,14 +135,13 @@ def create_master_task(master)
 		run_bibtex &= !cites.empty?
 
 		# Run bibtex, if a bib file OR the set of cites has changed.
-		if run_bibtex
-			# -min-crossrefs=100 essentially turns off cross referencing.  Not
-			# sure why one wouldn't just take the default of 2.
-			sh "bibtex -terse -min-crossrefs=100 #{master}"
-			# Always run pdflatex at least once after a bibtex since 
-			# we ran it for a reason.
-			sh "pdflatex #{$LATEX_OPTS} #{master}"
-		end
+		# -min-crossrefs=100 essentially turns off cross referencing.  Not
+		# sure why one wouldn't just take the default of 2.
+		sh "bibtex -terse -min-crossrefs=100 #{master}" if run_bibtex
+
+		# At least one of the dependencies is newer, so run latex.
+		puts "Running pdflatex..."
+		sh "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
 
 		prev_missing_cites = []
 		1.upto MAX_LATEX_ITERATION do 
