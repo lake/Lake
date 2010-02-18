@@ -110,34 +110,15 @@ def create_master_task(master)
 
 	file master.ext('pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
-		# Now that pdflatex has run, we extract the set of bib_files and 
-		# bib_cites from the aux file, if it exists. 
+		# Extract the set of bib_files and bib_cites from the aux files.
 		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
 
-		# We want running bibtex to essentially be stateless. We run bibtex iff:
-		#   a) any .bib file used by master is newer than master.bbl (or 
-		#      there is a .bib and master.bbl doesn't exist)
-		#   b) there is a cite in master.aux that is not in master.bbl but 
-		#      *is* in a bib file included by master.aux
-		bib_keys = get_bib_keys bibs
-		bbl_keys = get_bbl_keys [master.ext("bbl")]
-	
-		# Run if cite added to a tex file.
-		run_bibtex = !((cites - bbl_keys) & bib_keys).empty?
-
-		# Run bibtex if the set of bibs or cites has changed or if any bib file
-		# has changed since the last bbl was built.
-		run_bibtex |= (
-			(file master.ext("bbl") => bibs).needed?
-		) unless bibs.empty?
-
-		# If there are no cites in the paper, then don't run bibtex.
-		run_bibtex &= !cites.empty?
-
 		# Run bibtex, if a bib file OR the set of cites has changed.
-		# -min-crossrefs=100 essentially turns off cross referencing.  Not
-		# sure why one wouldn't just take the default of 2.
-		sh "bibtex -terse -min-crossrefs=100 #{master}" if run_bibtex
+		if run_bibtex?( bibs, cites, master )
+			# -min-crossrefs=100 essentially turns off cross referencing.
+			# Not sure why one wouldn't just take the default of 2.
+			sh "bibtex -terse -min-crossrefs=100 #{master}" 
+		end
 
 		# At least one of the dependencies is newer, so run latex.
 		puts "Running pdflatex..."

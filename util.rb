@@ -154,6 +154,33 @@ def get_deps_bibs_cites master
 	return [deps, bibs, cites].map{|x| x.uniq}
 end
 
+def run_bibtex? bibs, cites, master
+
+	# We want running bibtex to essentially be stateless. We run bibtex iff:
+	#   a) any .bib file used by master is newer than master.bbl (or 
+	#      there is a .bib and master.bbl doesn't exist)
+	#   b) there is a cite in master.aux that is not in master.bbl but 
+	#      *is* in a bib file included by master.aux
+	bib_keys = get_bib_keys bibs
+	bbl_keys = get_bbl_keys [master.ext("bbl")]
+
+	# Run if cite added to a tex file.
+	run_bibtex = !((cites - bbl_keys) & bib_keys).empty?
+
+	# Run bibtex if the set of bibs or cites has changed or if any bib file
+	# has changed since the last bbl was built.
+	run_bibtex |= (
+		(file master.ext("bbl") => bibs).needed?
+	) unless bibs.empty?
+
+	# If there are no cites in the paper, then don't run bibtex.
+	run_bibtex &= !cites.empty?
+
+	run_bibtex
+end
+
+
+
 # The following code block defines a default pdf viewer.  The viewer method
 # may be overridden in a local Rakefile, created by copying Rakefile.local.
 
