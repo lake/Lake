@@ -15,9 +15,9 @@ verbose(false) # Quiet the chatty shell commands.
 #			   they exist.
 # which we use to refresh fls and aux files prior to a rendering build.
 $LATEX_OPTS = '
-	-interaction batchmode  # be quiet and avoid interaction mode on error
-	-recorder				# record files read and written during a build
-	-file-line-error		# output both file and line number on error
+	-interaction nonstopmode  # be quiet and avoid interaction mode on error
+	-recorder				  # record files read and written during a build
+	-file-line-error		  # output both file and line number on error
 '.gsub(/\s+(#.*\n)?\s*/," ").strip
 
 if ENV['TEXINPUTS'].nil? or  ENV['TEXINPUTS'].empty?
@@ -92,12 +92,8 @@ task :default => :view
 def create_master_task(master)
 
 	# Always generate the fls and aux files so that get_deps_bibs_cites 
-	# does not return stale data.
+	# does not return stale data; for this run, we ignore errors.
 	system "pdflatex -draftmode #{$LATEX_OPTS} #{master} > /dev/null"
-	if not $?.success?
-		errors = parse_log( File.read( master.ext( "log" )))
-		puts errors.join( "\n\n" ) and exit 1
-	end
 
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
@@ -122,7 +118,11 @@ def create_master_task(master)
 
 		# At least one of the dependencies is newer, so run latex.
 		puts "Running pdflatex..."
-		sh "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
+		system "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
+		if not $?.success?
+			puts parse_log( File.read( master.ext( "log" ))).join( "\n\n" ) 
+			exit 1
+		end
 
 		prev_missing_cites = []
 		1.upto MAX_LATEX_ITERATION do 
