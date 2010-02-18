@@ -195,8 +195,8 @@ task :figures => FIGURES
 
 rule '.tex' => ['.fig'] do |t|
 	pdf_name = t.name.gsub /\.\w*$/, '.pdf'
-	sh "fig2dev -Lpdftex -p0 #{t.source} > #{pdf_name}"
-	sh "fig2dev -Lpdftex_t -p#{pdf_name} #{t.source} > #{t.name}"
+	sh "fig2dev -Lpdftex -p0 #{t.source} > #{pdf_name} 2> /dev/null"
+	sh "fig2dev -Lpdftex_t -p#{pdf_name} #{t.source} > #{t.name} 2> /dev/null"
 end
 
 rule '.pdf' => ['.eps'] do |t|
