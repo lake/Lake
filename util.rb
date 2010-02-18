@@ -156,6 +156,9 @@ end
 
 def run_bibtex? bibs, cites, master
 
+	# If there is no bibliography or no cites, don't run bibtex.
+	return false if bibs.nil? or bibs.empty? or cites.nil? or cites.empty?
+
 	# We want running bibtex to essentially be stateless. We run bibtex iff:
 	#   a) any .bib file used by master is newer than master.bbl (or 
 	#      there is a .bib and master.bbl doesn't exist)
@@ -169,12 +172,7 @@ def run_bibtex? bibs, cites, master
 
 	# Run bibtex if the set of bibs or cites has changed or if any bib file
 	# has changed since the last bbl was built.
-	run_bibtex |= (
-		(file master.ext("bbl") => bibs).needed?
-	) unless bibs.empty?
-
-	# If there are no cites in the paper, then don't run bibtex.
-	run_bibtex &= !cites.empty?
+	run_bibtex |= (file master.ext("bbl") => bibs).needed?
 
 	run_bibtex
 end
