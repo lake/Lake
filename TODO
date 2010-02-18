@@ -143,4 +143,5 @@ Better support for multiple pdfs (was masterexclusions)
 	rake pdf	# build first pdf (in this case α)
 	rake pdfs	# build all pdfs
 
-
+Improve the preambles.  Factor the shared core into a single preamble, then make
+standard, sig-alternate and beamer preambles.
