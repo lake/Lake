@@ -10,16 +10,6 @@ require File.join(__DIR__, 'latex_errors')
 
 verbose(false) # Quiet the chatty shell commands.
 
-# We use all of these latex options, except
-# -draftmode : don't write a pdf or load graphics files, but check that
-#			   they exist.
-# which we use to refresh fls and aux files prior to a rendering build.
-$LATEX_OPTS = '
-	-interaction nonstopmode  # be quiet and avoid interaction mode on error
-	-recorder				  # record files read and written during a build
-	-file-line-error		  # output both file and line number on error
-'.gsub(/\s+(#.*\n)?\s*/," ").strip
-
 if ENV['TEXINPUTS'].nil? or  ENV['TEXINPUTS'].empty?
 	ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/::"
 else
@@ -121,9 +111,18 @@ def create_master_task(master)
 			sh "bibtex -terse -min-crossrefs=100 #{master}" 
 		end
 
+		options = [
+			# be quiet and avoid interaction mode on error
+			"-interaction batchmode",  
+			# record files read and written during a build
+			"-recorder",		  
+			# output both file and line number on error
+			"-file-line-error"	  
+		]
+
 		# At least one of the dependencies is newer, so run latex.
 		puts "Running pdflatex..."
-		system "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
+		system "pdflatex #{options.join( " " )} #{master} > /dev/null"
 		if not $?.success?
 			puts parse_log( File.read( master.ext( "log" ))).join( "\n\n" ) 
 			exit 1
@@ -148,7 +147,7 @@ def create_master_task(master)
 			break if `egrep -s '#{regex}' #{master.ext("log")}`.empty?
 
 			puts "Re-running latex to resolve references."
-			sh "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
+			sh "pdflatex -interaction batchmode  #{master} > /dev/null"
 		end
 	end
 
