@@ -129,26 +129,16 @@ def create_master_task(master)
 			exit 1
 		end
 
-		prev_missing_cites = []
 		1.upto MAX_LATEX_ITERATION do 
 
 			# Early escape when we know we can't resolve all citation references
-			# because of missing citations.
+			# because citation keys exist that bibtex cannot find in the
+			# imported set of bibliographic data (*.bib) files.
 			missing_cites = cites - get_bbl_keys([master.ext("bbl")])
-			missing_cites = (
-				`egrep -s "I didn't find a database entry for " *.blg`.
-					collect {|l| l.split(' ').last }
-			)
 			unless missing_cites.empty?
-				if missing_cites == prev_missing_cites \
-						&& !prev_missing_cites.empty?
-					msg = "Missing the following citations. "
-					msg += "See warnings in pdflatex output.\n" 
-					puts(msg + missing_cites.to_a.join(", "))
-					break
-				else
-					prev_missing_cites = missing_cites
-				end
+				msg = "No bibliography data (*.bib) file contained these keys: "
+				msg += missing_cites.to_a.join(", ") + "\n"
+				raise msg
 			end
 
 			# We can stop when LaTeX is certain it has resolved all references.
