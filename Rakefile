@@ -148,7 +148,7 @@ def create_master_task(master)
 
 			# We can stop when LaTeX is certain it has resolved all references.
 			cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
-			cit_regex = "LaTeX Warning: Citation .* on page .* undefined"
+			cit_regex = "Warning: Citation .* on page .* undefined"
 			regex = "((#{cross_ref_regex})|(#{cit_regex}))"
 			break if `egrep -s '#{regex}' #{master.ext("log")}`.empty?
 
