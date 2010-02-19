@@ -128,28 +128,29 @@ end
 # Determine master's exact dependencies from its fls and aux files.
 def get_deps_bibs_cites master
 
-	# The variable deps will include packages, tex files, figures, anything
-	# that is read by latex to build the pdf.
+	unless File.exists? master.ext("fls") and File.exists? master.ext("aux")
+		raise "Missing #{master}.fls and #{master}.aux" 
+	end
+
+	# The variable deps includes packages, tex files, and figures; anything 
+	# that latex reads to build the pdf.
 	deps, bibs, cites = [master.ext("tex")], [], []
 
-	# Parse master.fls if it exists.
-	if File.exists? master.ext("fls")
-		# Latex both inputs and outputs aux files, so if master.pdf depended on
-		# master.aux, then each build would output a new master.aux, which
-		# would, in turn, trigger a new build, ad infinitum.  To prevent this,
-		# we separate latex' output files from its input files. 
-		outputs = `grep OUTPUT #{master.ext("fls")}`.split("\n").map do |line|
-			line.split(" ")[1]
-		end
-		deps += `grep INPUT #{master.ext("fls")}`.split("\n").map do |line| 
-			line.split(" ")[1]
-		end.reject{|f| outputs.include? f}
+	# Parse master.fls.  Latex both inputs and outputs aux files, so if
+	# master.pdf depended on master.aux, then each build would output a new
+	# master.aux, which would, in turn, trigger a new build, ad infinitum.  To
+	# prevent this, we separate latex' output files from its input files. 
+	outputs = `grep OUTPUT #{master.ext("fls")}`.split("\n").map do |line|
+		line.split(" ")[1]
 	end
+	deps += `grep INPUT #{master.ext("fls")}`.split("\n").map do |line| 
+		line.split(" ")[1]
+	end.reject{|f| outputs.include? f}
 
-	# If master.aux, exists parse it to determine its bib dependencies.
-	if File.exists? master.ext("aux")
-		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
-	end
+	# Parse master.aux to determine its bib dependencies.
+	bibs, cites = traverse_aux_file_tree [master.ext("aux")]
+
+	raise "There are cites, but no bib files." if bibs.empty? and !cites.empty?
 
 	return [deps, bibs, cites].map{|x| x.uniq}
 end
