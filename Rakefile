@@ -114,9 +114,6 @@ def create_master_task(master)
 
 	file master.ext('pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
-		# Extract the set of bib_files and bib_cites from the aux files.
-		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
-
 		# Run bibtex, if a bib file OR the set of cites has changed.
 		if run_bibtex?( bibs, cites, master )
 			# -min-crossrefs=100 essentially turns off cross referencing.
