@@ -153,7 +153,7 @@ def create_master_task(master)
 			break if `egrep -s '#{regex}' #{master.ext("log")}`.empty?
 
 			puts "Re-running latex to resolve references."
-			sh "pdflatex #{$LATEX_OPTS} #{master}"
+			sh "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
 		end
 	end
 
