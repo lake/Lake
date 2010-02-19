@@ -91,9 +91,17 @@ task :default => :view
 
 def create_master_task(master)
 
-	# Always generate the fls and aux files so that get_deps_bibs_cites 
-	# does not return stale data; for this run, we ignore errors.
-	system "pdflatex -draftmode #{$LATEX_OPTS} #{master} > /dev/null"
+	# Always refresh the fls and aux files so that get_deps_bibs_cites does not
+	# return stale data, as when a dependency has been deleted; for this run, we
+	# ignore errors.  This code accomplishes what -interaction nonstopmode
+	# advertises, but fails to do.
+	command = "pdflatex -draftmode -recorder -file-line-error #{master}"
+	IO.popen( command, "w+" ) do |pipe|
+		while line = pipe.gets
+			# This regex may not capture all error prompts.
+			pipe.puts "" if line =~ /^Enter|^\?/i
+		end
+	end
 
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
