@@ -130,24 +130,23 @@ def create_master_task(master)
 
 		1.upto MAX_LATEX_ITERATION do 
 
-			# Early escape when we know we can't resolve all citation references
-			# because citation keys exist that bibtex cannot find in the
-			# imported set of bibliographic data (*.bib) files.
-			missing_cites = cites - get_bbl_keys([master.ext("bbl")])
-			unless missing_cites.empty?
-				msg = "No bibliography data (*.bib) file contained these keys: "
-				msg += missing_cites.to_a.join(", ") + "\n"
-				raise msg
-			end
 
 			# We can stop when LaTeX is certain it has resolved all references.
 			cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
-			cit_regex = "Warning: Citation .* on page .* undefined"
-			regex = "((#{cross_ref_regex})|(#{cit_regex}))"
-			break if `egrep -s '#{regex}' #{master.ext("log")}`.empty?
+			break if `egrep -s '#{cross_ref_regex}' #{master.ext("log")}`.empty?
 
 			puts "Re-running latex to resolve references."
 			sh "pdflatex -interaction batchmode  #{master} > /dev/null"
+		end
+		
+		# Early escape when we know we can't resolve all citation references
+		# because citation keys exist that bibtex cannot find in the
+		# imported set of bibliographic data (*.bib) files.
+		missing_cites = cites - get_bbl_keys([master.ext("bbl")])
+		unless missing_cites.empty?
+			msg = "No bibliography data (*.bib) file contained these keys: "
+			msg += missing_cites.to_a.join(", ") + "\n"
+			raise msg
 		end
 	end
 
