@@ -85,13 +85,7 @@ def create_master_task(master)
 	# return stale data, as when a dependency has been deleted; for this run, we
 	# ignore errors.  This code accomplishes what -interaction nonstopmode
 	# advertises, but fails to do.
-	command = "pdflatex -draftmode -recorder -file-line-error #{master}"
-	IO.popen( command, "w+" ) do |pipe|
-		while line = pipe.gets
-			# This regex may not capture all error prompts.
-			pipe.puts "" if line =~ /^Enter|^\?/i
-		end
-	end
+	system "yes '' | pdflatex -draftmode -recorder -file-line-error #{master} > /dev/null"
 
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
