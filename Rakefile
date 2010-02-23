@@ -73,7 +73,8 @@ CLOBBER.include(
 		FIGURES - 
 		PREGENERATED_RESOURCES
 )
-MAX_LATEX_ITERATION = 10	# Prevents latex looping on reference resolution.
+# Prevent latex from diverging while resolving references.
+MAX_REFERENCE_RESOLUTIONS = 10
 
 
 task :default => :view
@@ -85,7 +86,8 @@ def create_master_task(master)
 	# return stale data, as when a dependency has been deleted; for this run, we
 	# ignore errors.  This code accomplishes what -interaction nonstopmode
 	# advertises, but fails to do.
-	system "yes '' | pdflatex -draftmode -recorder -file-line-error #{master} > /dev/null"
+	options = "-draftmode -recorder -file-line-error"
+	system "yes '' | pdflatex #{options} #{master} > /dev/null"
 
 	# The deps variable includes figures, sty, cls, and package files: anything
 	# latex reads when building the pdf.
@@ -122,24 +124,36 @@ def create_master_task(master)
 			exit 1
 		end
 
-		1.upto MAX_LATEX_ITERATION do 
-
-
-			# We can stop when LaTeX is certain it has resolved all references.
-			cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
-			break if `egrep -s '#{cross_ref_regex}' #{master.ext("log")}`.empty?
+		# Resolve references.
+		i = 1
+		prev_hash = `md5sum #{master}.log`
+		cross_ref_regex = "Rerun to get (citations|cross-references)"
+		while not `egrep -s '#{cross_ref_regex}' #{master.ext("log")}`.empty?
 
 			puts "Re-running latex to resolve references."
 			sh "pdflatex -interaction batchmode  #{master} > /dev/null"
+
+			# Break if the log file has not changed or we exceed our 
+			# resolution bound.
+			hash = `md5sum #{master}.log`
+			i += 1
+			break if i > MAX_REFERENCE_RESOLUTIONS or prev_hash == hash
+
+			prev_hash = hash
+
 		end
 		
-		# Early escape when we know we can't resolve all citation references
-		# because citation keys exist that bibtex cannot find in the
-		# imported set of bibliographic data (*.bib) files.
+		# Report citation keys that bibtex cannot find in the
+		# imported bibliographic data (*.bib files).
 		missing_cites = cites - get_bbl_keys([master.ext("bbl")])
 		unless missing_cites.empty?
-			msg = "No bibliography data (*.bib) file contained these keys: "
-			msg += missing_cites.to_a.join(", ") + "\n"
+			msg = "The following bibtex key" 
+				+ missing_cites.size > 1 ? "s" : ""
+			msg += " --- " + missing_cites.join(", ") 
+			msg += " --- " + (missing_cites.size > 1 ? "were" : "was")
+			msg += " not found in the imported file"
+				+ bibs.size > 1 ? "s" : ""
+			msg += ", " + bibs.join(", ") + ".\n"
 			raise msg
 		end
 	end
