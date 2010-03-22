@@ -105,7 +105,21 @@
 \newcommand{\infinity}{\infty}
 %}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Missing unicode chars, other brokenness in ucs/inputenc {{{1
+\DeclareUnicodeCharacter{183}{\cdot}						% ·
+\DeclareUnicodeCharacter{931}{\ensuremath\Sigma}			% Σ
+\DeclareUnicodeCharacter{9001}{\ensuremath\langle}			% 〈
+\DeclareUnicodeCharacter{9002}{\ensuremath\rangle}			% 〉
+\DeclareUnicodeCharacter{9608}{\ensuremath\blacksquare}		% █
+\DeclareUnicodeCharacter{1013}{\in}							% ϵ
+\DeclareUnicodeCharacter{8213}{---}							% ―
 
+\renewcommand{\textcent}{\cent}
+\renewcommand{\textcurrency}{\currency}
+\renewcommand{\textyen}{\yen}
+\renewcommand{\textbrokenbar}{\brokenvert}
+%}}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
