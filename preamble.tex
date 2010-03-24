@@ -20,8 +20,9 @@
 \usepackage{stmaryrd} %Additional math symbols.
 
 % These two let you use multibyte utf-8 characters, e.g. 03bb - λ 
-\usepackage{ucs}
+\usepackage[mathletters]{ucs}
 \usepackage[utf8x]{inputenc}
+\usepackage{wasysym}	% Defines \cent, \currency, \brokenvert
 
 % call this with optional  [turnoff] to turn off notes and todos
 \usepackage{todos}
@@ -109,7 +110,6 @@
 % Missing unicode chars, other brokenness in ucs/inputenc {{{1
 \DeclareUnicodeCharacter{183}{\cdot}						% ·
 \DeclareUnicodeCharacter{931}{\ensuremath\Sigma}			% Σ
-\DeclareUnicodeCharacter{916}{\ensuremath\Delta}			% Δ
 \DeclareUnicodeCharacter{9001}{\ensuremath\langle}			% 〈
 \DeclareUnicodeCharacter{9002}{\ensuremath\rangle}			% 〉
 \DeclareUnicodeCharacter{9608}{\ensuremath\blacksquare}		% █
