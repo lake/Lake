@@ -34,6 +34,7 @@ end
 
 # Implements the array usage of Dir::glob for older rubys (e.g. 1.8.5)
 def glob(pattern_array)
+	pattern_array = [pattern_array] unless pattern_array.is_a? Array
 	files = pattern_array.map{|s| Dir.glob(s)}.flatten
 	files & files
 end
