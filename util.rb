@@ -130,7 +130,7 @@ end
 def get_deps_bibs_cites master
 
 	unless File.exists? master.ext("fls") and File.exists? master.ext("aux")
-		raise "Missing #{master}.fls and #{master}.aux" 
+		raise "Missing #{master.ext("fls")} and #{master.ext("aux")}" 
 	end
 
 	# The variable deps includes packages, tex files, and figures; anything 
