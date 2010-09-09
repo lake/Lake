@@ -10,16 +10,6 @@ require File.join(__DIR__, 'latex_errors')
 
 verbose(false) # Quiet the chatty shell commands.
 
-# We use all of these latex options, except
-# -draftmode : don't write a pdf or load graphics files, but check that
-#			   they exist.
-# which we use to refresh fls and aux files prior to a rendering build.
-$LATEX_OPTS = '
-	-interaction batchmode  # be quiet and avoid interaction mode on error
-	-recorder				# record files read and written during a build
-	-file-line-error		# output both file and line number on error
-'.gsub(/\s+(#.*\n)?\s*/," ").strip
-
 if ENV['TEXINPUTS'].nil? or  ENV['TEXINPUTS'].empty?
 	ENV['TEXINPUTS'] = "#{__DIR__}/packages/todos/::"
 else
@@ -91,11 +81,16 @@ task :default => :view
 
 def create_master_task(master)
 
-	# Always regenerate the fls and aux files.
-	system "pdflatex -draftmode #{$LATEX_OPTS} #{master} > /dev/null"
-	if not $?.success?
-		errors = parse_log( File.read( master.ext( "log" )))
-		puts errors.join( "\n\n" ) and exit 1
+	# Always refresh the fls and aux files so that get_deps_bibs_cites does not
+	# return stale data, as when a dependency has been deleted; for this run, we
+	# ignore errors.  This code accomplishes what -interaction nonstopmode
+	# advertises, but fails to do.
+	command = "pdflatex -draftmode -recorder -file-line-error #{master}"
+	IO.popen( command, "w+" ) do |pipe|
+		while line = pipe.gets
+			# This regex may not capture all error prompts.
+			pipe.puts "" if line =~ /^Enter|^\?/i
+		end
 	end
 
 	# The deps variable includes figures, sty, cls, and package files: anything
@@ -109,74 +104,49 @@ def create_master_task(master)
 
 	file master.ext('pdf') => deps + bibs + FIGURES + PREGENERATED_RESOURCES do
 
-		# At least one of the dependencies is newer, so run latex.
-		puts "Running pdflatex..."
-		sh "pdflatex #{$LATEX_OPTS} #{master} > /dev/null"
-
-		# Now that pdflatex has run, we extract the set of bib_files and 
-		# bib_cites from the aux file, if it exists. 
-		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
-
-		# We want running bibtex to essentially be stateless. We run bibtex iff:
-		#   a) any .bib file used by master is newer than master.bbl (or 
-		#      there is a .bib and master.bbl doesn't exist)
-		#   b) there is a cite in master.aux that is not in master.bbl but 
-		#      *is* in a bib file included by master.aux
-		bib_keys = get_bib_keys bibs
-		bbl_keys = get_bbl_keys [master.ext("bbl")]
-	
-		# Run if cite added to a tex file.
-		run_bibtex = !((cites - bbl_keys) & bib_keys).empty?
-
-		# Run bibtex if the set of bibs or cites has changed or if any bib file
-		# has changed since the last bbl was built.
-		run_bibtex |= (
-			(file master.ext("bbl") => bibs).needed?
-		) unless bibs.empty?
-
-		# If there are no cites in the paper, then don't run bibtex.
-		run_bibtex &= !cites.empty?
-
 		# Run bibtex, if a bib file OR the set of cites has changed.
-		if run_bibtex
-			# -min-crossrefs=100 essentially turns off cross referencing.  Not
-			# sure why one wouldn't just take the default of 2.
-			sh "bibtex -terse -min-crossrefs=100 #{master}"
-			# Always run pdflatex at least once after a bibtex since 
-			# we ran it for a reason.
-			sh "pdflatex #{$LATEX_OPTS} #{master}"
+		if run_bibtex?( bibs, cites, master )
+			# -min-crossrefs=100 essentially turns off cross referencing.
+			# Not sure why one wouldn't just take the default of 2.
+			sh "bibtex -terse -min-crossrefs=100 #{master}" 
 		end
 
-		prev_missing_cites = []
+		options = [
+			# be quiet and avoid interaction mode on error
+			"-interaction batchmode",  
+			# record files read and written during a build
+			"-recorder",		  
+			# output both file and line number on error
+			"-file-line-error"	  
+		]
+
+		# At least one of the dependencies is newer, so run latex.
+		puts "Running pdflatex..."
+		system "pdflatex #{options.join( " " )} #{master} > /dev/null"
+		if not $?.success?
+			puts parse_log( File.read( master.ext( "log" ))).join( "\n\n" ) 
+			exit 1
+		end
+
 		1.upto MAX_LATEX_ITERATION do 
 
-			# Early escape when we know we can't resolve all citation references
-			# because of missing citations.
-			missing_cites = cites - get_bbl_keys([master.ext("bbl")])
-			missing_cites = (
-				`egrep -s "I didn't find a database entry for " *.blg`.
-					collect {|l| l.split(' ').last }
-			)
-			unless missing_cites.empty?
-				if missing_cites == prev_missing_cites \
-						&& !prev_missing_cites.empty?
-					msg = "Missing the following citations. "
-					msg += "See warnings in pdflatex output.\n" 
-					puts(msg + missing_cites.to_a.join(", "))
-					break
-				else
-					prev_missing_cites = missing_cites
-				end
-			end
 
 			# We can stop when LaTeX is certain it has resolved all references.
 			cross_ref_regex = "Rerun (LaTeX|to get cross-references right)"
-			cit_regex = "LaTeX Warning: Citation .* on page .* undefined"
-			regex = "((#{cross_ref_regex})|(#{cit_regex}))"
-			break if `egrep -s '#{regex}' #{master.ext("log")}`.empty?
+			break if `egrep -s '#{cross_ref_regex}' #{master.ext("log")}`.empty?
 
 			puts "Re-running latex to resolve references."
-			sh "pdflatex #{$LATEX_OPTS} #{master}"
+			sh "pdflatex -interaction batchmode  #{master} > /dev/null"
+		end
+		
+		# Early escape when we know we can't resolve all citation references
+		# because citation keys exist that bibtex cannot find in the
+		# imported set of bibliographic data (*.bib) files.
+		missing_cites = cites - get_bbl_keys([master.ext("bbl")])
+		unless missing_cites.empty?
+			msg = "No bibliography data (*.bib) file contained these keys: "
+			msg += missing_cites.to_a.join(", ") + "\n"
+			raise msg
 		end
 	end
 
@@ -218,8 +188,8 @@ task :figures => FIGURES
 
 rule '.tex' => ['.fig'] do |t|
 	pdf_name = t.name.gsub /\.\w*$/, '.pdf'
-	sh "fig2dev -Lpdftex -p0 #{t.source} > #{pdf_name}"
-	sh "fig2dev -Lpdftex_t -p#{pdf_name} #{t.source} > #{t.name}"
+	sh "fig2dev -Lpdftex -p0 #{t.source} > #{pdf_name} 2> /dev/null"
+	sh "fig2dev -Lpdftex_t -p#{pdf_name} #{t.source} > #{t.name} 2> /dev/null"
 end
 
 rule '.pdf' => ['.eps'] do |t|
