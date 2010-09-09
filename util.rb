@@ -142,10 +142,10 @@ def get_deps_bibs_cites master
 	# master.aux, which would, in turn, trigger a new build, ad infinitum.  To
 	# prevent this, we separate latex' output files from its input files. 
 	outputs = `grep OUTPUT #{master.ext("fls")}`.split("\n").map do |line|
-		line.split(" ")[1]
+		line.split(" ", 2)[1]
 	end
 	deps += `grep INPUT #{master.ext("fls")}`.split("\n").map do |line| 
-		line.split(" ")[1]
+		line.split(" ", 2)[1]
 	end.reject{|f| outputs.include? f}
 
 	# Parse master.aux to determine its bib dependencies.

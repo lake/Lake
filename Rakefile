@@ -86,7 +86,7 @@ def create_master_task(master)
 	# return stale data, as when a dependency has been deleted; for this run, we
 	# ignore errors.  This code accomplishes what -interaction nonstopmode
 	# advertises, but fails to do.
-	command = "pdflatex -draftmode -recorder -file-line-error #{master}"
+	command = "pdflatex -draftmode -recorder -file-line-error '#{master}'"
 	IO.popen( command, "w+" ) do |pipe|
 		while line = pipe.gets
 			# This regex may not capture all error prompts.
@@ -109,7 +109,7 @@ def create_master_task(master)
 		if run_bibtex?( bibs, cites, master )
 			# -min-crossrefs=100 essentially turns off cross referencing.
 			# Not sure why one wouldn't just take the default of 2.
-			sh "bibtex -terse -min-crossrefs=100 #{master}" 
+			sh "bibtex -terse -min-crossrefs=100 '#{master}'" 
 		end
 
 		options = [
@@ -123,7 +123,7 @@ def create_master_task(master)
 
 		# At least one of the dependencies is newer, so run latex.
 		puts "Running pdflatex..."
-		system "pdflatex #{options.join( " " )} #{master} > /dev/null"
+		system "pdflatex #{options.join( " " )} '#{master}' > /dev/null"
 		if not $?.success?
 			puts parse_log( File.read( master.ext( "log" ))).join( "\n\n" ) 
 			exit 1
@@ -131,16 +131,16 @@ def create_master_task(master)
 
 		# Resolve references.
 		i = 1
-		prev_hash = `md5sum #{master}.log`
+		prev_hash = `md5sum '#{master}.log'`
 		cross_ref_regex = "Rerun to get (citations|cross-references)"
-		while not `egrep -s '#{cross_ref_regex}' #{master.ext("log")}`.empty?
+		while not `egrep -s '#{cross_ref_regex}' '#{master.ext("log")}'`.empty?
 
 			puts "Re-running latex to resolve references."
-			sh "pdflatex -interaction batchmode  #{master} > /dev/null"
+			sh "pdflatex -interaction batchmode  '#{master}' > /dev/null"
 
 			# Break if the log file has not changed or we exceed our 
 			# resolution bound.
-			hash = `md5sum #{master}.log`
+			hash = `md5sum '#{master}.log'`
 			i += 1
 			break if i > MAX_REFERENCE_RESOLUTIONS or prev_hash == hash
 
