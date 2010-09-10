@@ -129,31 +129,57 @@ end
 # Determine master's exact dependencies from its fls and aux files.
 def get_deps_bibs_cites master
 
-	# The variable deps will include packages, tex files, figures, anything
-	# that is read by latex to build the pdf.
+	unless File.exists? master.ext("fls") and File.exists? master.ext("aux")
+		raise "Missing #{master.ext("fls")} and #{master.ext("aux")}" 
+	end
+
+	# The variable deps includes packages, tex files, and figures; anything 
+	# that latex reads to build the pdf.
 	deps, bibs, cites = [master.ext("tex")], [], []
 
-	# Parse master.fls if it exists.
-	if File.exists? master.ext("fls")
-		# Latex both inputs and outputs aux files, so if master.pdf depended on
-		# master.aux, then each build would output a new master.aux, which
-		# would, in turn, trigger a new build, ad infinitum.  To prevent this,
-		# we separate latex' output files from its input files. 
-		outputs = `grep OUTPUT #{master.ext("fls")}`.split("\n").map do |line|
-			line.split(" ")[1]
-		end
-		deps += `grep INPUT #{master.ext("fls")}`.split("\n").map do |line| 
-			line.split(" ")[1]
-		end.reject{|f| outputs.include? f}
+	# Parse master.fls.  Latex both inputs and outputs aux files, so if
+	# master.pdf depended on master.aux, then each build would output a new
+	# master.aux, which would, in turn, trigger a new build, ad infinitum.  To
+	# prevent this, we separate latex' output files from its input files. 
+	outputs = `grep OUTPUT #{master.ext("fls")}`.split("\n").map do |line|
+		line.split(" ", 2)[1]
 	end
+	deps += `grep INPUT #{master.ext("fls")}`.split("\n").map do |line| 
+		line.split(" ", 2)[1]
+	end.reject{|f| outputs.include? f}
 
-	# If master.aux, exists parse it to determine its bib dependencies.
-	if File.exists? master.ext("aux")
-		bibs, cites = traverse_aux_file_tree [master.ext("aux")]
-	end
+	# Parse master.aux to determine its bib dependencies.
+	bibs, cites = traverse_aux_file_tree [master.ext("aux")]
+
+	raise "There are cites, but no bib files." if bibs.empty? and !cites.empty?
 
 	return [deps, bibs, cites].map{|x| x.uniq}
 end
+
+def run_bibtex? bibs, cites, master
+
+	# If there is no bibliography or no cites, don't run bibtex.
+	return false if bibs.nil? or bibs.empty? or cites.nil? or cites.empty?
+
+	# We want running bibtex to essentially be stateless. We run bibtex iff:
+	#   a) any .bib file used by master is newer than master.bbl (or 
+	#      there is a .bib and master.bbl doesn't exist)
+	#   b) there is a cite in master.aux that is not in master.bbl but 
+	#      *is* in a bib file included by master.aux
+	bib_keys = get_bib_keys bibs
+	bbl_keys = get_bbl_keys [master.ext("bbl")]
+
+	# Run if cite added to a tex file.
+	run_bibtex = !((cites - bbl_keys) & bib_keys).empty?
+
+	# Run bibtex if the set of bibs or cites has changed or if any bib file
+	# has changed since the last bbl was built.
+	run_bibtex |= (file master.ext("bbl") => bibs).needed?
+
+	run_bibtex
+end
+
+
 
 # The following code block defines a default pdf viewer.  The viewer method
 # may be overridden in a local Rakefile, created by copying Rakefile.local.
