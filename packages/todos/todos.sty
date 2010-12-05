@@ -18,10 +18,15 @@
 \ExecuteOptions{turnon}
 \ProcessOptions\relax
 
+% This command takes a key value pair drawn from {todos,notes,all} x {on,off}.
+% For example, one will typically issue \todoset{all=off}.
 \newcommand{\todoset}[1]{
 \kvsetkeys{todos}{#1}
 }
 
+% Change parser so it no longer treats @ as special so we can call
+% kv@set@family#handler.  The kvsetkeys package is documented at
+% http://www.tex.ac.uk/tex-archive/macros/latex/contrib/oberdiek/kvsetkeys.pdf
 \makeatletter
 \kv@set@family@handler{todos}{
 \ifthenelse{\equal{#1}{todos} \OR \equal{#1}{notes} \OR \equal{#1}{all}}{}{\PackageError{todos}{Unknown todoset argument #1 (options are todos, notes, all)}}
