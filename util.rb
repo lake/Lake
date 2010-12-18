@@ -81,7 +81,7 @@ def parse_aux_file aux_file
 		bibs += line[/^\\bibdata\{(.*)\}/, 1].split(",").map do |b|
 			b.strip.ext "bib"
 		end if line =~ /^\\bibdata/
-		cites << line[/\{(.*)\}/, 1] if line =~ /^\\citation/
+		cites << line[/\{(.*)\}/, 1].split(",") if line =~ /^\\citation/
 		includes << line[/\{(.*)\}/, 1] if line =~ /^\\@input/
 	end if File.exists?(aux_file)
 	return [bibs, cites, includes]
