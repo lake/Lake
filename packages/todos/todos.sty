@@ -1,16 +1,47 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{todos}
 
-\RequirePackage{ifthen,color}
+\RequirePackage{ifthen,color,kvsetkeys}
+
 
 \newif\ifTurnedOff
 
+\newif\ifNotesOn
+\newif\ifTodosOn
+
+\NotesOntrue
+\TodosOntrue
 
 \DeclareOption{turnoff}{\TurnedOfftrue}
 \DeclareOption{turnon}{\TurnedOfffalse}
 \DeclareOption*{\PackageError{notes}{Unknown option '\CurrentOption'.}}
 \ExecuteOptions{turnon}
 \ProcessOptions\relax
+
+% This command takes a key value pair drawn from {todos,notes,all} x {on,off}.
+% For example, one will typically issue \todoset{all=off}.
+\newcommand{\todoset}[1]{
+\kvsetkeys{todos}{#1}
+}
+
+% Change parser so it no longer treats @ as special so we can call
+% kv@set@family#handler.  The kvsetkeys package is documented at
+% http://www.tex.ac.uk/tex-archive/macros/latex/contrib/oberdiek/kvsetkeys.pdf
+\makeatletter
+\kv@set@family@handler{todos}{
+\ifthenelse{\equal{#1}{todos} \OR \equal{#1}{notes} \OR \equal{#1}{all}}{}{\PackageError{todos}{Unknown todoset argument #1 (options are todos, notes, all)}}
+\ifthenelse{\equal{#2}{on} \OR \equal{#2}{off}}{}{\PackageError{todos}{Unknown todoset value #2 (options are on and off)}}
+\ifthenelse{\equal{#1}{todos}}
+	{\ifthenelse{\equal{#2}{on}}{\TodosOntrue}{\TodosOnfalse}}
+	{}
+\ifthenelse{\equal{#1}{notes}}
+	{\ifthenelse{\equal{#2}{on}}{\NotesOntrue}{\NotesOnFalse}}
+	{}
+\ifthenelse{\equal{#1}{all}}
+	{\ifthenelse{\equal{#2}{on}}{\TodosOntrue \NotesOntrue}{\TodosOnfalse \NotesOnfalse}}
+	{}
+}
+\makeatother
 
 
 \ifTurnedOff
@@ -83,12 +114,15 @@
 
 %drat... comment was already taken, so we use note instead
 \newcommand{\note}[2][\relax]{%
+\ifNotesOn%
 \noindent%
 \ifx #1\relax%
 {\em\small\color{Gray}{\bf note:} #2}%
 \else%
 \DefineNameCol{#1}%
 {\em\small\GetNameCol{#1}{\bf #1:} #2}%
+\fi%
+\else%
 \fi%
 }
 
@@ -100,14 +134,25 @@
 
 %code for the list of todos
 \makeatletter
-\newcommand \listoftodos{\section*{Todo list} \@starttoc{todo}}
-\newcommand\l@todo[2]
-{\par\noindent{}#1 (\textit{Page #2}) \par}
+\newcommand \listoftodos{%
+\ifTodosOn%
+\section*{Todo list} \@starttoc{todo}%
+\else%
+\fi%
+}
+
+\newcommand\l@todo[2]{%
+\ifTodosOn%
+\par\noindent{}#1 (\textit{Page #2}) \par%
+\else%
+\fi%
+}
 \makeatother
 
 %code for inserting the todo and adding it to the list
 \newcounter{TodoCounter}[section]
 \newcommand{\todo}[2][]{%
+\ifTodosOn%
 \stepcounter{TodoCounter}%
 \ifx #1 #1
 {\em\color{red}\textbf{Todo \arabic{section}-\arabic{TodoCounter}:} #2}%
@@ -116,13 +161,18 @@
 {\em\color{red}\textbf{Todo \arabic{section}-\arabic{TodoCounter} (for #1):} #2}%
 \addcontentsline{todo}{todo}{\textbf{\arabic{section}-\arabic{TodoCounter} #1:} \protect{#2}}%
 \fi%
+\else%
+\fi%
 }
 
 \newcommand{\findref}[1]{%
+\ifTodosOn%
 \stepcounter{TodoCounter}%
 \noindent%
 {\em\small\color{red}({\bf Todo \arabic{section}-\arabic{TodoCounter} Find Ref: } #1)}%
 \addcontentsline{todo}{todo}{\textbf{\arabic{section}-\arabic{TodoCounter} Find Reference:} \protect{#1}}%
+\else%
+\fi%
 }
 
 \fi
