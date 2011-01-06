@@ -132,7 +132,8 @@ def create_master_task(master)
 		# Resolve references.
 		i = 1
 		prev_hash = `md5sum '#{master}.log'`
-		cross_ref_regex = "Rerun to get (citations|cross-references)"
+		cross_ref_regex = "(Rerun to get (citations|cross-references)"
+		cross_ref_regex += "|Citation.*undefined)"
 		while not `egrep -s '#{cross_ref_regex}' '#{master.ext("log")}'`.empty?
 
 			puts "Re-running latex to resolve references."
