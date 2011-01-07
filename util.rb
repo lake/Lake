@@ -122,8 +122,9 @@ end
 # get a list of all bib entries in a list of .bbl files
 def get_bbl_keys bbls
     keys = []
+    bibitem_regex = /^\\bibitem(?:\[.*?\])*?\{([^}\n]+)\}/m
     bbls.select{ |x| File.exists? x}.each do |bbl|
-        File.read(bbl).scan(/\\bibitem\{([^}]+)\}/) { |x| keys << x[0] }
+        File.read(bbl).scan(bibitem_regex) { |x| keys << x[0] }
     end
     return keys.uniq
 end
