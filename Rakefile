@@ -153,12 +153,12 @@ def create_master_task(master)
 		# imported bibliographic data (*.bib files).
 		missing_cites = cites - get_bbl_keys([master.ext("bbl")])
 		unless missing_cites.empty?
-			msg = "The following bibtex key" 
-				+ missing_cites.size > 1 ? "s" : ""
+			msg = "The following bibtex key" \
+				+ (missing_cites.size > 1 ? "s" : "")
 			msg += " --- " + missing_cites.join(", ") 
 			msg += " --- " + (missing_cites.size > 1 ? "were" : "was")
-			msg += " not found in the imported file"
-				+ bibs.size > 1 ? "s" : ""
+			msg += " not found in the imported file" \
+				+ (bibs.size > 1 ? "s" : "")
 			msg += ", " + bibs.join(", ") + ".\n"
 			raise msg
 		end
