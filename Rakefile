@@ -18,7 +18,7 @@ end
 
 TEX_FILES = FileList['*.tex']
 MASTER_TEX_FILE_ROOTS = TEX_FILES.map do |f|
-	f.chomp('.tex') unless `grep '^[:space:]*\\\\begin{document}' #{f}`.empty?
+	f.chomp('.tex') unless `grep '^[[:space:]]*\\\\begin{document}' #{f}`.empty?
 end.compact
 error '
 	No master (la)tex documents found:  no tex file contains \begin{document}.
