@@ -1,5 +1,5 @@
 % chi2012.cls
-% Manas Tungare October 19, 2010.
+% Jean-Daniel Fekete, August 28, 2011.
 %
 % ---- Start of example  ----
 %
@@ -32,6 +32,9 @@
 %
 % ---- Start of 'updates'  ----
 %
+% Fixed the format to match the Word template and added a \teaser
+% command to add a teaser image.
+%
 % Allowance made to switch default fonts between those systems using
 % METAFONT and those using 'Type 1' or 'Truetype' fonts.
 % See LINE NUMBER 266 for details.
@@ -57,9 +60,9 @@
 %
 % ---- End of 'updates' ----
 %
-\def\fileversion{V0.15}          % for ACM's tracking purposes  % DLC
-\def\filedate{October 19, 2010}    % Gerry Murray's tracking data % DLC
-\def\docdate {Tuesday, 19th. October 2010} % Gerry Murray (with deltas to doc} % DLC
+\def\fileversion{V0.18}            % [jdf] for ACM's tracking purposes 
+\def\filedate{August, 28, 2011}    % [jdf] tracking data
+\def\docdate {Thursday, August 28th 2011} % [jdf] 
 \usepackage{epsfig}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -123,7 +126,8 @@
 %%%     dvips -e 0 foo.dvi >foo.ps
 %%%
 
-\typeout{Document Class `chi2012' <6 June 2011>. Updated for CHI 2012 by William Hudson.} % DLC
+\typeout{Document Class `chi2012' <August, 23, 2011>. Updated for CHI 2012
+  by William Hudson and Jean-Daniel Fekete.} % DLC
 \typeout{Document Class `chi2011' <October 19, 2010>. Tweaked by Manas Tungare.} % DLC
 \typeout{Shamelessly copied from}
 \typeout{`chiproceedings' <7th Sep. '00>. Modified by Jan O. Borchers}        % DLC
@@ -132,8 +136,8 @@
 \typeout{Excerpts were taken from (Journal Style) 'esub2acm.cls'.}
 % \typeout{****** Bugs/comments/suggestions to Manas Tungare -- manas@tungare.name ******} %DLC
 
-\oddsidemargin 4.5pc
-\evensidemargin 4.5pc
+\oddsidemargin 1.9cm            % [jdf] stick to CHI Formating Guidelines
+\evensidemargin 1.9cm           % [jdf] idem
 \advance\oddsidemargin by -1in  % Correct for LaTeX gratuitousness
 \advance\evensidemargin by -1in % Correct for LaTeX gratuitousness
 \marginparwidth 0pt             % Margin pars are not allowed.
@@ -141,7 +145,7 @@
                                 % marginal note
 
                                 % Top of page:
-\topmargin 4.5pc                % Nominal distance from top of page to top of
+\topmargin 2.2cm                % [jdf] stick to CHI Formating Guidelines
 %\topmargin 6.5pc                % Nominal distance from top of page to top of  % 00-09-07 job (for A4)
                                 % box containing running head.
 \advance\topmargin by -1in      % Correct for LaTeX gratuitousness
@@ -161,10 +165,10 @@
 \headheight 12pt                % Height of box containing running head.
 \headsep 25pt                   % Space between running head and text.
 
-\textheight 666pt       % 9 1/4 column height
-\textwidth 42pc         % Width of text line.
+\textheight 23cm        % [jdf] stick to CHI Formating Guidelines
+\textwidth 18cm         % [jdf] stick to CHI Formating Guidelines
                         % For two-column mode:
-\columnsep 2pc          %    Space between columns
+\columnsep 8.5mm        % [jdf] stick to CHI Formating Guidelines
 \columnseprule 0pt      %    Width of rule between columns.
 \hfuzz 1pt              % Allow some variation in column width, otherwise it's
                         % too hard to typeset in narrow columns.
@@ -214,6 +218,12 @@
                                  % \parskip and \topsep, added when user
                                  % leaves blank line before environment.
 \partopsep 0pt                                                              % 00-09-07 job
+
+\doublehyphendemerits=9999        % No consecutive line hyphens
+\brokenpenalty=9999               % No broken words across pages
+\widowpenalty=9999                % Almost no widows at bottom of page
+\clubpenalty=9999                 % Almost no orphans at top of page
+\interfootnotelinepenalty=9999    % Almost never break footnotes
 
 \@lowpenalty   51       % Produced by \nopagebreak[1] or \nolinebreak[1]
 \@medpenalty  151       % Produced by \nopagebreak[2] or \nolinebreak[2]
@@ -271,8 +281,6 @@
 \newdimen\allauboxes
 \allauboxes=\auwidth
 \newtoks\addauthors
-\newcount\addauflag
-\global\addauflag=0 %Haven't shown additional authors yet
 
 \newtoks\subtitletext
 \gdef\subtitle#1{\subtitletext={#1}}
@@ -280,17 +288,20 @@
 \gdef\additionalauthors#1{\addauthors={#1}}
 
 \gdef\numberofauthors#1{\global\aucount=#1
-\ifnum\aucount>3\global\originalaucount=\aucount \global\aucount=3\fi %g}
-\global\auskipcount=\aucount\global\advance\auskipcount by 1
+\ifnum\aucount>3\global\originalaucount=\aucount \global\aucount=3\fi%
+\global\auskipcount=\aucount\global\advance\auskipcount by -1 % [jdf] fix
 \global\multiply\auskipcount by 2
 \global\multiply\auskip by \auskipcount
 \global\advance\auwidth by -\auskip
-\global\divide\auwidth by \aucount}
+\global\divide\auwidth by \aucount
+\global\advance\auwidth by -5pt} % [jdf] tabular add some horizontal space
 
 % \and was modified to count the number of authors.  GKMT 12 Aug 1999
 \def\alignauthor{%                  % \begin{tabular}
-\end{tabular}%
-  \begin{tabular}[t]{p{\auwidth}}\centering}%
+  \end{tabular} %
+  \hskip 1pt % [jdf] allow break for more than 3 authors
+  \begin{tabular}[t]{p{\auwidth}}%
+    \centering\baselineskip 13pt}% [jdf] added more vertical spacing
 
 %  *** NOTE *** NOTE *** NOTE *** NOTE ***
 %  If you have 'font problems' then you may need
@@ -622,6 +633,15 @@
 \@namedef{table*}{\@dblfloat{table}}
 \@namedef{endtable*}{\end@dblfloat}
 
+% [jdf] create a \teaser command for adding a figure in title page
+\newcommand{\chi@empty}{}
+\newcommand{\chi@teaser}{}
+\newcommand{\teaser}[1]{\renewcommand{\chi@teaser}{#1}}
+
+\newlength{\teaserspace}
+\setlength{\teaserspace}{0.25in}
+%  [jdf] end teaser
+
 \newtoks\titleboxnotes
 \newcount\titleboxnoteflag
 
@@ -745,29 +765,35 @@
 
 % make aubox hsize/number of authors up to 3, less gutter
 % then showbox gutter showbox gutter showbox -- GKMT Aug 99
-\newbox\@acmtitlebox
+%\newbox\@acmtitlebox % [jdf] no use of the box
 \def\@maketitle{\newpage
  \null
- \setbox\@acmtitlebox\vbox{%
-\baselineskip 20pt
-\vskip 2em                   % Vertical space above title.
+% \setbox\@acmtitlebox\vbox{   % [jdf] box not used
+%\baselineskip 20pt            % [jdf] no skip
+  \vskip 1em                   % [jdf] removed Vertical space above title.
    \begin{center}
     {\ttlfnt \@title\par}       % Title set in 18pt Helvetica (Arial) bold size.
-%    \vskip 1.5em                % Vertical space after title.
-    \vskip 1ex                  % Vertical space after title. % 00-09-07 job
+    \vskip 0.5ex                % [jdf] Vertical space after title.
 %This should be the subtitle.
-{\subttlfnt \the\subtitletext\par}\vskip 1.25em%\fi
+{\subttlfnt \the\subtitletext\par}\vskip 0.7ex%\fi [jdf] less vertical space
     {\baselineskip 16pt\aufnt   % each author set in \12 pt Arial, in a
      \lineskip .5em             % tabular environment
      \begin{tabular}[t]{c}\@author
      \end{tabular}\par}
-    \vskip 1.5em               % Vertical space after author.
-   \end{center}}
- \dimen0=\ht\@acmtitlebox
+    \vskip 1em                  % [jdf] reduced Vertical space after author.
+   \end{center}%                % [jdf] begin add teaser
+   \ifx\chi@teaser\chi@empty \else%
+    \begingroup%
+      \def\@captype{figure}%
+        \chi@teaser%
+        \endgroup\par%
+        \vspace{\teaserspace}%  % [jdf] end teaser
+    \fi}
+% \dimen0=\ht\@acmtitlebox % [jdf] removed box stuff
 % \advance\dimen0 by -12.75pc\relax % Increased space for title box -- KBT
- \advance\dimen0 by -10.75pc\relax % Increased space for title box -- KBT  % 00-09-07 job (decreased)
- \unvbox\@acmtitlebox
- \ifdim\dimen0<0.0pt\relax\vskip-\dimen0\fi}
+% \advance\dimen0 by -8.75pc\relax % Increased space for title box -- KBT  % 00-09-07 job (decreased)
+% \unvbox\@acmtitlebox
+% \ifdim\dimen0<0.0pt\relax\vskip-\dimen0\fi}
 
 
 \newcount\titlenotecount
@@ -1125,8 +1151,8 @@
   \else
     \def\@svsechd{#4{\hskip #1\relax #5}}%
   \fi
-  \vskip -10.5pt  %gkmt, 7 jan 00 -- had been -14pt, now set to parskip
-  \@xsect{#3}\parskip=10.5pt} % within the starred section, parskip = leading 12 Jan 2000 gkmt
+  \vskip -6pt  % [jdf] less space between section as in the Word template
+  \@xsect{#3}\parskip=6pt} % [jdf] paragraph skip shorter
 
 
 \def\@sect#1#2#3#4#5#6[#7]#8{%
@@ -1160,7 +1186,7 @@
             \endgroup
         \endgroup
         \csname #1mark\endcsname{#7}%
-        \vskip -10.5pt  % -14pt gkmt, 11 aug 99 -- changed to -\parskip 11 Jan 2000
+        \vskip -6pt  % [jdf] less space between section as in the Word template
       \addcontentsline{toc}{#1}{%
             \ifnum #2>\c@secnumdepth \else
                 \protect\numberline{\csname the#1\endcsname}%
@@ -1186,7 +1212,7 @@
             }%
         }%
     \fi
-    \@xsect{#5}\parskip=10.5pt% within the section, parskip = leading 12 Jan 2000 gkmt
+    \@xsect{#5}\parskip=6pt% [jdf] shorter
 }
 \def\@xsect#1{%
     \@tempskipa #1\relax
@@ -1326,20 +1352,20 @@
     \@ifstar\@citeyear\@citeyear % changed from  "\@ifstart" 12 Jan 2000 gkmt
 }
 
-\def\@citenormal{%
+    \def\@citenormal{%
     \@ifnextchar [{\@tempswatrue\@citex;}
-                  {\@tempswafalse\@citex,[]}% was ; Gerry 2/24/00
+                  {\@tempswafalse\@citex[]}% GERRY FIX FOR BABEL 3/20/2009
 }
 \def\@citeyear{%
     \@ifnextchar [{\@tempswatrue\@citex,}%
-                  {\@tempswafalse\@citex,[]}%
+                  {\@tempswafalse\@citex[]}% GERRY FIX FOR BABEL 3/20/2009
 }
 \def\@citex#1[#2]#3{%
     \let\@citea\@empty
     \@cite{%
         \@for\@citeb:=#3\do{%
             \@citea
-            \def\@citea{#1 }%
+            \def\@citea{#1, }% 	% GERRY FIX FOR BABEL 3/20/2009 -- SO THAT YOU GET [1, 2] IN THE BODY TEXT
             \edef\@citeb{\expandafter\@iden\@citeb}%
             \if@filesw
                 \immediate\write\@auxout{\string\citation{\@citeb}}%
@@ -1356,10 +1382,11 @@
 }
 \let\@biblabel\@gobble
 \newdimen\bibindent
-\setcounter{enumi}{1}
 \bibindent=0em
+\newskip\bibsep % [jdf] allow bib space tweaking
+\bibsep 2pt \@plus 1pt \@minus 1pt % [jdf] initial spacing between ref entries
+\setcounter{enumi}{1}
 \def\thebibliography#1{%
-\ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
     \section{%
        {REFERENCES}
         \@mkboth{{\refname}}{{\refname}}%
@@ -1374,6 +1401,7 @@
         \itemindent -\bibindent
         \listparindent \itemindent
         \usecounter{enumi}
+        \itemsep\bibsep% [jdf] standard spacing between references
     }%
     \let\newblock\@empty
     \raggedright  %% 7 JAN 2000 gkmt
