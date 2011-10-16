@@ -3,7 +3,7 @@ require 'rake/clean'
 require 'rake'
 require 'set'
 
-__DIR__ = File.dirname( __FILE__)
+__DIR__ = File.expand_path( File.dirname( __FILE__) )
 
 require File.join(__DIR__, 'util')
 require File.join(__DIR__, 'latex_errors')
@@ -18,7 +18,7 @@ end
 
 TEX_FILES = FileList['*.tex']
 MASTER_TEX_FILE_ROOTS = TEX_FILES.map do |f|
-	f.chomp('.tex') unless `grep '^[:space:]*\\\\begin{document}' #{f}`.empty?
+	f.chomp('.tex') unless `grep '^[[:space:]]*\\\\begin{document}' #{f}`.empty?
 end.compact
 error '
 	No master (la)tex documents found:  no tex file contains \begin{document}.
