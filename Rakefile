@@ -3,10 +3,14 @@ require 'rake/clean'
 require 'rake'
 require 'set'
 
-__DIR__ = File.dirname( __FILE__)
+__DIR__ = File.expand_path( File.dirname( __FILE__) )
 
 require File.join(__DIR__, 'util')
 require File.join(__DIR__, 'latex_errors')
+
+# Ruby 1.9.x is sensitive to file encodings and errors when reading latex source
+# files, usually bibtex files, that contain non-ASCII characters.
+Encoding.default_external = "UTF-8"
 
 verbose(false) # Quiet the chatty shell commands.
 
