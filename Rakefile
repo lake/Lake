@@ -138,7 +138,7 @@ def create_master_task(master)
 
 		# Resolve references.
 		i = 1
-		prev_hash = `$MD5SUM '#{master}.log'`
+		prev_hash = `#{$MD5SUM} '#{master}.log'`
 		cross_ref_regex = "(Rerun to get (citations|cross-references)"
 		cross_ref_regex += "|Citation.*undefined)"
 		while not `egrep -s '#{cross_ref_regex}' '#{master.ext("log")}'`.empty?
@@ -148,7 +148,7 @@ def create_master_task(master)
 
 			# Break if the log file has not changed or we exceed our 
 			# resolution bound.
-			hash = `$MD5SUM '#{master}.log'`
+			hash = `#{$MD5SUM} '#{master}.log'`
 			i += 1
 			break if i > MAX_REFERENCE_RESOLUTIONS or prev_hash == hash
 
