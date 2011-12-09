@@ -10,7 +10,10 @@ require File.join(__DIR__, 'latex_errors')
 
 # Ruby 1.9.x is sensitive to file encodings and errors when reading latex source
 # files, usually bibtex files, that contain non-ASCII characters.
-Encoding.default_external = "UTF-8"
+Encoding.default_external = "UTF-8" if RUBY_VERSION =~ /1\.9\./
+
+$MD5SUM = `which md5sum`
+$MD5SUM = `which md5` if `uname` =~ /Darwin/
 
 verbose(false) # Quiet the chatty shell commands.
 
@@ -135,7 +138,7 @@ def create_master_task(master)
 
 		# Resolve references.
 		i = 1
-		prev_hash = `md5sum '#{master}.log'`
+		prev_hash = `$MD5SUM '#{master}.log'`
 		cross_ref_regex = "(Rerun to get (citations|cross-references)"
 		cross_ref_regex += "|Citation.*undefined)"
 		while not `egrep -s '#{cross_ref_regex}' '#{master.ext("log")}'`.empty?
@@ -145,7 +148,7 @@ def create_master_task(master)
 
 			# Break if the log file has not changed or we exceed our 
 			# resolution bound.
-			hash = `md5sum '#{master}.log'`
+			hash = `$MD5SUM '#{master}.log'`
 			i += 1
 			break if i > MAX_REFERENCE_RESOLUTIONS or prev_hash == hash
 
