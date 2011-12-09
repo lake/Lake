@@ -12,8 +12,8 @@ require File.join(__DIR__, 'latex_errors')
 # files, usually bibtex files, that contain non-ASCII characters.
 Encoding.default_external = "UTF-8" if RUBY_VERSION =~ /1\.9\./
 
-$MD5SUM = `which md5sum`
-$MD5SUM = `which md5` if `uname` =~ /Darwin/
+$MD5SUM = `which md5sum`.chomp
+$MD5SUM = `which md5`.chomp if `uname` =~ /Darwin/
 
 verbose(false) # Quiet the chatty shell commands.
 
