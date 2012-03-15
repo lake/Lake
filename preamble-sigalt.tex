@@ -2,7 +2,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-%\usepackage{amsthm} %incompatible with sig-alternate
+\usepackage{amsthm}
 \usepackage{url} % do I need this with hyperref?
 \usepackage{multicol}
 \usepackage{multirow}
@@ -14,12 +14,19 @@
 \usepackage{verbatim}
 \usepackage{float} % defines newfloat used below
 \usepackage{microtype}
-\usepackage{todos}
+\usepackage{mathptmx}
+\usepackage{stmaryrd} %Additional math symbols.
+\usepackage{textcomp}
+\usepackage[sort&compress]{natbib}
+\usepackage{todos} % Use \todoset{all=off} to turn off todos in a paper.
 \usepackage{fixltx2e} 
+\usepackage{booktabs}
+\usepackage{fancyhdr}
 
 % These two let you use multibyte utf-8 characters, e.g. 03bb - λ 
 \usepackage[mathletters]{ucs}
 \usepackage[utf8x]{inputenc}
+\usepackage{wasysym}	% Defines \cent, \currency, \brokenvert
 
 % hyperref redefines a number of macros, so it should be last.  Empirically,
 % doing so eliminates compiler warnings.
