@@ -1,5 +1,5 @@
 
-January 11, 2007
+March 5, 2007
 
 
 IEEEtran is the official LaTeX class for authors of the Institute of
@@ -19,12 +19,18 @@ website:
 
 http://www.michaelshell.org/tex/ieeetran/
 
-V1.7 is a significant update with many important changes. For a full list,
-please read the file changelog.txt. The most notable changes include:
+
+Version 1.7a is a bug fix release that corrects the two column peer
+review title page problem. This problem was not present in the 1.6 series.
+
+
+V1.7 is a significant update over the 1.6 series with many important
+changes. For a full list, please read the file changelog.txt. The most
+notable changes include:
 
  1. New class option compsoc to support the IEEE Computer Society format.
 
- 2. Several commands and environments have been depreciated in favor of
+ 2. Several commands and environments have been deprecated in favor of
     replacements with IEEE prefixes to better avoid potential future name
     clashes with other packages. Legacy code retained to allow the use of
     the obsolete forms (for now), but with a warning message to the console

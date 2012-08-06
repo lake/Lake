@@ -1,9 +1,21 @@
 
 
  Changelog history of the IEEEtran LaTeX class.
- 2007/01/11
+ 2007/03/05
  by Michael Shell (MDS)
  http://www.michaelshell.org/
+
+
+
+*******
+ 3/2007 V1.7a (MDS) changes:
+
+ 1) Corrected problem of unwanted two column peer review title page format.
+    Thanks to Virgilio Rodriguez for reporting this bug.
+
+ 2) "depreciated" -> "deprecated". Thanks to Virgilio Rodriguez for
+    suggesting this change.
+
 
 
 *******
@@ -32,7 +44,7 @@
     \newcommand{\CLASSINPUTinnersidemargin}{17mm}
     \newcommand{\CLASSINPUToutersidemargin}{11.647mm}
 
- 6) Several commands and environments have been depreciated in favor of
+ 6) Several commands and environments have been deprecated in favor of
     replacements with IEEE prefixes to better avoid potential future name
     clashes with other packages. Legacy code retained to allow the use of
     the obsolete forms (for now), but with a warning message to the console

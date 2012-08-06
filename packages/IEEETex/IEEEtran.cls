@@ -1,5 +1,5 @@
 %%
-%% IEEEtran.cls 2007/01/11 version V1.7
+%% IEEEtran.cls 2007/03/05 version V1.7a
 %% 
 %% 
 %% This is the official IEEE LaTeX class for authors of the Institute of 
@@ -191,7 +191,7 @@
 
 
 
-\ProvidesClass{IEEEtran}[2007/01/11 V1.7 by Michael Shell]
+\ProvidesClass{IEEEtran}[2007/03/05 V1.7a by Michael Shell]
 \typeout{-- See the "IEEEtran_HOWTO" manual for usage information.}
 \typeout{-- http://www.michaelshell.org/tex/ieeetran/}
 \NeedsTeXFormat{LaTeX2e}
@@ -292,10 +292,8 @@
 \DeclareOption{twoside}{\@twosidetrue\@mparswitchtrue
                         \CLASSOPTIONtwosidetrue\CLASSOPTIONonesidefalse}
 
-\DeclareOption{onecolumn}{\@twocolumnfalse
-                          \CLASSOPTIONonecolumntrue\CLASSOPTIONtwocolumnfalse}
-\DeclareOption{twocolumn}{\@twocolumntrue
-                          \CLASSOPTIONtwocolumntrue\CLASSOPTIONonecolumnfalse}
+\DeclareOption{onecolumn}{\CLASSOPTIONonecolumntrue\CLASSOPTIONtwocolumnfalse}
+\DeclareOption{twocolumn}{\CLASSOPTIONtwocolumntrue\CLASSOPTIONonecolumnfalse}
 
 % If the user selects draft, then this class AND any packages
 % will go into draft mode.
@@ -390,7 +388,7 @@
 
 
 % warn about the use of single column other than for draft mode
-\if@twocolumn\else%
+\ifCLASSOPTIONtwocolumn\else%
   \ifCLASSOPTIONdraftcls\else%
    \typeout{** ATTENTION: Single column mode is not typically used with IEEE publications.}%
   \fi%
@@ -3527,7 +3525,7 @@ between column types.}%
 % V1.6b define the \IEEEpeerreviewmaketitle as needed
 \ifCLASSOPTIONpeerreview
 \def\IEEEpeerreviewmaketitle{\@IEEEcleardoublepage{empty}%
-\if@twocolumn
+\ifCLASSOPTIONtwocolumn
 \twocolumn[\@IEEEpeerreviewmaketitle\@IEEEdynamictitlevspace]
 \else
 \newpage\@IEEEpeerreviewmaketitle\@IEEEstatictitlevskip
@@ -4004,10 +4002,10 @@ between column types.}%
 
 % standard book class behavior - let bottom line float up and down as
 % needed when single sided
-\if@twoside\else\raggedbottom\fi
+\ifCLASSOPTIONtwoside\else\raggedbottom\fi
 % if two column - turn on twocolumn, allow word spacings to stretch more and
 % enforce a rigid position for the last lines
-\if@twocolumn
+\ifCLASSOPTIONtwocolumn
 % the peer review option delays invoking twocolumn
    \ifCLASSOPTIONpeerreview\else
       \twocolumn
@@ -4649,7 +4647,7 @@ between column types.}%
 
 
 % hook to allow easy disabling of all legacy warnings
-\def\@IEEElegacywarn#1#2{\typeout{** ATTENTION: \@IEEEbackslash #1 is depreciated (line \the\inputlineno).
+\def\@IEEElegacywarn#1#2{\typeout{** ATTENTION: \@IEEEbackslash #1 is deprecated (line \the\inputlineno).
 Use \@IEEEbackslash #2 instead.}}
 
 
@@ -4688,7 +4686,7 @@ Use \@IEEEbackslash #2 instead.}}
 
 
 % let \proof use the IEEEtran version even after amsthm is loaded
-% \proof is now depreciated in favor of \IEEEproof
+% \proof is now deprecated in favor of \IEEEproof
 \AtBeginDocument{\def\proof{\@IEEElegacywarn{proof}{IEEEproof}\IEEEproof}\def\endproof{\endIEEEproof}}
 
 % V1.7 \overrideIEEEmargins is no longer supported.
