@@ -12,8 +12,13 @@ require File.join(__DIR__, 'latex_errors')
 # files, usually bibtex files, that contain non-ASCII characters.
 Encoding.default_external = "UTF-8" if RUBY_VERSION =~ /1\.9\./
 
-$MD5SUM = `which md5sum`.chomp
-$MD5SUM = `which md5`.chomp if `uname` =~ /Darwin/
+if `uname` =~ /Darwin/
+  $MD5SUM = `which md5`.chomp
+  $DIA="/Applications/Dia.app/Contents/Resources/bin/dia-cmd"
+else
+  $MD5SUM = `which md5sum`.chomp
+  $DIA = `which dia`.chomp
+ end
 
 verbose(false) # Quiet the chatty shell commands.
 
@@ -225,8 +230,10 @@ rule '.eps' => ['.dot'] do |t|
 	sh "dot #{t.source} -Tps > #{t.name}"
 end
 
-rule '.eps' => ['.dia'] do |t|
-	sh "dia -t eps #{t.source}"
+rule '.pdf' => ['.dia'] do |t|
+	sh "dia -t pdf #{t.source}"
+	sh "pdfcrop #{t.source.gsub(/dia/, 'tmp')} #{t.source.gsub(/dia/, 'pdf')}"
+	sh "rm #{t.source.gsub(/dia/, 'tmp')}"
 end
 
 # Figures/.foo.gnuplot-output => Figures/foo.gplot
