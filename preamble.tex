@@ -3,24 +3,24 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
-\usepackage{url} % do I need this with hyperref?
+%\usepackage{url} % do I need this with hyperref?
 \usepackage{multicol}
 \usepackage{multirow}
-\usepackage{setspace} % for double, 1.5, single spacing etc.
+%\usepackage{setspace} % for double, 1.5, single spacing etc.
 \usepackage{xspace}
 \usepackage{listings}
 \usepackage{ifthen}
 \usepackage{verbatim}
-\usepackage{float} % defines newfloat used below
+%\usepackage{float} % defines newfloat used below
 \usepackage{microtype}
 \usepackage{mathptmx}
 \usepackage{stmaryrd} %Additional math symbols.
 \usepackage{textcomp}
 \usepackage[sort&compress]{natbib} 
-\usepackage{todos} % Use \todoset{all=off} to turn off todos in a paper.
+%\usepackage{todos} % Use \todoset{all=off} to turn off todos in a paper.
 \usepackage{fixltx2e} 
 \usepackage{booktabs}
-\usepackage{fancyhdr}
+%\usepackage{fancyhdr}
 
 % These two let you use multibyte utf-8 characters, e.g. 03bb - λ 
 \usepackage[mathletters]{ucs}
@@ -29,37 +29,16 @@
 
 % hyperref redefines a number of macros, so it should be last.  Empirically,
 % doing so eliminates compiler warnings.
-\usepackage[bookmarks, colorlinks, citecolor=green, urlcolor=blue,
-			filecolor=blue, linkcolor=blue]{hyperref}
-% According to the hyperref readme, algorithm must follow hyperref
-\usepackage[noend]{algorithmic} % may not be installed
-\usepackage{algorithm}
+%\usepackage[bookmarks, colorlinks, citecolor=green, urlcolor=blue,
+%			filecolor=blue, linkcolor=blue]{hyperref}
+% According to the hyperref readme, algorithm must follow hyperref, but
+% since hyperref collides with so many packages, both must be included 
+% in the master document. 
+%\usepackage[noend]{algorithmic} % may not be installed
+%\usepackage{algorithm}
 
 % required for combined latex/pdf xfig figures
 \DeclareGraphicsRule{.pdftex}{pdf}{.pdftex}{} 
-
-
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% Macros																{{{1
-
-% English
-\newcommand{\cf}{\hbox{\emph{cf.}}\xspace}
-\newcommand{\deletia}{\ldots [deletia] \ldots}
-\newcommand{\etal}{\hbox{\emph{et al.}}\xspace}
-\newcommand{\eg}{\hbox{\emph{e.g.}}\xspace}
-\newcommand{\ie}{\hbox{\emph{i.e.}}\xspace}
-\newcommand{\scil}{\hbox{\emph{sc.}}\xspace} %scilicet: it is permitted to know
-\newcommand{\st}{\hbox{\emph{s.t.}}\xspace}
-\newcommand{\wrt}{\hbox{\emph{w.r.t.}}\xspace}
-\newcommand{\etc}{\hbox{\emph{etc.}}\xspace}
-\newcommand{\viz}{\hbox{\emph{viz.}}\xspace} %videlicet: it is permitted to see
-
-
-\newfloat{Protocol}{thp}{lop}
-\DeclareMathOperator{\cbar}{||} %denotes concurrency in protocol floats.
-\newfloat{Program}{thp}{lop}
-\newfloat{Procedure}{thp}{lop}
-
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % Theorems, etc.														{{{2
